@@ -20,7 +20,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif()
 
-if(VORTEX_BUILD_DOCS)
+if(HYDROGEN_BUILD_DOCS)
     find_package(Doxygen)
 
     if(Doxygen_FOUND)
@@ -59,6 +59,6 @@ add_subdirectory(extern/stb_image)
 
 add_subdirectory(src)
 
-if(VORTEX_BUILD_DEMO)
+if(HYDROGEN_BUILD_DEMO)
     add_subdirectory(apps)
 endif()
