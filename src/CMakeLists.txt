@@ -1,10 +1,12 @@
 set(HEADER_LIST
-    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Hydrogen.hpp")
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Hydrogen.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Platform.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Memory.hpp")
 
 set(SOURCE_LIST
-    test.cpp)
+    Core/Memory.cpp)
 
-add_library(Hydrogen ${HEADER_LIST} ${SOURCE_LIST})
+add_library(Hydrogen ${SOURCE_LIST} ${HEADER_LIST})
 
 target_include_directories(Hydrogen PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_compile_definitions(Hydrogen PRIVATE HY_EXPORT_API)
