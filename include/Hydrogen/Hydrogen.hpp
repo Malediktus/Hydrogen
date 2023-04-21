@@ -1,4 +1,5 @@
 #pragma once
 
-#include "Core/Core.hpp"
+#include "Core/Platform.hpp"
 #include "Core/Memory.hpp"
+#include "Core/Logger.hpp"

@@ -1,5 +1,6 @@
-#include <iostream>
+#include <Hydrogen/Hydrogen.hpp>
 
 int main() {
-    std::cout << "Hello world!\n";
+    Hydrogen::Logger logger("Test", Hydrogen::Logger::LogLevel::Debug);
+    logger.Warn("test");
 }

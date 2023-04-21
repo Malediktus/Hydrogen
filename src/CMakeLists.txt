@@ -1,10 +1,12 @@
 set(HEADER_LIST
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Hydrogen.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Platform.hpp"
-    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Memory.hpp")
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Memory.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Logger.hpp")
 
 set(SOURCE_LIST
-    Core/Memory.cpp)
+    Core/Memory.cpp
+    Core/Logger.cpp)
 
 add_library(Hydrogen ${SOURCE_LIST} ${HEADER_LIST})
 
@@ -20,5 +22,5 @@ else()
     target_compile_options(Hydrogen PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
-target_link_libraries(Hydrogen PRIVATE glfw Vulkan::Vulkan stb_image assimp spdlog::spdlog)
-target_link_libraries(Hydrogen PUBLIC glm TracyClient)
+target_link_libraries(Hydrogen PRIVATE glfw Vulkan::Vulkan stb_image assimp)
+target_link_libraries(Hydrogen PUBLIC spdlog::spdlog glm TracyClient)
