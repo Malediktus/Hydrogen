@@ -1,6 +1,23 @@
 #include <Hydrogen/Hydrogen.hpp>
 
-int main() {
-    Hydrogen::Logger logger("Test", Hydrogen::Logger::LogLevel::Debug);
-    logger.Warn("test");
+class DemoApplication : public Hydrogen::Application {
+public:
+    void OnSetup() override {
+        ApplicationInfo.Name = "Hydrogen Demo";
+        ApplicationInfo.Version = {1, 0, 0};
+    }
+
+    void OnInit() override {
+        Console->Debug("Started App");
+    }
+
+    void OnShutdown() override {
+    }
+
+    void OnUpdate() override {
+    }
+};
+
+Hydrogen::Reference<Hydrogen::Application> Hydrogen::CreateApplication() {
+    return Hydrogen::NewReference<DemoApplication>();
 }

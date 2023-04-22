@@ -2,11 +2,14 @@ set(HEADER_LIST
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Hydrogen.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Platform.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Memory.hpp"
-    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Logger.hpp")
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Logger.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Application.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Entry.hpp")
 
 set(SOURCE_LIST
     Core/Memory.cpp
-    Core/Logger.cpp)
+    Core/Logger.cpp
+    Core/Application.cpp)
 
 add_library(Hydrogen ${SOURCE_LIST} ${HEADER_LIST})
 
