@@ -34,4 +34,25 @@ public:
 private:
     Reference<spdlog::logger> m_Logger;
 };
+
+class SystemLogger {
+public:
+    static void Init() {
+        s_Logger = NewReference<Logger>("SYS", Logger::LogLevel::Trace);
+    }
+
+    static Reference<Logger> GetLogger() {
+        return s_Logger;
+    }
+
+private:
+    static Reference<Logger> s_Logger;
+};
+
+#define HY_LOG_TRACE(...) Hydrogen::SystemLogger::GetLogger()->Trace(__VA_ARGS__);
+#define HY_LOG_DEBUG(...) Hydrogen::SystemLogger::GetLogger()->Debug(__VA_ARGS__);
+#define HY_LOG_INFO(...) Hydrogen::SystemLogger::GetLogger()->Info(__VA_ARGS__);
+#define HY_LOG_WARN(...) Hydrogen::SystemLogger::GetLogger()->Warn(__VA_ARGS__);
+#define HY_LOG_ERROR(...) Hydrogen::SystemLogger::GetLogger()->Error(__VA_ARGS__);
+#define HY_LOG_FATAL(...) Hydrogen::SystemLogger::GetLogger()->Fatal(__VA_ARGS__);
 } // namespace Hydrogen

@@ -18,3 +18,5 @@ Logger::Logger(std::string name, LogLevel logLevel, std::string format, bool out
     m_Logger = NewReference<spdlog::logger>(name, begin(logSinks), end(logSinks));
     m_Logger->set_level((spdlog::level::level_enum) logLevel);
 }
+
+Reference<Logger> SystemLogger::s_Logger;
