@@ -24,3 +24,9 @@ void TaskManager::Update() {
         task->OnUpdate();
     }
 }
+
+void TaskManager::Shutdown() {
+    for (auto task : s_Tasks) {
+        task->OnDeactivate();
+    }
+}

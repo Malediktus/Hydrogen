@@ -1,5 +1,27 @@
 #include <Hydrogen/Hydrogen.hpp>
 
+class DemoTask : public Hydrogen::Task {
+public:
+    DemoTask(Hydrogen::Reference<Hydrogen::Logger> console) {
+        Console = console;
+    }
+
+    void OnActivate() override {
+        Console->Debug("Activate");
+    }
+
+    void OnUpdate() override {
+        Console->Debug("Update");
+    }
+
+    void OnDeactivate() override {
+        Console->Debug("Deactivate");
+    }
+
+private:
+    Hydrogen::Reference<Hydrogen::Logger> Console;
+};
+
 class DemoApplication : public Hydrogen::Application {
 public:
     void OnSetup() override {
@@ -9,6 +31,7 @@ public:
 
     void OnInit() override {
         Console->Debug("Started App");
+        m_DemoTask = Hydrogen::TaskManager::Activate(Hydrogen::NewReference<DemoTask>(Console));
     }
 
     void OnShutdown() override {
@@ -16,6 +39,9 @@ public:
 
     void OnUpdate() override {
     }
+
+private:
+    Hydrogen::Reference<Hydrogen::Task> m_DemoTask;
 };
 
 Hydrogen::Reference<Hydrogen::Application> Hydrogen::CreateApplication() {

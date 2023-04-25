@@ -19,6 +19,7 @@ public:
     static void Deactivate(Reference<Task> task);
 
     static void Update();
+    static void Shutdown();
 
 private:
     static std::vector<Reference<Task>> s_Tasks;
