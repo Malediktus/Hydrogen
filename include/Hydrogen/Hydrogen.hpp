@@ -6,3 +6,4 @@
 #include "Core/Application.hpp"
 #include "Core/Entry.hpp"
 #include "Core/Task.hpp"
+#include "Assets/Manager.hpp"

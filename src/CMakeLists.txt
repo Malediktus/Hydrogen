@@ -6,13 +6,15 @@ set(HEADER_LIST
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Application.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Entry.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Task.hpp"
-    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/UUID.hpp")
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/UUID.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Assets/Manager.hpp")
 
 set(SOURCE_LIST
     Core/Memory.cpp
     Core/Logger.cpp
     Core/Application.cpp
-    Core/Task.cpp)
+    Core/Task.cpp
+    Assets/Manager.cpp)
 
 add_library(Hydrogen ${SOURCE_LIST} ${HEADER_LIST})
 
