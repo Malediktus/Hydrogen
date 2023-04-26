@@ -40,6 +40,10 @@ public:
     void OnUpdate() override {
     }
 
+    void OnEvent(const Hydrogen::Event&) override {
+        Console->Debug("An event occured");
+    }
+
 private:
     Hydrogen::Reference<Hydrogen::Task> m_DemoTask;
 };

@@ -1,4 +1,4 @@
-#include <Hydrogen/Assets/Manager.hpp>
+#include <Hydrogen/Assets/AssetManager.hpp>
 
 using namespace Hydrogen;
 

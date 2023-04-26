@@ -2,6 +2,7 @@
 
 #include "Memory.hpp"
 #include "Logger.hpp"
+#include "../Event/EventManager.hpp"
 #include <string>
 #include <glm/glm.hpp>
 
@@ -16,6 +17,7 @@ public:
     virtual void OnInit() = 0;
     virtual void OnShutdown() = 0;
     virtual void OnUpdate() = 0;
+    virtual void OnEvent(const Event& event) = 0;
 
 protected:
     Reference<Logger> Console;

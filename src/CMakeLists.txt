@@ -7,14 +7,18 @@ set(HEADER_LIST
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Entry.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Task.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/UUID.hpp"
-    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Assets/Manager.hpp")
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Base.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Assets/AssetManager.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Event/EventManager.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Event/KeyCodes.hpp")
 
 set(SOURCE_LIST
     Core/Memory.cpp
     Core/Logger.cpp
     Core/Application.cpp
     Core/Task.cpp
-    Assets/Manager.cpp)
+    Assets/AssetManager.cpp
+    Event/EventManager.cpp)
 
 add_library(Hydrogen ${SOURCE_LIST} ${HEADER_LIST})
 
