@@ -11,7 +11,6 @@ public:
     }
 
     void OnUpdate() override {
-        Console->Debug("Update");
     }
 
     void OnDeactivate() override {
@@ -27,6 +26,7 @@ public:
     void OnSetup() override {
         ApplicationInfo.Name = "Hydrogen Demo";
         ApplicationInfo.Version = {1, 0, 0};
+        ApplicationInfo.WindowSize = {1080, 720};
     }
 
     void OnInit() override {

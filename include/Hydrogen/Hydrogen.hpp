@@ -6,6 +6,7 @@
 #include "Core/Application.hpp"
 #include "Core/Entry.hpp"
 #include "Core/Task.hpp"
+#include "Core/Window.hpp"
 #include "Assets/AssetManager.hpp"
 #include "Event/KeyCodes.hpp"
 #include "Event/EventManager.hpp"

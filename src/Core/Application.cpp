@@ -11,7 +11,9 @@ Application::Application() {
 
 void Application::Run() {
     AssetManager::Init();
+    AppWindow = Window::Create(ApplicationInfo.Name, ApplicationInfo.WindowSize.x, ApplicationInfo.WindowSize.y);
     OnInit();
+    // Register event callbacks
     EventDispatcher::Subscribe<WindowResizeEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
     EventDispatcher::Subscribe<WindowCloseEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
     EventDispatcher::Subscribe<KeyPressEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
@@ -21,10 +23,12 @@ void Application::Run() {
     EventDispatcher::Subscribe<MousePressEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
     EventDispatcher::Subscribe<MouseReleaseEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
     EventDispatcher::Subscribe<MouseScrollEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
-    // while (true) {
-    TaskManager::Update();
-    OnUpdate();
-    //}
+
+    while (!AppWindow->GetWindowClose()) {
+        TaskManager::Update();
+        OnUpdate();
+    }
+
     OnShutdown();
     TaskManager::Shutdown();
 }

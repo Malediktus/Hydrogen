@@ -8,17 +8,21 @@ set(HEADER_LIST
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Task.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/UUID.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Base.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Core/Window.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Assets/AssetManager.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Event/EventManager.hpp"
-    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Event/KeyCodes.hpp")
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Event/KeyCodes.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/MacOS/MacOSWindow.hpp")
 
 set(SOURCE_LIST
     Core/Memory.cpp
     Core/Logger.cpp
     Core/Application.cpp
     Core/Task.cpp
+    Core/Window.cpp
     Assets/AssetManager.cpp
-    Event/EventManager.cpp)
+    Event/EventManager.cpp
+    Platform/MacOS/MacOSWindow.cpp)
 
 add_library(Hydrogen ${SOURCE_LIST} ${HEADER_LIST})
 

@@ -2,7 +2,9 @@
 
 #include "Memory.hpp"
 #include "Logger.hpp"
+#include "Window.hpp"
 #include "../Event/EventManager.hpp"
+
 #include <string>
 #include <glm/glm.hpp>
 
@@ -21,9 +23,11 @@ public:
 
 protected:
     Reference<Logger> Console;
+    Reference<Window> AppWindow;
     struct _ApplicationInfo {
         std::string Name;
         glm::vec3 Version;
+        glm::vec2 WindowSize;
     } ApplicationInfo;
 };
 
