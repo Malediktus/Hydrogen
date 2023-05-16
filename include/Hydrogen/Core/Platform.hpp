@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 // Platform detection
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
     #define HY_PLATFORM_WINDOWS
@@ -118,3 +120,11 @@
 #if defined(__wasm__)
     #define HY_ARCH_WASM
 #endif
+
+namespace Hydrogen {
+enum class Platform { Windows, WindowsPC, XBoxOne, Unix, Apple, MacOS, IOS, Web, Android, Linux, DragonFlyBSD, FreeBSD, NetBSD, OpenBSD, AkarOS, Solaris, Playstation, Nintendo };
+
+std::string PlatformToString(Platform platform);
+Platform GetCurrentPlatform();
+inline std::string GetCurrentPlatformName();
+} // namespace Hydrogen

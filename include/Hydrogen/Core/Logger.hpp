@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Memory.hpp"
+#include "Assert.hpp"
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 #include <string>

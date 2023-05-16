@@ -1,11 +1,13 @@
 #include <Hydrogen/Platform/MacOS/MacOSWindow.hpp>
+#include <Hydrogen/Core/Logger.hpp>
 
 using namespace Hydrogen;
 
 MacOSWindow::MacOSWindow(const std::string& title, uint32_t width, uint32_t height) {
-    glfwInit(); // TODO: Check for errors
+    HY_ASSERT(glfwInit(), "Init glfw");
     glfwWindowHint(GLFW_NO_API, GLFW_TRUE);
-    m_Window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr); // TODO: Check for errors
+    m_Window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+    HY_ASSERT(m_Window, "glfw window is null");
 }
 
 MacOSWindow::~MacOSWindow() {

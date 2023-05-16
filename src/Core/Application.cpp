@@ -11,6 +11,7 @@ Application::Application() {
 
 void Application::Run() {
     AssetManager::Init();
+    OnSetup();
     AppWindow = Window::Create(ApplicationInfo.Name, ApplicationInfo.WindowSize.x, ApplicationInfo.WindowSize.y);
     OnInit();
     // Register event callbacks
