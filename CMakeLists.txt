@@ -86,6 +86,7 @@ set(ASSIMP_BUILD_MMD_IMPORTER OFF)
 set(SPDLOG_BUILD_EXAMPLES OFF)
 set(SPDLOG_BUILD_TESTS OFF)
 set(TRACY_BUILD_EXAMPLES OFF)
+set(VORTEX_BUILD_GLAD ON)
 
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
     set(TRACY_ENABLE ON)
@@ -103,6 +104,7 @@ add_subdirectory(extern/tracy)
 add_subdirectory(extern/spdlog)
 add_subdirectory(extern/assimp)
 add_subdirectory(extern/stb_image)
+add_subdirectory(extern/VortexRenderer)
 
 add_subdirectory(src)
 

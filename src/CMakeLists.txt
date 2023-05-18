@@ -42,4 +42,4 @@ else()
 endif()
 
 target_link_libraries(Hydrogen PRIVATE glfw Vulkan::Vulkan stb_image assimp)
-target_link_libraries(Hydrogen PUBLIC spdlog::spdlog glm TracyClient)
+target_link_libraries(Hydrogen PUBLIC spdlog::spdlog glm Vortex::Vortex)

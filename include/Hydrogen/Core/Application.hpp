@@ -29,6 +29,10 @@ protected:
         glm::vec3 Version;
         glm::vec2 WindowSize;
     } ApplicationInfo;
+
+private:
+    Reference<Vortex::Context> m_VortexContext;
+    Reference<Vortex::Renderer> m_WindowRenderer;
 };
 
 extern Reference<Application> CreateApplication();

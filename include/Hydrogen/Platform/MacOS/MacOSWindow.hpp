@@ -26,6 +26,11 @@ public:
     uint32_t GetMouseY() const override;
     glm::vec2 GetMousePos() const override;
 
+    void UpdateEvents() override;
+    void Render() override;
+
+    void SetupOpenglContext() override;
+
 private:
     GLFWwindow* m_Window;
 };

@@ -5,7 +5,19 @@ using namespace Hydrogen;
 
 MacOSWindow::MacOSWindow(const std::string& title, uint32_t width, uint32_t height) {
     HY_ASSERT(glfwInit(), "Init glfw");
+
+    auto api = Vortex::Window::ChooseRenderingAPI();
+
     glfwWindowHint(GLFW_NO_API, GLFW_TRUE);
+    if (api == Vortex::RendererAPI::API::OpenGL) {
+        glfwWindowHint(GLFW_SAMPLES, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    } else {
+        HY_INVOKE_ERROR("Only OpenGL is supported for now");
+    }
+
     m_Window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
     HY_ASSERT(m_Window, "glfw window is null");
 }
@@ -80,4 +92,16 @@ glm::vec2 MacOSWindow::GetMousePos() const {
     double x, y;
     glfwGetCursorPos(m_Window, &x, &y);
     return glm::vec2(x, y);
+}
+
+void MacOSWindow::UpdateEvents() {
+    glfwPollEvents();
+}
+
+void MacOSWindow::Render() {
+    glfwSwapBuffers(m_Window);
+}
+
+void MacOSWindow::SetupOpenglContext() {
+    glfwMakeContextCurrent(m_Window);
 }

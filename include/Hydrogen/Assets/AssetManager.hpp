@@ -43,6 +43,34 @@ public:
     }
 };
 
+class ShaderAsset : public Asset {
+public:
+    ShaderAsset() {
+        m_AssetInfo.Preload = true;
+    }
+
+    void Load(const std::string& filepath) override {
+        HY_LOG_DEBUG("Loading shader: {}", filepath);
+        m_VortexShader = Vortex::ShaderCreate(filepath);
+    }
+
+    const Reference<Vortex::Shader>& GetVortexShader() {
+        return m_VortexShader;
+    }
+
+    static const std::vector<const std::string> GetFileExtensions() {
+        return std::vector<const std::string> {".glsl"};
+    }
+
+    static bool CheckFileExtensions(const std::string& ext) {
+        auto exts = GetFileExtensions();
+        return std::find(exts.begin(), exts.end(), ext.c_str()) != exts.end();
+    }
+
+private:
+    Reference<Vortex::Shader> m_VortexShader;
+};
+
 class AssetManager {
 public:
     static void Init() {
@@ -61,29 +89,39 @@ public:
                 if (ref->GetInfo().Preload)
                     ref->Load(filenameString);
                 s_Assets[filenameString] = ref;
+            } else if (ShaderAsset::CheckFileExtensions(extension)) {
+                auto ref = NewReference<ShaderAsset>();
+                if (ref->GetInfo().Preload)
+                    ref->Load(filenameString);
+                s_Assets[filenameString] = ref;
             }
         }
     }
 
-    static Reference<Asset> Get(const std::string& filename) {
+    template <typename T> static Reference<T> Get(const std::string& filename) {
+        static_assert(std::is_base_of<Asset, T>::value, "T must be derived from Asset");
+
         if (s_Assets[filename])
-            return s_Assets[filename];
+            return std::dynamic_pointer_cast<T>(s_Assets[filename]);
 
         std::filesystem::path filepath(filename);
         if (!(std::filesystem::exists(filepath))) {
-            return s_Assets[filename];
+            return std::dynamic_pointer_cast<T>(s_Assets[filename]);
         }
 
         auto extension = filepath.extension().string();
         auto filenameString = filepath.string();
-        if (extension == ".png" || extension == ".jpg" || extension == ".bmp" || extension == ".tga" || extension == ".hdr") {
+        if (SpriteAsset::CheckFileExtensions(extension)) {
             auto ref = NewReference<SpriteAsset>();
-            if (ref->GetInfo().Preload)
-                ref->Load(filenameString);
+            ref->Load(filenameString);
+            s_Assets[filenameString] = ref;
+        } else if (ShaderAsset::CheckFileExtensions(extension)) {
+            auto ref = NewReference<ShaderAsset>();
+            ref->Load(filenameString);
             s_Assets[filenameString] = ref;
         }
 
-        return s_Assets[filenameString];
+        return std::dynamic_pointer_cast<T>(s_Assets[filenameString]);
     }
 
 private:

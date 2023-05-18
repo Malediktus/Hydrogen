@@ -1,5 +1,0 @@
-Filename: "test.txt"
-Extension: "txt"
-Type: "Text"
-Load: "Preload"
-Unload: "CountReference"

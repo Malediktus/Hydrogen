@@ -16,3 +16,6 @@
 [submodule "extern/tracy"]
 	path = extern/tracy
 	url = https://github.com/wolfpld/tracy
+[submodule "extern/VortexRenderer"]
+	path = extern/VortexRenderer
+	url = https://github.com/Malediktus/VortexRenderer

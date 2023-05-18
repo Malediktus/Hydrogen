@@ -6,7 +6,7 @@
 #include <glm/glm.hpp>
 
 namespace Hydrogen {
-class Window {
+class Window : public Vortex::Window {
 public:
     virtual ~Window() = default;
 
@@ -25,6 +25,9 @@ public:
     virtual uint32_t GetMouseX() const = 0;
     virtual uint32_t GetMouseY() const = 0;
     virtual glm::vec2 GetMousePos() const = 0;
+
+    virtual void UpdateEvents() = 0;
+    virtual void Render() = 0;
 
     static Reference<Window> Create(const std::string& title, uint32_t width, uint32_t height);
 };

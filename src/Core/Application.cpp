@@ -10,9 +10,25 @@ Application::Application() {
 }
 
 void Application::Run() {
-    AssetManager::Init();
     OnSetup();
     AppWindow = Window::Create(ApplicationInfo.Name, ApplicationInfo.WindowSize.x, ApplicationInfo.WindowSize.y);
+
+    Vortex::ProjectInformation vortexProject;
+    vortexProject.ProjectName = ApplicationInfo.Name;
+    vortexProject.ProjectVersion = ApplicationInfo.Version;
+
+    m_VortexContext = Vortex::ContextCreate(AppWindow, vortexProject);
+    m_VortexContext->Init();
+
+    Vortex::Renderer::SetContext(m_VortexContext);
+    Vortex::RenderCommand::Init();
+    Vortex::RenderCommand::ConfigureAntiAliasing(true);
+
+    AssetManager::Init();
+
+    Reference<ShaderAsset> defaultShader = AssetManager::Get<ShaderAsset>("assets/BlinnPhong.glsl");
+    m_WindowRenderer = NewReference<Vortex::Renderer>(defaultShader->GetVortexShader(), 1280, 720, false);
+
     OnInit();
     // Register event callbacks
     EventDispatcher::Subscribe<WindowResizeEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
@@ -28,8 +44,13 @@ void Application::Run() {
     while (!AppWindow->GetWindowClose()) {
         TaskManager::Update();
         OnUpdate();
+        m_WindowRenderer->BeginFrame();
+        m_WindowRenderer->EndFrame();
+        AppWindow->Render();
+        AppWindow->UpdateEvents();
     }
 
     OnShutdown();
     TaskManager::Shutdown();
+    m_VortexContext->Destroy();
 }
