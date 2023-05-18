@@ -41,5 +41,5 @@ else()
     target_compile_options(Hydrogen PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
-target_link_libraries(Hydrogen PRIVATE glfw Vulkan::Vulkan stb_image assimp)
-target_link_libraries(Hydrogen PUBLIC spdlog::spdlog glm Vortex::Vortex)
+target_link_libraries(Hydrogen PRIVATE glfw assimp)
+target_link_libraries(Hydrogen PUBLIC spdlog::spdlog glm Vortex::Vortex EnTT::EnTT)

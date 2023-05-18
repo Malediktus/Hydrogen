@@ -102,6 +102,10 @@ void MacOSWindow::Render() {
     glfwSwapBuffers(m_Window);
 }
 
-void MacOSWindow::SetupOpenglContext() {
+void MacOSWindow::SetupOpenglContext(int, int) {
     glfwMakeContextCurrent(m_Window);
+}
+
+void* MacOSWindow::GetWindowOpenGLProcAddress() {
+    return (void*) glfwGetProcAddress;
 }

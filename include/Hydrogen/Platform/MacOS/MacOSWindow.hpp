@@ -29,7 +29,8 @@ public:
     void UpdateEvents() override;
     void Render() override;
 
-    void SetupOpenglContext() override;
+    void SetupOpenglContext(int major, int minor) override;
+    void* GetWindowOpenGLProcAddress() override;
 
 private:
     GLFWwindow* m_Window;
