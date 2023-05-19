@@ -32,6 +32,10 @@ public:
     void OnInit() override {
         Console->Debug("Started App");
         m_DemoTask = Hydrogen::TaskManager::Activate(Hydrogen::NewReference<DemoTask>(Console));
+
+        auto entity = CurrentScene->AddEntity("PointLight");
+        entity->AddComponent<Hydrogen::TransformComponent>(glm::vec3(-3.0f, 0.0f, 0.0f));
+        entity->AddComponent<Hydrogen::PointLightComponent>(Vortex::PointLight(1.0f, 1.0f, 1.0f, glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f)));
     }
 
     void OnShutdown() override {

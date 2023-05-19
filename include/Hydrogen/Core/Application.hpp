@@ -3,6 +3,7 @@
 #include "Memory.hpp"
 #include "Logger.hpp"
 #include "Window.hpp"
+#include "../Scene/Scene.hpp"
 #include "../Event/EventManager.hpp"
 
 #include <string>
@@ -24,6 +25,7 @@ public:
 protected:
     Reference<Logger> Console;
     Reference<Window> AppWindow;
+    Reference<Scene> CurrentScene;
     struct _ApplicationInfo {
         std::string Name;
         glm::vec3 Version;

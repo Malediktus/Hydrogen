@@ -11,3 +11,4 @@
 #include "Assets/AssetManager.hpp"
 #include "Event/KeyCodes.hpp"
 #include "Event/EventManager.hpp"
+#include "Scene/Scene.hpp"

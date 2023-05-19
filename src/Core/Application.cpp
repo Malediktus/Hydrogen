@@ -29,6 +29,8 @@ void Application::Run() {
     Reference<ShaderAsset> defaultShader = AssetManager::Get<ShaderAsset>("assets/BlinnPhong.glsl");
     m_WindowRenderer = NewReference<Vortex::Renderer>(defaultShader->GetVortexShader(), 1280, 720, false);
 
+    CurrentScene = NewReference<Scene>();
+
     OnInit();
     // Register event callbacks
     EventDispatcher::Subscribe<WindowResizeEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));

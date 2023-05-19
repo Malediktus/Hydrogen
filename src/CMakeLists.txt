@@ -13,6 +13,8 @@ set(HEADER_LIST
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Assets/AssetManager.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Event/EventManager.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Event/KeyCodes.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Scene/Scene.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Scene/Components.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/MacOS/MacOSWindow.hpp")
 
 set(SOURCE_LIST
@@ -25,6 +27,7 @@ set(SOURCE_LIST
     Core/Assert.cpp
     Assets/AssetManager.cpp
     Event/EventManager.cpp
+    Scene/Scene.cpp
     Platform/MacOS/MacOSWindow.cpp)
 
 add_library(Hydrogen ${SOURCE_LIST} ${HEADER_LIST})
