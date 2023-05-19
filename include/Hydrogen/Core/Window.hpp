@@ -2,11 +2,12 @@
 
 #include "Memory.hpp"
 #include "../Event/KeyCodes.hpp"
+#include "../Renderer/RenderWindow.hpp"
 
 #include <glm/glm.hpp>
 
 namespace Hydrogen {
-class Window : public Vortex::Window {
+class Window : public RenderWindow {
 public:
     virtual ~Window() = default;
 

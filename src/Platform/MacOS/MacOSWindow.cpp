@@ -6,10 +6,10 @@ using namespace Hydrogen;
 MacOSWindow::MacOSWindow(const std::string& title, uint32_t width, uint32_t height) {
     HY_ASSERT(glfwInit(), "Init glfw");
 
-    auto api = Vortex::Window::ChooseRenderingAPI();
+    auto api = RenderWindow::ChooseRenderingAPI();
 
     glfwWindowHint(GLFW_NO_API, GLFW_TRUE);
-    if (api == Vortex::RendererAPI::API::OpenGL) {
+    if (api == RendererAPI::API::OpenGL) {
         glfwWindowHint(GLFW_SAMPLES, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);

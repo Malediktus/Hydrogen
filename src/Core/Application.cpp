@@ -13,21 +13,21 @@ void Application::Run() {
     OnSetup();
     AppWindow = Window::Create(ApplicationInfo.Name, ApplicationInfo.WindowSize.x, ApplicationInfo.WindowSize.y);
 
-    Vortex::ProjectInformation vortexProject;
-    vortexProject.ProjectName = ApplicationInfo.Name;
-    vortexProject.ProjectVersion = ApplicationInfo.Version;
+    ProjectInformation rendererProject;
+    rendererProject.ProjectName = ApplicationInfo.Name;
+    rendererProject.ProjectVersion = ApplicationInfo.Version;
 
-    m_VortexContext = Vortex::ContextCreate(AppWindow, vortexProject);
-    m_VortexContext->Init();
+    m_RenderContext = Context::Create(AppWindow, rendererProject);
+    m_RenderContext->Init();
 
-    Vortex::Renderer::SetContext(m_VortexContext);
-    Vortex::RenderCommand::Init();
-    Vortex::RenderCommand::ConfigureAntiAliasing(true);
+    Renderer::SetContext(m_RenderContext);
+    RenderCommand::Init();
+    RenderCommand::ConfigureAntiAliasing(true);
 
     AssetManager::Init();
 
     Reference<ShaderAsset> defaultShader = AssetManager::Get<ShaderAsset>("assets/BlinnPhong.glsl");
-    m_WindowRenderer = NewReference<Vortex::Renderer>(defaultShader->GetVortexShader(), 1280, 720, false);
+    m_WindowRenderer = NewReference<Renderer>(defaultShader->GetVortexShader(), 1280, 720, false);
 
     CurrentScene = NewReference<Scene>();
 
@@ -54,5 +54,5 @@ void Application::Run() {
 
     OnShutdown();
     TaskManager::Shutdown();
-    m_VortexContext->Destroy();
+    m_RenderContext->Destroy();
 }

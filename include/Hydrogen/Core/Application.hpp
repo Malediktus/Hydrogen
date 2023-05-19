@@ -5,6 +5,8 @@
 #include "Window.hpp"
 #include "../Scene/Scene.hpp"
 #include "../Event/EventManager.hpp"
+#include "../Renderer/Context.hpp"
+#include "../Renderer/Renderer.hpp"
 
 #include <string>
 #include <glm/glm.hpp>
@@ -33,8 +35,8 @@ protected:
     } ApplicationInfo;
 
 private:
-    Reference<Vortex::Context> m_VortexContext;
-    Reference<Vortex::Renderer> m_WindowRenderer;
+    Reference<Context> m_RenderContext;
+    Reference<Renderer> m_WindowRenderer;
 };
 
 extern Reference<Application> CreateApplication();

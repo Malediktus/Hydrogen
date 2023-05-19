@@ -15,6 +15,26 @@ set(HEADER_LIST
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Event/KeyCodes.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Scene/Scene.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Scene/Components.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Renderer/Buffer.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Renderer/Camera.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Renderer/Context.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Renderer/Framebuffer.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Renderer/Renderbuffer.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Renderer/RendererAPI.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Renderer/RenderWindow.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Renderer/Shader.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Renderer/Texture.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Renderer/VertexArray.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Renderer/RenderCommand.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Renderer/Renderer.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLBuffer.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLContext.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLFramebuffer.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLRenderbuffer.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLRendererAPI.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLShader.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLTexture.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLVertexArray.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/MacOS/MacOSWindow.hpp")
 
 set(SOURCE_LIST
@@ -28,6 +48,25 @@ set(SOURCE_LIST
     Assets/AssetManager.cpp
     Event/EventManager.cpp
     Scene/Scene.cpp
+    Renderer/Buffer.cpp
+    Renderer/Context.cpp
+    Renderer/Framebuffer.cpp
+    Renderer/Renderbuffer.cpp
+    Renderer/RendererAPI.cpp
+    Renderer/RenderWindow.cpp
+    Renderer/Shader.cpp
+    Renderer/Texture.cpp
+    Renderer/VertexArray.cpp
+    Renderer/RenderCommand.cpp
+    Renderer/Renderer.cpp
+    Platform/OpenGL/OpenGLBuffer.cpp
+    Platform/OpenGL/OpenGLContext.cpp
+    Platform/OpenGL/OpenGLFramebuffer.cpp
+    Platform/OpenGL/OpenGLRenderbuffer.cpp
+    Platform/OpenGL/OpenGLRendererAPI.cpp
+    Platform/OpenGL/OpenGLShader.cpp
+    Platform/OpenGL/OpenGLTexture.cpp
+    Platform/OpenGL/OpenGLVertexArray.cpp
     Platform/MacOS/MacOSWindow.cpp)
 
 add_library(Hydrogen ${SOURCE_LIST} ${HEADER_LIST})
@@ -44,5 +83,5 @@ else()
     target_compile_options(Hydrogen PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
-target_link_libraries(Hydrogen PRIVATE glfw assimp)
-target_link_libraries(Hydrogen PUBLIC spdlog::spdlog glm Vortex::Vortex EnTT::EnTT)
+target_link_libraries(Hydrogen PRIVATE glfw assimp glad)
+target_link_libraries(Hydrogen PUBLIC spdlog::spdlog glm EnTT::EnTT TracyClient)

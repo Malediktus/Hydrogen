@@ -1,9 +1,8 @@
 #pragma once
 
-#include <string>
 #include "../Core/UUID.hpp"
-
-#include <Vortex/Vortex.hpp>
+#include "../Renderer/Renderer.hpp"
+#include <string>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -45,38 +44,37 @@ struct TransformComponent {
 };
 
 struct MeshRendererComponent {
-    Vortex::Mesh Mesh = {nullptr};
+    std::vector<Reference<VertexArray>> VertexArrays = {};
+    Reference<Shader> MeshShader = {};
 
     MeshRendererComponent() = default;
     MeshRendererComponent(const MeshRendererComponent&) = default;
-    MeshRendererComponent(const Vortex::Mesh& mesh) : Mesh(mesh) {
-    }
 };
 
 struct PointLightComponent {
-    Vortex::PointLight PointLight = {1.0f, 1.0f, 1.0f, glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f)};
+    PointLight _PointLight = {1.0f, 1.0f, 1.0f, glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f)};
 
     PointLightComponent() = default;
     // PointLightComponent(const PointLightComponent&) = default;
-    PointLightComponent(const Vortex::PointLight& pointLight) : PointLight(pointLight) {
+    PointLightComponent(const PointLight& pointLight) : _PointLight(pointLight) {
     }
 };
 
 struct SpotLightComponent {
-    Vortex::SpotLight SpotLight = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f)};
+    SpotLight _SpotLight = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f)};
 
     SpotLightComponent() = default;
     SpotLightComponent(const SpotLightComponent&) = default;
-    SpotLightComponent(const Vortex::SpotLight& spotLight) : SpotLight(spotLight) {
+    SpotLightComponent(const SpotLight& spotLight) : _SpotLight(spotLight) {
     }
 };
 
 struct DirectionalLightComponent {
-    Vortex::DirectionalLight DirectionalLight = {glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f)};
+    DirectionalLight _DirectionalLight = {glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f)};
 
     DirectionalLightComponent() = default;
     DirectionalLightComponent(const DirectionalLightComponent&) = default;
-    DirectionalLightComponent(const Vortex::DirectionalLight& directionalLight) : DirectionalLight(directionalLight) {
+    DirectionalLightComponent(const DirectionalLight& directionalLight) : _DirectionalLight(directionalLight) {
     }
 };
 } // namespace Hydrogen

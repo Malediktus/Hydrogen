@@ -2,6 +2,7 @@
 
 #include "../Core/Memory.hpp"
 #include "../Core/Logger.hpp"
+#include "../Renderer/Shader.hpp"
 
 #include <filesystem>
 
@@ -51,10 +52,10 @@ public:
 
     void Load(const std::string& filepath) override {
         HY_LOG_DEBUG("Loading shader: {}", filepath);
-        m_VortexShader = Vortex::ShaderCreate(filepath);
+        m_VortexShader = Shader::Create(filepath);
     }
 
-    const Reference<Vortex::Shader>& GetVortexShader() {
+    const Reference<Shader>& GetVortexShader() {
         return m_VortexShader;
     }
 
@@ -68,7 +69,7 @@ public:
     }
 
 private:
-    Reference<Vortex::Shader> m_VortexShader;
+    Reference<Shader> m_VortexShader;
 };
 
 class AssetManager {

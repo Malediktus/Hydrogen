@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <Vortex/Vortex.hpp>
 
 namespace Hydrogen {
 template <typename T> using Reference = std::shared_ptr<T>;
