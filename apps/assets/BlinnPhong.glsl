@@ -1,14 +1,18 @@
 #type vertex
 
 #version 330 core
+
 layout(location = 0) in vec3 v_in_Pos;
 layout(location = 1) in vec3 v_in_Normal;
 layout(location = 2) in vec2 v_in_TexCoords;
+
 out vec2 v_out_TexCoords;
 out vec3 v_out_Normal;
 out vec3 v_out_FragPos;
+
 uniform mat4 u_ViewProj;
 uniform mat4 u_Model;
+
 void main() {
     v_out_TexCoords = v_in_TexCoords;
     v_out_Normal = mat3(transpose(inverse(u_Model))) * v_in_Normal;

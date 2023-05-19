@@ -69,10 +69,11 @@ public:
 
     void OnResize(const int width, const int height);
 
-    void BeginFrame();
+    void BeginFrame(const Reference<Camera>& camera);
     void EndFrame();
 
-    void Submit(const Reference<VertexArray>& vertexArray, Reference<Camera> camera);
+    void Submit(const Reference<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
+    void Submit(const Light& light, const glm::mat4& transform = glm::mat4(1.0f));
 
     Reference<Texture2D> GetTexture() {
         return m_ColorTexture;
@@ -92,5 +93,12 @@ private:
     Reference<Texture2D> m_ColorTexture;
     Reference<Renderbuffer> m_DepthStencilRenderbuffer;
     static Reference<Context> s_Context;
+    struct Framedata {
+        Reference<Camera> FrameCamera;
+        std::vector<Reference<VertexArray>> VertexArrays;
+        std::vector<glm::mat4> VertexArrayTransforms;
+        std::vector<Light> Lights;
+        std::vector<glm::mat4> LightTransforms;
+    } m_Framedata;
 };
 } // namespace Hydrogen

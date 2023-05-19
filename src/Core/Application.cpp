@@ -46,8 +46,10 @@ void Application::Run() {
     while (!AppWindow->GetWindowClose()) {
         TaskManager::Update();
         OnUpdate();
-        m_WindowRenderer->BeginFrame();
-        m_WindowRenderer->EndFrame();
+
+        // m_WindowRenderer->BeginFrame(camera);
+        // m_WindowRenderer->EndFrame();
+
         AppWindow->Render();
         AppWindow->UpdateEvents();
     }
