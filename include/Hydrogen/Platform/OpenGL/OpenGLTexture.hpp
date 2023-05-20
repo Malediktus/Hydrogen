@@ -21,6 +21,7 @@ public:
     virtual void* GetNative() const override;
 
 private:
+    uint32_t m_InternalFormat, m_Format, m_Type;
     uint32_t m_Width, m_Height;
     uint32_t m_RendererID;
 };

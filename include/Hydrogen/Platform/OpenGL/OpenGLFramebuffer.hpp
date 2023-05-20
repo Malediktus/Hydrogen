@@ -22,6 +22,7 @@ public:
 
 private:
     uint32_t m_RendererID;
-    bool hasAttachments;
+    uint32_t numAttachments;
+    uint32_t numColorAttachments = 0, numDepthAttachments = 0, numStencilAttachments = 0, numDepthStencilAttachments = 0;
 };
 } // namespace Hydrogen::OpenGL

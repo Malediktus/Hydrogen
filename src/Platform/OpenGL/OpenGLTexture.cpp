@@ -13,8 +13,14 @@ OpenGLTexture2D::OpenGLTexture2D(const int width, const int height, Texture2DSto
     glGenTextures(1, &m_RendererID);
     glBindTexture(GL_TEXTURE_2D, m_RendererID);
 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
     GLenum internalFormat = GL_RGBA8;
     GLenum format = GL_RGBA;
+    GLenum type = GL_FLOAT;
 
     switch (storageType) {
     case Texture2DStorageType::RGBA8F:
@@ -24,6 +30,7 @@ OpenGLTexture2D::OpenGLTexture2D(const int width, const int height, Texture2DSto
     case Texture2DStorageType::RGBA8I:
         internalFormat = GL_RGBA8I;
         format = GL_RGBA;
+        type = GL_UNSIGNED_BYTE;
         break;
     case Texture2DStorageType::RGBA16F:
         internalFormat = GL_RGBA16F;
@@ -32,6 +39,7 @@ OpenGLTexture2D::OpenGLTexture2D(const int width, const int height, Texture2DSto
     case Texture2DStorageType::RGBA16I:
         internalFormat = GL_RGBA16I;
         format = GL_RGBA;
+        type = GL_UNSIGNED_BYTE;
         break;
     case Texture2DStorageType::RGBA32F:
         internalFormat = GL_RGBA32F;
@@ -40,6 +48,7 @@ OpenGLTexture2D::OpenGLTexture2D(const int width, const int height, Texture2DSto
     case Texture2DStorageType::RGBA32I:
         internalFormat = GL_RGBA32I;
         format = GL_RGBA;
+        type = GL_UNSIGNED_BYTE;
         break;
     case Texture2DStorageType::SRGBA8F:
         internalFormat = GL_SRGB8_ALPHA8;
@@ -52,6 +61,7 @@ OpenGLTexture2D::OpenGLTexture2D(const int width, const int height, Texture2DSto
     case Texture2DStorageType::RGB8I:
         internalFormat = GL_RGB8I;
         format = GL_RGB;
+        type = GL_UNSIGNED_BYTE;
         break;
     case Texture2DStorageType::RGB16F:
         internalFormat = GL_RGB16F;
@@ -60,6 +70,7 @@ OpenGLTexture2D::OpenGLTexture2D(const int width, const int height, Texture2DSto
     case Texture2DStorageType::RGB16I:
         internalFormat = GL_RGB16I;
         format = GL_RGB;
+        type = GL_UNSIGNED_BYTE;
         break;
     case Texture2DStorageType::RGB32F:
         internalFormat = GL_RGB32F;
@@ -68,6 +79,7 @@ OpenGLTexture2D::OpenGLTexture2D(const int width, const int height, Texture2DSto
     case Texture2DStorageType::RGB32I:
         internalFormat = GL_RGB32I;
         format = GL_RGB;
+        type = GL_UNSIGNED_BYTE;
         break;
     case Texture2DStorageType::SRGB8F:
         internalFormat = GL_SRGB8;
@@ -90,11 +102,11 @@ OpenGLTexture2D::OpenGLTexture2D(const int width, const int height, Texture2DSto
         break;
     }
 
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    m_Type = type;
+    m_InternalFormat = internalFormat;
+    m_Format = format;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, nullptr);
 
     glCheckError();
     HY_LOG_TRACE("Created OpenGL texture2D from file (ID: {})", m_RendererID);
@@ -106,6 +118,7 @@ OpenGLTexture2D::OpenGLTexture2D(const int width, const int height, const void* 
     m_Height = height;
     glGenTextures(1, &m_RendererID);
     glBindTexture(GL_TEXTURE_2D, m_RendererID);
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -113,6 +126,7 @@ OpenGLTexture2D::OpenGLTexture2D(const int width, const int height, const void* 
 
     GLenum internalFormat = GL_RGBA8;
     GLenum format = GL_RGBA;
+    GLenum type = GL_FLOAT;
 
     switch (storageType) {
     case Texture2DStorageType::RGBA8F:
@@ -122,6 +136,7 @@ OpenGLTexture2D::OpenGLTexture2D(const int width, const int height, const void* 
     case Texture2DStorageType::RGBA8I:
         internalFormat = GL_RGBA8I;
         format = GL_RGBA;
+        type = GL_UNSIGNED_BYTE;
         break;
     case Texture2DStorageType::RGBA16F:
         internalFormat = GL_RGBA16F;
@@ -130,6 +145,7 @@ OpenGLTexture2D::OpenGLTexture2D(const int width, const int height, const void* 
     case Texture2DStorageType::RGBA16I:
         internalFormat = GL_RGBA16I;
         format = GL_RGBA;
+        type = GL_UNSIGNED_BYTE;
         break;
     case Texture2DStorageType::RGBA32F:
         internalFormat = GL_RGBA32F;
@@ -138,6 +154,7 @@ OpenGLTexture2D::OpenGLTexture2D(const int width, const int height, const void* 
     case Texture2DStorageType::RGBA32I:
         internalFormat = GL_RGBA32I;
         format = GL_RGBA;
+        type = GL_UNSIGNED_BYTE;
         break;
     case Texture2DStorageType::SRGBA8F:
         internalFormat = GL_SRGB8_ALPHA8;
@@ -150,6 +167,7 @@ OpenGLTexture2D::OpenGLTexture2D(const int width, const int height, const void* 
     case Texture2DStorageType::RGB8I:
         internalFormat = GL_RGB8I;
         format = GL_RGB;
+        type = GL_UNSIGNED_BYTE;
         break;
     case Texture2DStorageType::RGB16F:
         internalFormat = GL_RGB16F;
@@ -158,6 +176,7 @@ OpenGLTexture2D::OpenGLTexture2D(const int width, const int height, const void* 
     case Texture2DStorageType::RGB16I:
         internalFormat = GL_RGB16I;
         format = GL_RGB;
+        type = GL_UNSIGNED_BYTE;
         break;
     case Texture2DStorageType::RGB32F:
         internalFormat = GL_RGB32F;
@@ -166,6 +185,7 @@ OpenGLTexture2D::OpenGLTexture2D(const int width, const int height, const void* 
     case Texture2DStorageType::RGB32I:
         internalFormat = GL_RGB32I;
         format = GL_RGB;
+        type = GL_UNSIGNED_BYTE;
         break;
     case Texture2DStorageType::SRGB8F:
         internalFormat = GL_SRGB8;
@@ -188,7 +208,11 @@ OpenGLTexture2D::OpenGLTexture2D(const int width, const int height, const void* 
         break;
     }
 
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    m_Type = type;
+    m_InternalFormat = internalFormat;
+    m_Format = format;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, data);
 
     glCheckError();
     HY_LOG_TRACE("Created OpenGL texture2D from file (ID: {})", m_RendererID);

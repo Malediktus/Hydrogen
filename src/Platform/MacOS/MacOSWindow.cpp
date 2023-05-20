@@ -100,6 +100,16 @@ void MacOSWindow::UpdateEvents() {
 
 void MacOSWindow::Render() {
     glfwSwapBuffers(m_Window);
+
+    // Only for MacOS (Because of some strange glfw bug)
+    static bool moved = false;
+    if (!moved) {
+        int x, y;
+        glfwGetWindowPos(m_Window, &x, &y);
+        glfwSetWindowPos(m_Window, x + 1, y);
+        glfwSetWindowPos(m_Window, x, y);
+        moved = true;
+    }
 }
 
 void MacOSWindow::SetupOpenglContext(int, int) {
