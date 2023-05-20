@@ -27,7 +27,8 @@ void Application::Run() {
     AssetManager::Init();
 
     Reference<ShaderAsset> defaultShader = AssetManager::Get<ShaderAsset>("assets/Raw.glsl");
-    m_WindowRenderer = NewReference<Renderer>(defaultShader->GetVortexShader(), 1280, 720);
+    Reference<ShaderAsset> geometryShader = AssetManager::Get<ShaderAsset>("assets/GeometryPass.glsl");
+    m_WindowRenderer = NewReference<Renderer>(defaultShader->GetShader(), geometryShader->GetShader(), 1280, 720);
 
     CurrentScene = NewReference<Scene>();
 

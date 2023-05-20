@@ -12,6 +12,8 @@ public:
     virtual void BindRead() const override;
     virtual void Unbind() const override;
 
+    virtual void SetDrawBuffers(const std::vector<std::pair<FramebufferAttachment, uint32_t>>& attachments) override;
+
     virtual void AttachColorTexture(const Reference<Texture2D>& texture) override;
     virtual void AttachDepthTexture(const Reference<Texture2D>& texture) override;
     virtual void AttachStencilTexture(const Reference<Texture2D>& texture) override;

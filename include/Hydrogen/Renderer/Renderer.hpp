@@ -64,7 +64,7 @@ struct SpotLight : public Light {
 
 class Renderer {
 public:
-    Renderer(const Reference<Shader>& defaultShader, const int width, const int height);
+    Renderer(const Reference<Shader>& defaultShader, const Reference<Shader>& geometryShader, const int width, const int height);
     ~Renderer() = default;
 
     void OnResize(const int width, const int height);
@@ -84,6 +84,13 @@ public:
 
 private:
     Reference<Shader> m_Shader;
+    Reference<Shader> m_GeometryShader;
+    Reference<Framebuffer> m_GBuffer;
+    Reference<Texture2D> m_GBufferPositionTexture;
+    Reference<Texture2D> m_GBufferDiffuseTexture;
+    Reference<Texture2D> m_GBufferNormalTexture;
+    Reference<Texture2D> m_GBufferTexCoordTexture;
+    Reference<Texture2D> m_GBufferDepthTexture;
     static Reference<Context> s_Context;
 
     struct Framedata {

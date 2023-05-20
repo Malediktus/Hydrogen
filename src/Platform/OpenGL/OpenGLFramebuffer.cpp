@@ -61,12 +61,41 @@ void OpenGLFramebuffer::Unbind() const {
     HY_LOG_TRACE("Unbound OpenGL framebuffer (ID: {})", m_RendererID);
 }
 
+void OpenGLFramebuffer::SetDrawBuffers(const std::vector<std::pair<FramebufferAttachment, uint32_t>>& attachments) {
+    ZoneScoped;
+    glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+    std::vector<GLenum> vec(attachments.size());
+    for (auto& attachment : attachments) {
+        switch (attachment.first) {
+        case FramebufferAttachment::Color:
+            HY_ASSERT(attachment.second < 32, "Value of range");
+            vec.push_back(GL_COLOR_ATTACHMENT0 + attachment.second);
+            break;
+        case FramebufferAttachment::Depth:
+            vec.push_back(GL_DEPTH_ATTACHMENT);
+            break;
+        case FramebufferAttachment::Stencil:
+            vec.push_back(GL_STENCIL_ATTACHMENT);
+            break;
+        case FramebufferAttachment::DepthStencil:
+            vec.push_back(GL_DEPTH_STENCIL_ATTACHMENT);
+            break;
+        default:
+            HY_INVOKE_ERROR("Invalid FramebufferAttachment value");
+            break;
+        }
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glCheckError();
+    HY_LOG_TRACE("Set OpenGL draw buffers for framebuffer (ID: {})", m_RendererID);
+}
+
 void OpenGLFramebuffer::AttachColorTexture(const std::shared_ptr<Texture2D>& texture) {
     ZoneScoped;
     HY_ASSERT(numColorAttachments < 32, "Too many color attachments");
-    Bind();
+    glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + numColorAttachments, GL_TEXTURE_2D, *(GLuint*) texture->GetNative(), 0);
-    Unbind();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glCheckError();
     numColorAttachments++;
     numAttachments++;
@@ -76,9 +105,9 @@ void OpenGLFramebuffer::AttachColorTexture(const std::shared_ptr<Texture2D>& tex
 void OpenGLFramebuffer::AttachDepthTexture(const std::shared_ptr<Texture2D>& texture) {
     ZoneScoped;
     HY_ASSERT(numDepthAttachments < 1 && numDepthStencilAttachments < 1, "Too many depth attachments");
-    Bind();
+    glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, *(GLuint*) texture->GetNative(), 0);
-    Unbind();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glCheckError();
     numDepthAttachments++;
     numAttachments++;
@@ -88,9 +117,9 @@ void OpenGLFramebuffer::AttachDepthTexture(const std::shared_ptr<Texture2D>& tex
 void OpenGLFramebuffer::AttachStencilTexture(const std::shared_ptr<Texture2D>& texture) {
     ZoneScoped;
     HY_ASSERT(numStencilAttachments < 1 && numDepthStencilAttachments < 1, "Too many stencil attachments");
-    Bind();
+    glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_TEXTURE_2D, *(GLuint*) texture->GetNative(), 0);
-    Unbind();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glCheckError();
     numStencilAttachments++;
     numAttachments++;
@@ -100,9 +129,9 @@ void OpenGLFramebuffer::AttachStencilTexture(const std::shared_ptr<Texture2D>& t
 void OpenGLFramebuffer::AttachDepthStencilTexture(const std::shared_ptr<Texture2D>& texture) {
     ZoneScoped;
     HY_ASSERT(numDepthStencilAttachments < 1 && numDepthAttachments < 1 && numStencilAttachments < 1, "Too many depth/stencil attachments");
-    Bind();
+    glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, *(GLuint*) texture->GetNative(), 0);
-    Unbind();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glCheckError();
     numDepthStencilAttachments++;
     numAttachments++;
@@ -112,9 +141,9 @@ void OpenGLFramebuffer::AttachDepthStencilTexture(const std::shared_ptr<Texture2
 void OpenGLFramebuffer::AttachColorRenderbuffer(const std::shared_ptr<Renderbuffer>& renderbuffer) {
     ZoneScoped;
     HY_ASSERT(numColorAttachments < 32, "Too many color attachments");
-    Bind();
+    glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + numColorAttachments, GL_RENDERBUFFER, *(GLuint*) renderbuffer->GetNative());
-    Unbind();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glCheckError();
     numColorAttachments++;
     numAttachments++;
@@ -124,9 +153,9 @@ void OpenGLFramebuffer::AttachColorRenderbuffer(const std::shared_ptr<Renderbuff
 void OpenGLFramebuffer::AttachDepthRenderbuffer(const std::shared_ptr<Renderbuffer>& renderbuffer) {
     ZoneScoped;
     HY_ASSERT(numDepthAttachments < 1 && numDepthStencilAttachments < 1, "Too many depth attachments");
-    Bind();
+    glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, *(GLuint*) renderbuffer->GetNative());
-    Unbind();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glCheckError();
     numDepthAttachments++;
     numAttachments++;
@@ -136,9 +165,9 @@ void OpenGLFramebuffer::AttachDepthRenderbuffer(const std::shared_ptr<Renderbuff
 void OpenGLFramebuffer::AttachStencilRenderbuffer(const std::shared_ptr<Renderbuffer>& renderbuffer) {
     ZoneScoped;
     HY_ASSERT(numStencilAttachments < 1 && numDepthStencilAttachments < 1, "Too many stencil attachments");
-    Bind();
+    glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, *(GLuint*) renderbuffer->GetNative());
-    Unbind();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glCheckError();
     numStencilAttachments++;
     numAttachments++;
@@ -148,9 +177,9 @@ void OpenGLFramebuffer::AttachStencilRenderbuffer(const std::shared_ptr<Renderbu
 void OpenGLFramebuffer::AttachDepthStencilRenderbuffer(const std::shared_ptr<Renderbuffer>& renderbuffer) {
     ZoneScoped;
     HY_ASSERT(numDepthStencilAttachments < 1 && numDepthAttachments < 1 && numStencilAttachments < 1, "Too many depth/stencil attachments");
-    Bind();
+    glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, *(GLuint*) renderbuffer->GetNative());
-    Unbind();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glCheckError();
     numDepthStencilAttachments++;
     numAttachments++;

@@ -52,11 +52,11 @@ public:
 
     void Load(const std::string& filepath) override {
         HY_LOG_DEBUG("Loading shader: {}", filepath);
-        m_VortexShader = Shader::Create(filepath);
+        m_Shader = Shader::Create(filepath);
     }
 
-    const Reference<Shader>& GetVortexShader() {
-        return m_VortexShader;
+    const Reference<Shader>& GetShader() {
+        return m_Shader;
     }
 
     static const std::vector<const std::string> GetFileExtensions() {
@@ -69,7 +69,7 @@ public:
     }
 
 private:
-    Reference<Shader> m_VortexShader;
+    Reference<Shader> m_Shader;
 };
 
 class AssetManager {
