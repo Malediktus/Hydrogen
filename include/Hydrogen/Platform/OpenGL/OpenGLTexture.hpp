@@ -5,8 +5,8 @@
 namespace Hydrogen::OpenGL {
 class OpenGLTexture2D : public Texture2D {
 public:
-    OpenGLTexture2D(const int width, const int height, Texture2DUsageType usageType);
-    OpenGLTexture2D(const int width, const int height, const void* data, Texture2DUsageType usageType);
+    OpenGLTexture2D(const int width, const int height, Texture2DStorageType storageType);
+    OpenGLTexture2D(const int width, const int height, const void* data, Texture2DStorageType usageType);
     virtual ~OpenGLTexture2D();
 
     virtual uint32_t GetWidth() const override {

@@ -19,7 +19,25 @@ public:
     virtual void* GetNative() const = 0;
 };
 
-enum class Texture2DUsageType { Color = 0, Depth = 1, Stencil = 2, DepthStencil = 3 };
+enum class Texture2DStorageType {
+    RGBA8F = 0,
+    RGBA8I = 1,
+    RGBA16F = 2,
+    RGBA16I = 3,
+    RGBA32F = 4,
+    RGBA32I = 5,
+    SRGBA8F = 6,
+    RGB8F = 7,
+    RGB8I = 8,
+    RGB16F = 9,
+    RGB16I = 10,
+    RGB32F = 11,
+    RGB32I = 12,
+    SRGB8F = 13,
+    Depth = 14,
+    Stencil = 15,
+    DepthStencil = 16
+};
 
 class Texture2D : public Texture {
 public:
@@ -46,7 +64,7 @@ public:
         return nullptr;
     }
 
-    static Reference<Texture2D> Create(const int width, const int height, Texture2DUsageType usageType = Texture2DUsageType::Color);
-    static Reference<Texture2D> Create(const int width, const int height, const void* data, Texture2DUsageType usageType = Texture2DUsageType::Color);
+    static Reference<Texture2D> Create(const int width, const int height, Texture2DStorageType storageType = Texture2DStorageType::RGBA8F);
+    static Reference<Texture2D> Create(const int width, const int height, const void* data, Texture2DStorageType storageType = Texture2DStorageType::RGBA8F);
 };
 } // namespace Hydrogen

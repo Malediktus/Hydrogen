@@ -16,7 +16,7 @@ Renderer::Renderer(const Reference<Shader>& defaultShader, const int width, cons
     m_Framebuffer = Framebuffer::Create(s_Context->GetWindow());
 
     if (renderToTexture) {
-        m_ColorTexture = Texture2D::Create(width, height, Texture2DUsageType::Color);
+        m_ColorTexture = Texture2D::Create(width, height, Texture2DStorageType::RGBA8F);
         m_DepthStencilRenderbuffer = Renderbuffer::Create(width, height, RenderbufferUsageType::DepthStencil);
         m_Framebuffer->AttachColorTexture(m_ColorTexture);
         m_Framebuffer->AttachDepthStencilRenderbuffer(m_DepthStencilRenderbuffer);

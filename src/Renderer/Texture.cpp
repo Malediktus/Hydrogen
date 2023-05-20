@@ -5,22 +5,22 @@
 
 using namespace Hydrogen;
 
-Reference<Texture2D> Texture2D::Create(const int width, const int height, Texture2DUsageType usageType) {
+Reference<Texture2D> Texture2D::Create(const int width, const int height, Texture2DStorageType storageType) {
     ZoneScoped;
     switch (Renderer::GetAPI()) {
     case RendererAPI::API::OpenGL:
-        return NewReference<OpenGL::OpenGLTexture2D>(width, height, usageType);
+        return NewReference<OpenGL::OpenGLTexture2D>(width, height, storageType);
     default:
         HY_ASSERT_CHECK(false, "Invalid renderer API value returned from Renderer::GetRendererAPI()");
     }
     return nullptr;
 }
 
-Reference<Texture2D> Texture2D::Create(const int width, const int height, const void* data, Texture2DUsageType usageType) {
+Reference<Texture2D> Texture2D::Create(const int width, const int height, const void* data, Texture2DStorageType storageType) {
     ZoneScoped;
     switch (Renderer::GetAPI()) {
     case RendererAPI::API::OpenGL:
-        return NewReference<OpenGL::OpenGLTexture2D>(width, height, data, usageType);
+        return NewReference<OpenGL::OpenGLTexture2D>(width, height, data, storageType);
     default:
         HY_ASSERT_CHECK(false, "Invalid renderer API value returned from Renderer::GetRendererAPI()");
     }
