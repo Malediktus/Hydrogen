@@ -93,6 +93,7 @@ private:
     Reference<Texture2D> m_ColorTexture;
     Reference<Renderbuffer> m_DepthStencilRenderbuffer;
     static Reference<Context> s_Context;
+
     struct Framedata {
         Reference<Camera> FrameCamera;
         std::vector<Reference<VertexArray>> VertexArrays;
