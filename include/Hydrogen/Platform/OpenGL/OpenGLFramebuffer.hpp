@@ -8,6 +8,8 @@ public:
     virtual ~OpenGLFramebuffer();
 
     virtual void Bind() const override;
+    virtual void BindWrite() const override;
+    virtual void BindRead() const override;
     virtual void Unbind() const override;
 
     virtual void AttachColorTexture(const Reference<Texture2D>& texture) override;

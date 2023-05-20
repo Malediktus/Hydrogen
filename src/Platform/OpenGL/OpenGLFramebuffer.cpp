@@ -31,6 +31,26 @@ void OpenGLFramebuffer::Bind() const {
     HY_LOG_TRACE("Bound OpenGL framebuffer (ID: {})", m_RendererID);
 }
 
+void OpenGLFramebuffer::BindWrite() const {
+    ZoneScoped;
+    if (numAttachments == 0)
+        return;
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_RendererID);
+    glCheckError();
+    HY_LOG_TRACE("Bound OpenGL framebuffer for drawing (ID: {})", m_RendererID);
+}
+
+void OpenGLFramebuffer::BindRead() const {
+    ZoneScoped;
+    if (numAttachments == 0)
+        return;
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_RendererID);
+    glCheckError();
+    HY_LOG_TRACE("Bound OpenGL framebuffer for reading (ID: {})", m_RendererID);
+}
+
 void OpenGLFramebuffer::Unbind() const {
     ZoneScoped;
     if (numAttachments == 0)

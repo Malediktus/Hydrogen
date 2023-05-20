@@ -139,8 +139,8 @@ void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shader
             glDeleteShader(shader);
             HY_LOG_TRACE("Deleted OpenGL shader (ID: {})", shader);
 
-            spdlog::error("OpenGL shader compilation failed:\n{}", infoLog.data());
-            spdlog::error("Shader info: (type: {}, ID: {})", ::Utils::StringFromShaderType(type), shader);
+            HY_LOG_ERROR("OpenGL shader compilation failed:\n{}", infoLog.data());
+            HY_LOG_ERROR("Shader info: (type: {}, ID: {})", ::Utils::StringFromShaderType(type), shader);
             HY_ASSERT(false, "Shader compilation failed");
             break;
         }
@@ -173,8 +173,8 @@ void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shader
         for (auto id : glShaderIDs)
             glDeleteShader(id);
 
-        spdlog::error("OpenGL shader program linking failed:\n{}", infoLog.data());
-        spdlog::error("Shader program info: (ID: {})", program);
+        HY_LOG_ERROR("OpenGL shader program linking failed:\n{}", infoLog.data());
+        HY_LOG_ERROR("Shader program info: (ID: {})", program);
 
         HY_ASSERT(false, "Shader linking failed");
         return;
