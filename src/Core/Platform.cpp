@@ -3,7 +3,7 @@
 
 using namespace Hydrogen;
 
-std::string Hydrogen::PlatformToString(Platform platform) {
+String Hydrogen::PlatformToString(Platform platform) {
     switch (platform) {
     case Platform::Windows:
         return "Windows";
@@ -99,6 +99,6 @@ Platform Hydrogen::GetCurrentPlatform() {
     HY_INVOKE_ERROR("Invalid platform");
 }
 
-inline std::string Hydrogen::GetCurrentPlatformName() {
+inline String Hydrogen::GetCurrentPlatformName() {
     return PlatformToString(GetCurrentPlatform());
 }

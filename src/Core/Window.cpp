@@ -4,9 +4,9 @@
 #include <Hydrogen/Platform/MacOS/MacOSWindow.hpp>
 
 namespace Hydrogen {
-Reference<Window> Window::Create(const std::string& title, uint32_t width, uint32_t height) {
+ReferencePointer<Window> Window::Create(const String& title, uint32_t width, uint32_t height) {
 #ifdef HY_PLATFORM_MACOS
-    return NewReference<MacOSWindow>(title, width, height);
+    return NewReferencePointer<MacOSWindow>(title, width, height);
 #endif
     HY_INVOKE_ERROR("Invalid platform");
     return nullptr;

@@ -20,7 +20,7 @@ public:
 
     virtual void* GetNative() const = 0;
 
-    static Reference<Renderbuffer> Create(uint32_t width, uint32_t height, RenderbufferUsageType usageType);
+    static ReferencePointer<Renderbuffer> Create(uint32_t width, uint32_t height, RenderbufferUsageType usageType);
 };
 
 } // namespace Hydrogen

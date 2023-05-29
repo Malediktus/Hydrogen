@@ -3,16 +3,16 @@
 
 using namespace Hydrogen;
 
-std::vector<Reference<Task>> TaskManager::s_Tasks;
+DynamicArray<ReferencePointer<Task>> TaskManager::s_Tasks;
 
-Reference<Task> TaskManager::Activate(Reference<Task> task) {
+ReferencePointer<Task> TaskManager::Activate(ReferencePointer<Task> task) {
     s_Tasks.push_back(task);
     task->OnActivate();
     return task;
 }
 
-void TaskManager::Deactivate(Reference<Task> task) {
-    std::vector<Reference<Task>>::iterator position = std::find(s_Tasks.begin(), s_Tasks.end(), task);
+void TaskManager::Deactivate(ReferencePointer<Task> task) {
+    DynamicArray<ReferencePointer<Task>>::iterator position = std::find(s_Tasks.begin(), s_Tasks.end(), task);
     if (position != s_Tasks.end()) {
         task->OnDeactivate();
         s_Tasks.erase(position);

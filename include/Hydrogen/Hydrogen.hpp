@@ -12,3 +12,4 @@
 #include "Event/KeyCodes.hpp"
 #include "Event/EventManager.hpp"
 #include "Scene/Scene.hpp"
+#include "Math/Math.hpp"

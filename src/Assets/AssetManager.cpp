@@ -2,4 +2,4 @@
 
 using namespace Hydrogen;
 
-std::unordered_map<std::string, Reference<Asset>> AssetManager::s_Assets;
+std::unordered_map<String, ReferencePointer<Asset>> AssetManager::s_Assets;

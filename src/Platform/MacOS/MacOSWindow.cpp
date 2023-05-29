@@ -42,10 +42,10 @@ uint32_t MacOSWindow::GetHeight() const {
     return (uint32_t) height;
 }
 
-glm::vec2 MacOSWindow::GetViewportSize() const {
+Vector2 MacOSWindow::GetViewportSize() const {
     int width, height;
     glfwGetWindowSize(m_Window, &width, &height);
-    return glm::vec2(width, height);
+    return Vector2(width, height);
 }
 
 bool MacOSWindow::GetWindowClose() const {
@@ -88,10 +88,10 @@ uint32_t MacOSWindow::GetMouseY() const {
     return y;
 }
 
-glm::vec2 MacOSWindow::GetMousePos() const {
+Vector2 MacOSWindow::GetMousePos() const {
     double x, y;
     glfwGetCursorPos(m_Window, &x, &y);
-    return glm::vec2(x, y);
+    return Vector2(x, y);
 }
 
 void MacOSWindow::UpdateEvents() {

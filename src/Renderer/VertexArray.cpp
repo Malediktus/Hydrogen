@@ -5,11 +5,11 @@
 
 using namespace Hydrogen;
 
-Reference<VertexArray> VertexArray::Create() {
+ReferencePointer<VertexArray> VertexArray::Create() {
     ZoneScoped;
     switch (Renderer::GetAPI()) {
     case RendererAPI::API::OpenGL:
-        return NewReference<OpenGL::OpenGLVertexArray>();
+        return NewReferencePointer<OpenGL::OpenGLVertexArray>();
     default:
         HY_ASSERT_CHECK(false, "Invalid renderer API value returned from Renderer::GetRendererAPI()");
     }

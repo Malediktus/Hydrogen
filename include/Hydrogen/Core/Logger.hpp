@@ -11,7 +11,7 @@ class Logger {
 public:
     enum class LogLevel { Trace = 0, Debug = 1, Info = 2, Warn = 3, Error = 4, Fatal = 5, Disable = 6 };
     // TODO: Default arguments
-    Logger(std::string name, LogLevel logLevel = LogLevel::Info, std::string format = "%^[%T] %n: %v%$", bool out = true, std::string filename = "");
+    Logger(String name, LogLevel logLevel = LogLevel::Info, String format = "%^[%T] %n: %v%$", bool out = true, String filename = "");
 
     template <typename... Args> inline void Trace(Args&&... args) {
         m_Logger->trace(std::forward<Args>(args)...);
@@ -33,21 +33,21 @@ public:
     }
 
 private:
-    Reference<spdlog::logger> m_Logger;
+    ReferencePointer<spdlog::logger> m_Logger;
 };
 
 class SystemLogger {
 public:
     static void Init() {
-        s_Logger = NewReference<Logger>("SYS", Logger::LogLevel::Debug);
+        s_Logger = NewReferencePointer<Logger>("SYS", Logger::LogLevel::Debug);
     }
 
-    static Reference<Logger> GetLogger() {
+    static ReferencePointer<Logger> GetLogger() {
         return s_Logger;
     }
 
 private:
-    static Reference<Logger> s_Logger;
+    static ReferencePointer<Logger> s_Logger;
 };
 
 #define HY_LOG_TRACE(...) Hydrogen::SystemLogger::GetLogger()->Trace(__VA_ARGS__);

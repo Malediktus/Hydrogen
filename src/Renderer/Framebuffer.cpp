@@ -5,11 +5,11 @@
 
 using namespace Hydrogen;
 
-Reference<Framebuffer> Framebuffer::Create(const Reference<RenderWindow>& window) {
+ReferencePointer<Framebuffer> Framebuffer::Create(const ReferencePointer<RenderWindow>& window) {
     ZoneScoped;
     switch (Renderer::GetAPI()) {
     case RendererAPI::API::OpenGL:
-        return NewReference<OpenGL::OpenGLFramebuffer>(window);
+        return NewReferencePointer<OpenGL::OpenGLFramebuffer>(window);
     default:
         HY_ASSERT_CHECK(false, "Invalid renderer API value returned from Renderer::GetRendererAPI()");
     }

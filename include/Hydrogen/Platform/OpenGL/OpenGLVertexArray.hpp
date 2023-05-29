@@ -11,8 +11,8 @@ public:
     virtual void Bind() const override;
     virtual void Unbind() const override;
 
-    virtual void AddVertexBuffer(const Reference<VertexBuffer>& vertexBuffer) override;
-    virtual void SetIndexBuffer(const Reference<IndexBuffer>& indexBuffer) override;
+    virtual void AddVertexBuffer(const ReferencePointer<VertexBuffer>& vertexBuffer) override;
+    virtual void SetIndexBuffer(const ReferencePointer<IndexBuffer>& indexBuffer) override;
 
     virtual void SetRenderPrimitive(RenderPrimitive primitive) override {
         m_Primitive = primitive;
@@ -22,17 +22,17 @@ public:
         return m_Primitive;
     }
 
-    virtual const std::vector<Reference<VertexBuffer>>& GetVertexBuffers() const override {
+    virtual const DynamicArray<ReferencePointer<VertexBuffer>>& GetVertexBuffers() const override {
         return m_VertexBuffers;
     }
-    virtual const Reference<IndexBuffer>& GetIndexBuffer() const override {
+    virtual const ReferencePointer<IndexBuffer>& GetIndexBuffer() const override {
         return m_IndexBuffer;
     }
 
 private:
     uint32_t m_RendererID;
     RenderPrimitive m_Primitive;
-    std::vector<Reference<VertexBuffer>> m_VertexBuffers;
-    Reference<IndexBuffer> m_IndexBuffer;
+    DynamicArray<ReferencePointer<VertexBuffer>> m_VertexBuffers;
+    ReferencePointer<IndexBuffer> m_IndexBuffer;
 };
 } // namespace Hydrogen::OpenGL

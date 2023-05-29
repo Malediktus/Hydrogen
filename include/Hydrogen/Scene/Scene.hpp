@@ -14,7 +14,7 @@ public:
     Scene() = default;
     ~Scene() = default;
 
-    Reference<Entity> AddEntity(const std::string& name);
+    ReferencePointer<Entity> AddEntity(const String& name);
 
 private:
     entt::registry m_Registry;
@@ -68,7 +68,7 @@ public:
         return GetComponent<IDComponent>().ID;
     }
 
-    const std::string& GetName() {
+    const String& GetName() {
         return GetComponent<TagComponent>().Tag;
     }
 

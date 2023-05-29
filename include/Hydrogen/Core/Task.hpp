@@ -15,13 +15,13 @@ public:
 
 class TaskManager {
 public:
-    static Reference<Task> Activate(Reference<Task> task);
-    static void Deactivate(Reference<Task> task);
+    static ReferencePointer<Task> Activate(ReferencePointer<Task> task);
+    static void Deactivate(ReferencePointer<Task> task);
 
     static void Update();
     static void Shutdown();
 
 private:
-    static std::vector<Reference<Task>> s_Tasks;
+    static DynamicArray<ReferencePointer<Task>> s_Tasks;
 };
 } // namespace Hydrogen

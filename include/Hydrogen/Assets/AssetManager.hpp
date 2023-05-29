@@ -14,7 +14,7 @@ public:
     };
 
     virtual ~Asset() = default;
-    virtual void Load(const std::string& filepath) = 0;
+    virtual void Load(const String& filepath) = 0;
 
     AssetInfo GetInfo() {
         return m_AssetInfo;
@@ -30,15 +30,15 @@ public:
         m_AssetInfo.Preload = true;
     }
 
-    void Load(const std::string& filepath) override {
+    void Load(const String& filepath) override {
         HY_LOG_DEBUG("Loading sprite: {}", filepath);
     }
 
-    static const std::vector<const std::string> GetFileExtensions() {
-        return std::vector<const std::string> {".png", ".jpg", ".bmp", ".tga", ".hdr"};
+    static const DynamicArray<const String> GetFileExtensions() {
+        return DynamicArray<const String> {".png", ".jpg", ".bmp", ".tga", ".hdr"};
     }
 
-    static bool CheckFileExtensions(const std::string& ext) {
+    static bool CheckFileExtensions(const String& ext) {
         auto exts = GetFileExtensions();
         return std::find(exts.begin(), exts.end(), ext.c_str()) != exts.end();
     }
@@ -50,26 +50,26 @@ public:
         m_AssetInfo.Preload = true;
     }
 
-    void Load(const std::string& filepath) override {
+    void Load(const String& filepath) override {
         HY_LOG_DEBUG("Loading shader: {}", filepath);
         m_Shader = Shader::Create(filepath);
     }
 
-    const Reference<Shader>& GetShader() {
+    const ReferencePointer<Shader>& GetShader() {
         return m_Shader;
     }
 
-    static const std::vector<const std::string> GetFileExtensions() {
-        return std::vector<const std::string> {".glsl"};
+    static const DynamicArray<const String> GetFileExtensions() {
+        return DynamicArray<const String> {".glsl"};
     }
 
-    static bool CheckFileExtensions(const std::string& ext) {
+    static bool CheckFileExtensions(const String& ext) {
         auto exts = GetFileExtensions();
         return std::find(exts.begin(), exts.end(), ext.c_str()) != exts.end();
     }
 
 private:
-    Reference<Shader> m_Shader;
+    ReferencePointer<Shader> m_Shader;
 };
 
 class AssetManager {
@@ -86,12 +86,12 @@ public:
             auto extension = filename.extension().string();
             auto filenameString = filename.string();
             if (SpriteAsset::CheckFileExtensions(extension)) {
-                auto ref = NewReference<SpriteAsset>();
+                auto ref = NewReferencePointer<SpriteAsset>();
                 if (ref->GetInfo().Preload)
                     ref->Load(filenameString);
                 s_Assets[filenameString] = ref;
             } else if (ShaderAsset::CheckFileExtensions(extension)) {
-                auto ref = NewReference<ShaderAsset>();
+                auto ref = NewReferencePointer<ShaderAsset>();
                 if (ref->GetInfo().Preload)
                     ref->Load(filenameString);
                 s_Assets[filenameString] = ref;
@@ -99,7 +99,7 @@ public:
         }
     }
 
-    template <typename T> static Reference<T> Get(const std::string& filename) {
+    template <typename T> static ReferencePointer<T> Get(const String& filename) {
         static_assert(std::is_base_of<Asset, T>::value, "T must be derived from Asset");
 
         if (s_Assets[filename])
@@ -113,11 +113,11 @@ public:
         auto extension = filepath.extension().string();
         auto filenameString = filepath.string();
         if (SpriteAsset::CheckFileExtensions(extension)) {
-            auto ref = NewReference<SpriteAsset>();
+            auto ref = NewReferencePointer<SpriteAsset>();
             ref->Load(filenameString);
             s_Assets[filenameString] = ref;
         } else if (ShaderAsset::CheckFileExtensions(extension)) {
-            auto ref = NewReference<ShaderAsset>();
+            auto ref = NewReferencePointer<ShaderAsset>();
             ref->Load(filenameString);
             s_Assets[filenameString] = ref;
         }
@@ -126,6 +126,6 @@ public:
     }
 
 private:
-    static std::unordered_map<std::string, Reference<Asset>> s_Assets;
+    static std::unordered_map<String, ReferencePointer<Asset>> s_Assets;
 };
 } // namespace Hydrogen

@@ -67,7 +67,7 @@ void OpenGLVertexArray::Unbind() const {
     HY_LOG_TRACE("Unbount OpenGL vertex array (ID: {})", m_RendererID);
 }
 
-void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer) {
+void OpenGLVertexArray::AddVertexBuffer(const ReferencePointer<VertexBuffer>& vertexBuffer) {
     ZoneScoped;
     HY_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "At lease one value is needed in vertex buffer layout");
 
@@ -88,7 +88,7 @@ void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& ver
     HY_LOG_TRACE("Attached vertex buffer to OpenGL vertex array (ID: {})", m_RendererID);
 }
 
-void OpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer) {
+void OpenGLVertexArray::SetIndexBuffer(const ReferencePointer<IndexBuffer>& indexBuffer) {
     ZoneScoped;
     glBindVertexArray(m_RendererID);
     indexBuffer->Bind();

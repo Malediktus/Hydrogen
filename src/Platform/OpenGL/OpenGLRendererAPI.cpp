@@ -1,5 +1,6 @@
 #include <Hydrogen/Platform/OpenGL/OpenGLRendererAPI.hpp>
 #include <Hydrogen/Core/Logger.hpp>
+#include <Hydrogen/Math/Math.hpp>
 #include <tracy/Tracy.hpp>
 #include <glad/glad.h>
 
@@ -89,7 +90,7 @@ static GLenum PrimitiveToGLenum(RenderPrimitive primitive) {
 }
 } // namespace Hydrogen::Utils
 
-void OpenGLRendererAPI::SetClearColor(const glm::vec4& color) {
+void OpenGLRendererAPI::SetClearColor(const Vector4& color) {
     ZoneScoped;
     glClearColor(color.r, color.g, color.b, color.a);
     glCheckError();

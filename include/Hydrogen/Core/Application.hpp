@@ -3,6 +3,7 @@
 #include "Memory.hpp"
 #include "Logger.hpp"
 #include "Window.hpp"
+#include "../Math/Math.hpp"
 #include "../Scene/Scene.hpp"
 #include "../Event/EventManager.hpp"
 #include "../Renderer/Context.hpp"
@@ -25,19 +26,22 @@ public:
     virtual void OnEvent(const Event& event) = 0;
 
 protected:
-    Reference<Logger> Console;
-    Reference<Window> AppWindow;
-    Reference<Scene> CurrentScene;
+    ReferencePointer<Logger> Console;
+    ReferencePointer<Window> AppWindow;
+    ReferencePointer<Scene> CurrentScene;
     struct _ApplicationInfo {
-        std::string Name;
-        glm::vec3 Version;
-        glm::vec2 WindowSize;
+        String Name;
+        Vector3 Version;
+        Vector2 WindowSize;
     } ApplicationInfo;
 
 private:
-    Reference<Context> m_RenderContext;
-    Reference<Renderer> m_WindowRenderer;
+    bool m_Initialized = false;
+    void OnResize(const Event& event);
+
+    ReferencePointer<Context> m_RenderContext;
+    ReferencePointer<Renderer> m_WindowRenderer;
 };
 
-extern Reference<Application> CreateApplication();
+extern ReferencePointer<Application> CreateApplication();
 } // namespace Hydrogen

@@ -5,7 +5,7 @@
 using namespace Hydrogen;
 
 Application::Application() {
-    Console = NewReference<Logger>("APP", Logger::LogLevel::Debug);
+    Console = NewReferencePointer<Logger>("APP", Logger::LogLevel::Debug);
     SystemLogger::Init();
 }
 
@@ -26,13 +26,11 @@ void Application::Run() {
 
     AssetManager::Init();
 
-    Reference<ShaderAsset> defaultShader = AssetManager::Get<ShaderAsset>("assets/Raw.glsl");
-    Reference<ShaderAsset> geometryShader = AssetManager::Get<ShaderAsset>("assets/GeometryPass.glsl");
-    m_WindowRenderer = NewReference<Renderer>(defaultShader->GetShader(), geometryShader->GetShader(), 1280, 720);
+    ReferencePointer<ShaderAsset> defaultShader = AssetManager::Get<ShaderAsset>("assets/BlinnPhong.glsl");
+    m_WindowRenderer = NewReferencePointer<Renderer>(defaultShader->GetShader(), 1280, 720);
 
-    CurrentScene = NewReference<Scene>();
+    CurrentScene = NewReferencePointer<Scene>();
 
-    OnInit();
     // Register event callbacks
     EventDispatcher::Subscribe<WindowResizeEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
     EventDispatcher::Subscribe<WindowCloseEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
@@ -43,6 +41,8 @@ void Application::Run() {
     EventDispatcher::Subscribe<MousePressEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
     EventDispatcher::Subscribe<MouseReleaseEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
     EventDispatcher::Subscribe<MouseScrollEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+
+    EventDispatcher::Subscribe<WindowResizeEvent>(std::bind(&Application::OnResize, this, std::placeholders::_1));
 
     float planeVertices[] = {10.0f,  -0.5f, 10.0f,  0.0f, 1.0f, 0.0f, 10.0f, 0.0f,  -10.0f, -0.5f, 10.0f,  0.0f, 1.0f, 0.0f, 0.0f,  0.0f,
                              -10.0f, -0.5f, -10.0f, 0.0f, 1.0f, 0.0f, 0.0f,  10.0f, 10.0f,  -0.5f, 10.0f,  0.0f, 1.0f, 0.0f, 10.0f, 0.0f,
@@ -57,13 +57,14 @@ void Application::Run() {
     vertexArray->AddVertexBuffer(vertexBuffer);
     vertexArray->SetIndexBuffer(indexBuffer);
 
-    glm::vec3 lightPositions[] = {glm::vec3(-3.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(3.0f, 0.0f, 0.0f)};
-    glm::vec3 lightColors[] = {glm::vec3(0.25), glm::vec3(0.50), glm::vec3(0.75), glm::vec3(1.00)};
+    Vector3 lightPositions[] = {Vector3(-3.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), Vector3(3.0f, 0.0f, 0.0f)};
+    Vector3 lightColors[] = {Vector3(0.25), Vector3(0.50), Vector3(0.75), Vector3(1.00)};
 
-    auto camera = NewReference<Camera>(90.0f, 1280.0f, 720.0f);
-    camera->Translate(glm::vec3(0.0f, 3.0f, 12.0f));
+    auto camera = NewReferencePointer<Camera>(90.0f, 1280.0f, 720.0f);
+    camera->Translate(Vector3(0.0f, 3.0f, 12.0f));
 
-    RenderCommand::ConfigureAntiAliasing(true);
+    m_Initialized = true;
+    OnInit();
 
     while (!AppWindow->GetWindowClose()) {
         TaskManager::Update();
@@ -83,4 +84,12 @@ void Application::Run() {
     OnShutdown();
     TaskManager::Shutdown();
     m_RenderContext->Destroy();
+}
+
+void Application::OnResize(const Event& event) {
+    if (!m_Initialized)
+        return;
+    auto resizeEvent = dynamic_cast<const WindowResizeEvent&>(event);
+    HY_LOG_DEBUG("Resizing renderer: {}, {}", resizeEvent.GetWidth(), resizeEvent.GetHeight());
+    m_WindowRenderer->OnResize(resizeEvent.GetWidth(), resizeEvent.GetHeight());
 }

@@ -24,16 +24,16 @@ public:
     virtual void Bind() const = 0;
     virtual void Unbind() const = 0;
 
-    virtual void AddVertexBuffer(const Reference<VertexBuffer>& vertexBuffer) = 0;
-    virtual void SetIndexBuffer(const Reference<IndexBuffer>& indexBuffer) = 0;
+    virtual void AddVertexBuffer(const ReferencePointer<VertexBuffer>& vertexBuffer) = 0;
+    virtual void SetIndexBuffer(const ReferencePointer<IndexBuffer>& indexBuffer) = 0;
 
     virtual void SetRenderPrimitive(RenderPrimitive renderPrimitive) = 0;
     virtual RenderPrimitive GetRenderPrimitive() const = 0;
 
-    virtual const std::vector<Reference<VertexBuffer>>& GetVertexBuffers() const = 0;
-    virtual const Reference<IndexBuffer>& GetIndexBuffer() const = 0;
+    virtual const std::vector<ReferencePointer<VertexBuffer>>& GetVertexBuffers() const = 0;
+    virtual const ReferencePointer<IndexBuffer>& GetIndexBuffer() const = 0;
 
-    static Reference<VertexArray> Create();
+    static ReferencePointer<VertexArray> Create();
 };
 
 } // namespace Hydrogen

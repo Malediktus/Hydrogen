@@ -15,6 +15,7 @@ set(HEADER_LIST
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Event/KeyCodes.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Scene/Scene.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Scene/Components.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Math/Math.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Renderer/Buffer.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Renderer/Camera.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Renderer/Context.hpp"

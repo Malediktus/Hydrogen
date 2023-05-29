@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Platform.hpp"
+#include "../Core/Memory.hpp"
 #include <string>
 
 #ifdef HY_DEBUG
@@ -27,8 +28,8 @@
 
 namespace Hydrogen {
 #ifdef HY_COMPILER_MSVC
-void ReportAssertionFailure(const char* filename, size_t line, bool check, const std::string& msg);
+void ReportAssertionFailure(const char* filename, size_t line, bool check, const String& msg);
 #else
-__attribute__((noreturn)) void ReportAssertionFailure(const char* filename, size_t line, bool check, const std::string& msg);
+__attribute__((noreturn)) void ReportAssertionFailure(const char* filename, size_t line, bool check, const String& msg);
 #endif
 } // namespace Hydrogen

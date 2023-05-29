@@ -9,8 +9,8 @@
 
 namespace Hydrogen {
 struct ProjectInformation {
-    std::string ProjectName;
-    glm::vec3 ProjectVersion;
+    String ProjectName;
+    Vector3 ProjectVersion;
 };
 
 class Context {
@@ -20,8 +20,8 @@ public:
     virtual void Init() = 0;
     virtual void Destroy() = 0;
 
-    virtual Reference<RenderWindow> GetWindow() = 0;
+    virtual ReferencePointer<RenderWindow> GetWindow() = 0;
 
-    static Reference<Context> Create(const Reference<RenderWindow>& window, ProjectInformation projectInfo);
+    static ReferencePointer<Context> Create(const ReferencePointer<RenderWindow>& window, ProjectInformation projectInfo);
 };
 } // namespace Hydrogen

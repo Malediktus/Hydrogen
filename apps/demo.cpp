@@ -2,7 +2,7 @@
 
 class DemoTask : public Hydrogen::Task {
 public:
-    DemoTask(Hydrogen::Reference<Hydrogen::Logger> console) {
+    DemoTask(Hydrogen::ReferencePointer<Hydrogen::Logger> console) {
         Console = console;
     }
 
@@ -18,7 +18,7 @@ public:
     }
 
 private:
-    Hydrogen::Reference<Hydrogen::Logger> Console;
+    Hydrogen::ReferencePointer<Hydrogen::Logger> Console;
 };
 
 class DemoApplication : public Hydrogen::Application {
@@ -31,7 +31,7 @@ public:
 
     void OnInit() override {
         Console->Debug("Started App");
-        m_DemoTask = Hydrogen::TaskManager::Activate(Hydrogen::NewReference<DemoTask>(Console));
+        m_DemoTask = Hydrogen::TaskManager::Activate(Hydrogen::NewReferencePointer<DemoTask>(Console));
 
         auto entity = CurrentScene->AddEntity("PointLight");
         entity->AddComponent<Hydrogen::TransformComponent>(glm::vec3(-3.0f, 0.0f, 0.0f));
@@ -49,9 +49,9 @@ public:
     }
 
 private:
-    Hydrogen::Reference<Hydrogen::Task> m_DemoTask;
+    Hydrogen::ReferencePointer<Hydrogen::Task> m_DemoTask;
 };
 
-Hydrogen::Reference<Hydrogen::Application> Hydrogen::CreateApplication() {
-    return Hydrogen::NewReference<DemoApplication>();
+Hydrogen::ReferencePointer<Hydrogen::Application> Hydrogen::CreateApplication() {
+    return Hydrogen::NewReferencePointer<DemoApplication>();
 }

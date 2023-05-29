@@ -5,33 +5,33 @@
 
 using namespace Hydrogen;
 
-Reference<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size) {
+ReferencePointer<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size) {
     ZoneScoped;
     switch (Renderer::GetAPI()) {
     case RendererAPI::API::OpenGL:
-        return NewReference<OpenGL::OpenGLVertexBuffer>(vertices, size);
+        return NewReferencePointer<OpenGL::OpenGLVertexBuffer>(vertices, size);
     default:
         HY_ASSERT_CHECK(false, "Invalid renderer API value returned from Renderer::GetRendererAPI()");
     }
     return nullptr;
 }
 
-Reference<VertexBuffer> VertexBuffer::Create(uint32_t size) {
+ReferencePointer<VertexBuffer> VertexBuffer::Create(uint32_t size) {
     ZoneScoped;
     switch (Renderer::GetAPI()) {
     case RendererAPI::API::OpenGL:
-        return NewReference<OpenGL::OpenGLVertexBuffer>(size);
+        return NewReferencePointer<OpenGL::OpenGLVertexBuffer>(size);
     default:
         HY_ASSERT_CHECK(false, "Invalid renderer API value returned from Renderer::GetRendererAPI()");
     }
     return nullptr;
 }
 
-Reference<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t size) {
+ReferencePointer<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t size) {
     ZoneScoped;
     switch (Renderer::GetAPI()) {
     case RendererAPI::API::OpenGL:
-        return NewReference<OpenGL::OpenGLIndexBuffer>(indices, size);
+        return NewReferencePointer<OpenGL::OpenGLIndexBuffer>(indices, size);
     default:
         HY_ASSERT_CHECK(false, "Invalid renderer API value returned from Renderer::GetRendererAPI()");
     }

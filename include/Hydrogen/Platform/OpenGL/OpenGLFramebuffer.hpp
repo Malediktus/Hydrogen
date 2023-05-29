@@ -4,7 +4,7 @@
 namespace Hydrogen::OpenGL {
 class OpenGLFramebuffer : public Framebuffer {
 public:
-    OpenGLFramebuffer(const Reference<RenderWindow>& window);
+    OpenGLFramebuffer(const ReferencePointer<RenderWindow>& window);
     virtual ~OpenGLFramebuffer();
 
     virtual void Bind() const override;
@@ -14,15 +14,15 @@ public:
 
     virtual void SetDrawBuffers(const std::vector<std::pair<FramebufferAttachment, uint32_t>>& attachments) override;
 
-    virtual void AttachColorTexture(const Reference<Texture2D>& texture) override;
-    virtual void AttachDepthTexture(const Reference<Texture2D>& texture) override;
-    virtual void AttachStencilTexture(const Reference<Texture2D>& texture) override;
-    virtual void AttachDepthStencilTexture(const Reference<Texture2D>& texture) override;
+    virtual void AttachColorTexture(const ReferencePointer<Texture2D>& texture) override;
+    virtual void AttachDepthTexture(const ReferencePointer<Texture2D>& texture) override;
+    virtual void AttachStencilTexture(const ReferencePointer<Texture2D>& texture) override;
+    virtual void AttachDepthStencilTexture(const ReferencePointer<Texture2D>& texture) override;
 
-    virtual void AttachColorRenderbuffer(const Reference<Renderbuffer>& renderbuffer) override;
-    virtual void AttachDepthRenderbuffer(const Reference<Renderbuffer>& renderbuffer) override;
-    virtual void AttachStencilRenderbuffer(const Reference<Renderbuffer>& renderbuffer) override;
-    virtual void AttachDepthStencilRenderbuffer(const Reference<Renderbuffer>& renderbuffer) override;
+    virtual void AttachColorRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) override;
+    virtual void AttachDepthRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) override;
+    virtual void AttachStencilRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) override;
+    virtual void AttachDepthStencilRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) override;
 
 private:
     uint32_t m_RendererID;

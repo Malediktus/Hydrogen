@@ -15,19 +15,19 @@ namespace Hydrogen {
 enum LightType { None = 0, Point = 1, Directional = 2, Spot = 3 };
 
 struct Light {
-    Light(const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3 specular) : Ambient(ambient), Diffuse(diffuse), Specular(specular) {
+    Light(const Vector3& ambient, const Vector3& diffuse, const Vector3 specular) : Ambient(ambient), Diffuse(diffuse), Specular(specular) {
         ZoneScoped;
     }
     ~Light() = default;
 
     LightType Type = LightType::None;
-    glm::vec3 Ambient;
-    glm::vec3 Diffuse;
-    glm::vec3 Specular;
+    Vector3 Ambient;
+    Vector3 Diffuse;
+    Vector3 Specular;
 };
 
 struct PointLight : public Light {
-    PointLight(float constant, float linear, float quadratic, const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3 specular)
+    PointLight(float constant, float linear, float quadratic, const Vector3& ambient, const Vector3& diffuse, const Vector3 specular)
         : Light(ambient, diffuse, specular), Constant(constant), Linear(linear), Quadratic(quadratic) {
         ZoneScoped;
         Type = LightType::Point;
@@ -40,7 +40,7 @@ struct PointLight : public Light {
 };
 
 struct DirectionalLight : public Light {
-    DirectionalLight(const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3 specular) : Light(ambient, diffuse, specular) {
+    DirectionalLight(const Vector3& ambient, const Vector3& diffuse, const Vector3 specular) : Light(ambient, diffuse, specular) {
         ZoneScoped;
         Type = LightType::Directional;
     }
@@ -48,7 +48,7 @@ struct DirectionalLight : public Light {
 };
 
 struct SpotLight : public Light {
-    SpotLight(float cutOff, float outerCutOff, float constant, float linear, float quadratic, const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3 specular)
+    SpotLight(float cutOff, float outerCutOff, float constant, float linear, float quadratic, const Vector3& ambient, const Vector3& diffuse, const Vector3 specular)
         : Light(ambient, diffuse, specular), CutOff(cutOff), OuterCutOff(outerCutOff), Constant(constant), Linear(linear), Quadratic(quadratic) {
         ZoneScoped;
         Type = LightType::Spot;
@@ -64,37 +64,34 @@ struct SpotLight : public Light {
 
 class Renderer {
 public:
-    Renderer(const Reference<Shader>& defaultShader, const Reference<Shader>& geometryShader, const int width, const int height);
+    Renderer(const ReferencePointer<Shader>& defaultShader, const int width, const int height);
     ~Renderer() = default;
 
     void OnResize(const int width, const int height);
 
-    void BeginFrame(const Reference<Camera>& camera);
+    void BeginFrame(const ReferencePointer<Camera>& camera);
     void EndFrame();
 
-    void Submit(const Reference<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
-    void Submit(const Light& light, const glm::mat4& transform = glm::mat4(1.0f));
+    void Submit(const ReferencePointer<VertexArray>& vertexArray, const Matrix4& transform = Matrix4(1.0f));
+    void Submit(const Light& light, const Matrix4& transform = Matrix4(1.0f));
 
     inline static RendererAPI::API GetAPI() {
         return RendererAPI::GetAPI();
     }
 
-    static void SetContext(Reference<Context> context);
-    static Reference<Context> GetContext();
+    static void SetContext(ReferencePointer<Context> context);
+    static ReferencePointer<Context> GetContext();
 
 private:
-    Reference<Shader> m_Shader;
-    Reference<Shader> m_GeometryShader;
-    Reference<Framebuffer> m_GBuffer;
-    Reference<Texture2D> m_GBufferPositionTexture;
-    Reference<Texture2D> m_GBufferDiffuseTexture;
-    Reference<Texture2D> m_GBufferNormalTexture;
-    Reference<Texture2D> m_GBufferTexCoordTexture;
-    Reference<Texture2D> m_GBufferDepthTexture;
-    static Reference<Context> s_Context;
+    ReferencePointer<Shader> m_Shader;
+    static ReferencePointer<Context> s_Context;
 
     struct Framedata {
-        Reference<Camera> FrameCamera;
+        ReferencePointer<Camera> FrameCamera;
+        DynamicArray<const ReferencePointer<VertexArray>> vertexArrays;
+        DynamicArray<Matrix4> vertexArrayTransforms;
+        DynamicArray<Light> lights;
+        DynamicArray<Matrix4> lightTransforms;
     } m_Framedata;
 };
 } // namespace Hydrogen

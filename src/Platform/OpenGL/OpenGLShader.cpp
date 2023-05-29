@@ -1,5 +1,6 @@
 #include <Hydrogen/Platform/OpenGL/OpenGLShader.hpp>
 #include <Hydrogen/Platform/OpenGL/OpenGLRendererAPI.hpp>
+#include <Hydrogen/Core/Memory.hpp>
 #include <Hydrogen/Core/Logger.hpp>
 #include <array>
 #include <fstream>
@@ -10,9 +11,10 @@
 #include <vector>
 
 using namespace Hydrogen::OpenGL;
+using namespace Hydrogen;
 
 namespace Utils {
-static GLenum ShaderTypeFromString(const std::string& type) {
+static GLenum ShaderTypeFromString(const String& type) {
     ZoneScoped;
     if (type == "vertex")
         return GL_VERTEX_SHADER;
@@ -26,7 +28,7 @@ static GLenum ShaderTypeFromString(const std::string& type) {
     return 0;
 }
 
-static const std::string StringFromShaderType(const GLenum type) {
+static const String StringFromShaderType(const GLenum type) {
     ZoneScoped;
     if (type == GL_VERTEX_SHADER)
         return "vertex";
@@ -41,23 +43,23 @@ static const std::string StringFromShaderType(const GLenum type) {
 }
 } // namespace Utils
 
-OpenGLShader::OpenGLShader(const std::string& filepath) {
+OpenGLShader::OpenGLShader(const String& filepath) {
     ZoneScoped;
-    std::string source = ReadFile(filepath);
+    String source = ReadFile(filepath);
     auto shaderSources = PreProcess(source);
     Compile(shaderSources);
 
     // Extract name from filepath
     auto lastSlash = filepath.find_last_of("/\\");
-    lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
+    lastSlash = lastSlash == String::npos ? 0 : lastSlash + 1;
     auto lastDot = filepath.rfind('.');
-    auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
+    auto count = lastDot == String::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
     m_Name = filepath.substr(lastSlash, count);
 }
 
-OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, const std::string& geometrySrc) : m_Name(name) {
+OpenGLShader::OpenGLShader(const String& name, const String& vertexSrc, const String& fragmentSrc, const String& geometrySrc) : m_Name(name) {
     ZoneScoped;
-    std::unordered_map<GLenum, std::string> sources;
+    std::unordered_map<GLenum, String> sources;
     sources[GL_VERTEX_SHADER] = vertexSrc;
     sources[GL_FRAGMENT_SHADER] = fragmentSrc;
     if (!geometrySrc.empty())
@@ -72,9 +74,9 @@ OpenGLShader::~OpenGLShader() {
     // HY_LOG_TRACE("Deleted OpenGL shader program (ID: {})", m_RendererID); // Dont now why but this segfaults (maybe lifetime related)
 }
 
-std::string OpenGLShader::ReadFile(const std::string& filepath) {
+String OpenGLShader::ReadFile(const String& filepath) {
     ZoneScoped;
-    std::string result;
+    String result;
     std::ifstream in(filepath, std::ios::in | std::ios::binary);
     HY_ASSERT(in, "Failed to open shader file");
     in.seekg(0, std::ios::end);
@@ -86,28 +88,28 @@ std::string OpenGLShader::ReadFile(const std::string& filepath) {
     return result;
 }
 
-std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& source) {
+std::unordered_map<GLenum, String> OpenGLShader::PreProcess(const String& source) {
     ZoneScoped;
-    std::unordered_map<GLenum, std::string> shaderSources;
+    std::unordered_map<GLenum, String> shaderSources;
 
     const char* typeToken = "#type";
     size_t typeTokenLength = strlen(typeToken);
     size_t pos = source.find(typeToken, 0);
-    while (pos != std::string::npos) {
+    while (pos != String::npos) {
         size_t eol = source.find_first_of("\r\n", pos);
-        HY_ASSERT(eol != std::string::npos, "Expected definition after #type instruction");
+        HY_ASSERT(eol != String::npos, "Expected definition after #type instruction");
         size_t begin = pos + typeTokenLength + 1;
-        std::string type = source.substr(begin, eol - begin);
+        String type = source.substr(begin, eol - begin);
 
         size_t nextLinePos = source.find_first_not_of("\r\n", eol);
         pos = source.find(typeToken, nextLinePos);
-        shaderSources[::Utils::ShaderTypeFromString(type)] = source.substr(nextLinePos, pos - (nextLinePos == std::string::npos ? source.size() - 1 : nextLinePos));
+        shaderSources[::Utils::ShaderTypeFromString(type)] = source.substr(nextLinePos, pos - (nextLinePos == String::npos ? source.size() - 1 : nextLinePos));
     }
 
     return shaderSources;
 }
 
-void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shaderSources) {
+void OpenGLShader::Compile(const std::unordered_map<GLenum, String>& shaderSources) {
     ZoneScoped;
     GLuint program = glCreateProgram();
     HY_LOG_TRACE("Created OpenGL shader program (ID: {})", program);
@@ -116,7 +118,7 @@ void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shader
     int glShaderIDIndex = 0;
     for (auto& kv : shaderSources) {
         GLenum type = kv.first;
-        const std::string& source = kv.second;
+        const String& source = kv.second;
 
         GLuint shader = glCreateShader(type);
         HY_LOG_TRACE("Created OpenGL shader of type {} (ID: {})", ::Utils::StringFromShaderType(type), shader);
@@ -206,42 +208,42 @@ void OpenGLShader::Unbind() const {
     HY_LOG_TRACE("Unbound OpenGL shader program (ID: {})", m_RendererID);
 }
 
-void OpenGLShader::SetInt(const std::string& name, int value) {
+void OpenGLShader::SetInt(const String& name, int value) {
     ZoneScoped;
     m_UniformInts[name] = value;
 }
 
-void OpenGLShader::SetFloat(const std::string& name, float value) {
+void OpenGLShader::SetFloat(const String& name, float value) {
     ZoneScoped;
     m_UniformFloats[name] = value;
 }
 
-void OpenGLShader::SetFloat2(const std::string& name, const glm::vec2& value) {
+void OpenGLShader::SetFloat2(const String& name, const glm::vec2& value) {
     ZoneScoped;
     m_UniformFloat2s[name] = value;
 }
 
-void OpenGLShader::SetFloat3(const std::string& name, const glm::vec3& value) {
+void OpenGLShader::SetFloat3(const String& name, const glm::vec3& value) {
     ZoneScoped;
     m_UniformFloat3s[name] = value;
 }
 
-void OpenGLShader::SetFloat4(const std::string& name, const glm::vec4& value) {
+void OpenGLShader::SetFloat4(const String& name, const glm::vec4& value) {
     ZoneScoped;
     m_UniformFloat4s[name] = value;
 }
 
-void OpenGLShader::SetMatrix3(const std::string& name, const glm::mat3& matrix) {
+void OpenGLShader::SetMatrix3(const String& name, const glm::mat3& matrix) {
     ZoneScoped;
     m_UniformMatrix3s[name] = matrix;
 }
 
-void OpenGLShader::SetMatrix4(const std::string& name, const glm::mat4& matrix) {
+void OpenGLShader::SetMatrix4(const String& name, const glm::mat4& matrix) {
     ZoneScoped;
     m_UniformMatrix4s[name] = matrix;
 }
 
-void OpenGLShader::UploadInt(const std::string& name, int value) {
+void OpenGLShader::UploadInt(const String& name, int value) {
     ZoneScoped;
     GLint location = glGetUniformLocation(m_RendererID, name.c_str());
     glUniform1i(location, value);
@@ -249,7 +251,7 @@ void OpenGLShader::UploadInt(const std::string& name, int value) {
     HY_LOG_TRACE("Uploaded int to OpenGL shader program (name: {}, value: {}, ID: {})", name, value, m_RendererID);
 }
 
-void OpenGLShader::UploadFloat(const std::string& name, float value) {
+void OpenGLShader::UploadFloat(const String& name, float value) {
     ZoneScoped;
     GLint location = glGetUniformLocation(m_RendererID, name.c_str());
     glUniform1f(location, value);
@@ -257,7 +259,7 @@ void OpenGLShader::UploadFloat(const std::string& name, float value) {
     HY_LOG_TRACE("Uploaded float to OpenGL shader program (name: {}, value: {}, ID: {})", name, value, m_RendererID);
 }
 
-void OpenGLShader::UploadFloat2(const std::string& name, const glm::vec2& value) {
+void OpenGLShader::UploadFloat2(const String& name, const glm::vec2& value) {
     ZoneScoped;
     GLint location = glGetUniformLocation(m_RendererID, name.c_str());
     glUniform2f(location, value.x, value.y);
@@ -265,7 +267,7 @@ void OpenGLShader::UploadFloat2(const std::string& name, const glm::vec2& value)
     HY_LOG_TRACE("Uploaded vector2 to OpenGL shader program (name: {}, value: ({}, {}), ID: {})", name, value.x, value.y, m_RendererID);
 }
 
-void OpenGLShader::UploadFloat3(const std::string& name, const glm::vec3& value) {
+void OpenGLShader::UploadFloat3(const String& name, const glm::vec3& value) {
     ZoneScoped;
     GLint location = glGetUniformLocation(m_RendererID, name.c_str());
     glUniform3f(location, value.x, value.y, value.z);
@@ -273,7 +275,7 @@ void OpenGLShader::UploadFloat3(const std::string& name, const glm::vec3& value)
     HY_LOG_TRACE("Uploaded vector3 to OpenGL shader program (name: {}, value: ({}, {}, {}), ID: {})", name, value.x, value.y, value.z, m_RendererID);
 }
 
-void OpenGLShader::UploadFloat4(const std::string& name, const glm::vec4& value) {
+void OpenGLShader::UploadFloat4(const String& name, const glm::vec4& value) {
     ZoneScoped;
     GLint location = glGetUniformLocation(m_RendererID, name.c_str());
     glUniform4f(location, value.x, value.y, value.z, value.w);
@@ -281,7 +283,7 @@ void OpenGLShader::UploadFloat4(const std::string& name, const glm::vec4& value)
     HY_LOG_TRACE("Uploaded vector4 to OpenGL shader program (name: {}, value: ({}, {}, {}, {}), ID: {})", name, value.x, value.y, value.z, value.w, m_RendererID);
 }
 
-void OpenGLShader::UploadMatrix3(const std::string& name, const glm::mat3& matrix) {
+void OpenGLShader::UploadMatrix3(const String& name, const glm::mat3& matrix) {
     ZoneScoped;
     GLint location = glGetUniformLocation(m_RendererID, name.c_str());
     glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
@@ -289,7 +291,7 @@ void OpenGLShader::UploadMatrix3(const std::string& name, const glm::mat3& matri
     HY_LOG_TRACE("Uploaded matrix3x3 to OpenGL shader program (name: {}, ID: {})", name, m_RendererID);
 }
 
-void OpenGLShader::UploadMatrix4(const std::string& name, const glm::mat4& matrix) {
+void OpenGLShader::UploadMatrix4(const String& name, const glm::mat4& matrix) {
     ZoneScoped;
     GLint location = glGetUniformLocation(m_RendererID, name.c_str());
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));

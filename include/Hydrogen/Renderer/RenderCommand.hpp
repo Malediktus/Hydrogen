@@ -12,7 +12,7 @@ public:
         s_RendererAPI = RendererAPI::Create();
     }
 
-    inline static void SetClearColor(const glm::vec4& color) {
+    inline static void SetClearColor(const Vector4& color) {
         s_RendererAPI->SetClearColor(color);
     }
 
@@ -52,11 +52,11 @@ public:
         s_RendererAPI->ConfigureAntiAliasing(enable);
     }
 
-    inline static void DrawIndexed(const Reference<VertexArray>& vertexArray, uint32_t count = 0) {
+    inline static void DrawIndexed(const ReferencePointer<VertexArray>& vertexArray, uint32_t count = 0) {
         s_RendererAPI->DrawIndexed(vertexArray, count);
     }
 
 private:
-    static Reference<RendererAPI> s_RendererAPI;
+    static ReferencePointer<RendererAPI> s_RendererAPI;
 };
 } // namespace Hydrogen

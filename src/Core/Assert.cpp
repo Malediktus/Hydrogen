@@ -3,7 +3,7 @@
 
 using namespace Hydrogen;
 
-void Hydrogen::ReportAssertionFailure(const char* filename, size_t line, bool check, const std::string& msg) {
+void Hydrogen::ReportAssertionFailure(const char* filename, size_t line, bool check, const String& msg) {
 #ifdef HY_DEBUG
     if (check) {
         HY_LOG_FATAL("Assertion failure of type sanity check in file {}, line {}: {}\n", filename, line, msg);

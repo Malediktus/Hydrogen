@@ -2,4 +2,4 @@
 
 using namespace Hydrogen;
 
-Reference<RendererAPI> RenderCommand::s_RendererAPI;
+ReferencePointer<RendererAPI> RenderCommand::s_RendererAPI;

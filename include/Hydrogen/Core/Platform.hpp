@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include "../Core/Memory.hpp"
 
 // Platform detection
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
@@ -124,7 +124,7 @@
 namespace Hydrogen {
 enum class Platform { Windows, WindowsPC, XBoxOne, Unix, Apple, MacOS, IOS, Web, Android, Linux, DragonFlyBSD, FreeBSD, NetBSD, OpenBSD, AkarOS, Solaris, Playstation, Nintendo };
 
-std::string PlatformToString(Platform platform);
+String PlatformToString(Platform platform);
 Platform GetCurrentPlatform();
-inline std::string GetCurrentPlatformName();
+inline String GetCurrentPlatformName();
 } // namespace Hydrogen

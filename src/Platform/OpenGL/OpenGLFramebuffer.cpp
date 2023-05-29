@@ -7,7 +7,7 @@
 using namespace Hydrogen;
 using namespace Hydrogen::OpenGL;
 
-OpenGLFramebuffer::OpenGLFramebuffer(const std::shared_ptr<RenderWindow>&) {
+OpenGLFramebuffer::OpenGLFramebuffer(const ReferencePointer<RenderWindow>&) {
     ZoneScoped;
     glGenFramebuffers(1, &m_RendererID);
     glCheckError();
@@ -61,10 +61,10 @@ void OpenGLFramebuffer::Unbind() const {
     HY_LOG_TRACE("Unbound OpenGL framebuffer (ID: {})", m_RendererID);
 }
 
-void OpenGLFramebuffer::SetDrawBuffers(const std::vector<std::pair<FramebufferAttachment, uint32_t>>& attachments) {
+void OpenGLFramebuffer::SetDrawBuffers(const DynamicArray<std::pair<FramebufferAttachment, uint32_t>>& attachments) {
     ZoneScoped;
     glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
-    std::vector<GLenum> vec(attachments.size());
+    DynamicArray<GLenum> vec(attachments.size());
     for (auto& attachment : attachments) {
         switch (attachment.first) {
         case FramebufferAttachment::Color:
@@ -90,7 +90,7 @@ void OpenGLFramebuffer::SetDrawBuffers(const std::vector<std::pair<FramebufferAt
     HY_LOG_TRACE("Set OpenGL draw buffers for framebuffer (ID: {})", m_RendererID);
 }
 
-void OpenGLFramebuffer::AttachColorTexture(const std::shared_ptr<Texture2D>& texture) {
+void OpenGLFramebuffer::AttachColorTexture(const ReferencePointer<Texture2D>& texture) {
     ZoneScoped;
     HY_ASSERT(numColorAttachments < 32, "Too many color attachments");
     glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
@@ -102,7 +102,7 @@ void OpenGLFramebuffer::AttachColorTexture(const std::shared_ptr<Texture2D>& tex
     HY_LOG_TRACE("Attached texture of type color buffer to OpenGL framebuffer (ID: {}, TextureID: {})", m_RendererID, *(GLuint*) texture->GetNative());
 }
 
-void OpenGLFramebuffer::AttachDepthTexture(const std::shared_ptr<Texture2D>& texture) {
+void OpenGLFramebuffer::AttachDepthTexture(const ReferencePointer<Texture2D>& texture) {
     ZoneScoped;
     HY_ASSERT(numDepthAttachments < 1 && numDepthStencilAttachments < 1, "Too many depth attachments");
     glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
@@ -114,7 +114,7 @@ void OpenGLFramebuffer::AttachDepthTexture(const std::shared_ptr<Texture2D>& tex
     HY_LOG_TRACE("Attached texture of type depth buffer to OpenGL framebuffer (ID: {}, TextureID: {})", m_RendererID, *(GLuint*) texture->GetNative());
 }
 
-void OpenGLFramebuffer::AttachStencilTexture(const std::shared_ptr<Texture2D>& texture) {
+void OpenGLFramebuffer::AttachStencilTexture(const ReferencePointer<Texture2D>& texture) {
     ZoneScoped;
     HY_ASSERT(numStencilAttachments < 1 && numDepthStencilAttachments < 1, "Too many stencil attachments");
     glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
@@ -126,7 +126,7 @@ void OpenGLFramebuffer::AttachStencilTexture(const std::shared_ptr<Texture2D>& t
     HY_LOG_TRACE("Attached texture of type stencil buffer to OpenGL framebuffer (ID: {}, TextureID: {})", m_RendererID, *(GLuint*) texture->GetNative());
 }
 
-void OpenGLFramebuffer::AttachDepthStencilTexture(const std::shared_ptr<Texture2D>& texture) {
+void OpenGLFramebuffer::AttachDepthStencilTexture(const ReferencePointer<Texture2D>& texture) {
     ZoneScoped;
     HY_ASSERT(numDepthStencilAttachments < 1 && numDepthAttachments < 1 && numStencilAttachments < 1, "Too many depth/stencil attachments");
     glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
@@ -138,7 +138,7 @@ void OpenGLFramebuffer::AttachDepthStencilTexture(const std::shared_ptr<Texture2
     HY_LOG_TRACE("Attached texture of type depth_stencil buffer to OpenGL framebuffer (ID: {}, TextureID: {})", m_RendererID, *(GLuint*) texture->GetNative());
 }
 
-void OpenGLFramebuffer::AttachColorRenderbuffer(const std::shared_ptr<Renderbuffer>& renderbuffer) {
+void OpenGLFramebuffer::AttachColorRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) {
     ZoneScoped;
     HY_ASSERT(numColorAttachments < 32, "Too many color attachments");
     glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
@@ -150,7 +150,7 @@ void OpenGLFramebuffer::AttachColorRenderbuffer(const std::shared_ptr<Renderbuff
     HY_LOG_TRACE("Attached renderbuffer of type color buffer to OpenGL framebuffer (ID: {}, RenderbufferID: {})", m_RendererID, *(GLuint*) renderbuffer->GetNative());
 }
 
-void OpenGLFramebuffer::AttachDepthRenderbuffer(const std::shared_ptr<Renderbuffer>& renderbuffer) {
+void OpenGLFramebuffer::AttachDepthRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) {
     ZoneScoped;
     HY_ASSERT(numDepthAttachments < 1 && numDepthStencilAttachments < 1, "Too many depth attachments");
     glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
@@ -162,7 +162,7 @@ void OpenGLFramebuffer::AttachDepthRenderbuffer(const std::shared_ptr<Renderbuff
     HY_LOG_TRACE("Attached renderbuffer of type depth buffer to OpenGL framebuffer (ID: {}, RenderbufferID: {})", m_RendererID, *(GLuint*) renderbuffer->GetNative());
 }
 
-void OpenGLFramebuffer::AttachStencilRenderbuffer(const std::shared_ptr<Renderbuffer>& renderbuffer) {
+void OpenGLFramebuffer::AttachStencilRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) {
     ZoneScoped;
     HY_ASSERT(numStencilAttachments < 1 && numDepthStencilAttachments < 1, "Too many stencil attachments");
     glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
@@ -174,7 +174,7 @@ void OpenGLFramebuffer::AttachStencilRenderbuffer(const std::shared_ptr<Renderbu
     HY_LOG_TRACE("Attached renderbuffer of type stencil buffer to OpenGL framebuffer (ID: {}, RenderbufferID: {})", m_RendererID, *(GLuint*) renderbuffer->GetNative());
 }
 
-void OpenGLFramebuffer::AttachDepthStencilRenderbuffer(const std::shared_ptr<Renderbuffer>& renderbuffer) {
+void OpenGLFramebuffer::AttachDepthStencilRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) {
     ZoneScoped;
     HY_ASSERT(numDepthStencilAttachments < 1 && numDepthAttachments < 1 && numStencilAttachments < 1, "Too many depth/stencil attachments");
     glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);

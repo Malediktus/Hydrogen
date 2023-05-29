@@ -147,8 +147,8 @@ public:
     virtual const BufferLayout& GetLayout() const = 0;
     virtual void SetLayout(const BufferLayout& layout) = 0;
 
-    static Reference<VertexBuffer> Create(float* vertices, uint32_t size);
-    static Reference<VertexBuffer> Create(uint32_t size);
+    static ReferencePointer<VertexBuffer> Create(float* vertices, uint32_t size);
+    static ReferencePointer<VertexBuffer> Create(uint32_t size);
 };
 
 class IndexBuffer {
@@ -161,6 +161,6 @@ public:
 
     virtual uint32_t GetCount() const = 0;
 
-    static Reference<IndexBuffer> Create(uint32_t* indices, uint32_t size);
+    static ReferencePointer<IndexBuffer> Create(uint32_t* indices, uint32_t size);
 };
 } // namespace Hydrogen

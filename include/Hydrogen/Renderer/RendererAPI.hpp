@@ -3,9 +3,9 @@
 #include "../Core/Base.hpp"
 #include "../Core/Assert.hpp"
 #include "../Core/Memory.hpp"
+#include "../Math/Math.hpp"
 #include "VertexArray.hpp"
 #include <glm/glm.hpp>
-#include <memory>
 #include <cstdint>
 
 namespace Hydrogen {
@@ -35,7 +35,7 @@ public:
     enum class CullingType { BACK = 0, FRONT = 1, FRONT_AND_BACK = 2 };
     enum class CullingDirection { CLOCKWISE = 0, COUNTERCLOCKWISE = 1 };
 
-    virtual void SetClearColor(const glm::vec4& color) = 0;
+    virtual void SetClearColor(const Vector4& color) = 0;
     virtual void Clear(const ClearBuffer clearBuffer) = 0;
     virtual void SetViewport(const int width, const int height) = 0;
 
@@ -49,7 +49,7 @@ public:
     virtual void ConfigureWireframeView(const bool enable) = 0;
     virtual void ConfigureAntiAliasing(const bool enable) = 0;
 
-    virtual void DrawIndexed(const Reference<VertexArray>& vertexArray, uint32_t indexCount = 0) = 0;
+    virtual void DrawIndexed(const ReferencePointer<VertexArray>& vertexArray, uint32_t indexCount = 0) = 0;
 
     inline static RendererAPI::API GetAPI() {
         return s_API;
@@ -59,7 +59,7 @@ public:
         s_API = api;
     }
 
-    static Reference<RendererAPI> Create();
+    static ReferencePointer<RendererAPI> Create();
 
 private:
     static API s_API;

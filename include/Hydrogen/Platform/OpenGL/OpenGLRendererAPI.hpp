@@ -8,7 +8,7 @@ public:
     OpenGLRendererAPI() = default;
     virtual ~OpenGLRendererAPI() = default;
 
-    virtual void SetClearColor(const glm::vec4& color) override;
+    virtual void SetClearColor(const Vector4& color) override;
     virtual void Clear(const ClearBuffer clearBuffer) override;
 
     virtual void ConfigureDepthTesting(const bool enable, const bool depthMask, const DepthTestFunc func) override;
@@ -23,7 +23,7 @@ public:
 
     virtual void SetViewport(const int width, const int height) override;
 
-    virtual void DrawIndexed(const Reference<VertexArray>& vertexArray, uint32_t indexCount) override;
+    virtual void DrawIndexed(const ReferencePointer<VertexArray>& vertexArray, uint32_t indexCount) override;
 };
 
 void CheckOpenGLError(const char* file, int line);
