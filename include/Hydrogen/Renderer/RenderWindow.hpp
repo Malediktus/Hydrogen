@@ -11,6 +11,6 @@ public:
     virtual void SetupOpenglContext(int majorVersion, int minorVersion) = 0;
     virtual void* GetWindowOpenGLProcAddress() = 0;
 
-    static RendererAPI::API ChooseRenderingAPI();
+    static RendererAPI::API ChooseRenderingAPI(bool vulkanAvailable);
 };
 } // namespace Hydrogen

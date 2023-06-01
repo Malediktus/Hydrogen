@@ -1,6 +1,7 @@
 #include <Hydrogen/Renderer/Shader.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <Hydrogen/Platform/OpenGL/OpenGLShader.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanShader.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen;
@@ -10,6 +11,8 @@ ReferencePointer<Shader> Shader::Create(const String& filepath) {
     switch (Renderer::GetAPI()) {
     case RendererAPI::API::OpenGL:
         return NewReferencePointer<OpenGL::OpenGLShader>(filepath);
+    case RendererAPI::API::Vulkan:
+        return NewReferencePointer<Vulkan::VulkanShader>(filepath);
     default:
         HY_ASSERT_CHECK(false, "Invalid renderer API value returned from Renderer::GetRendererAPI()");
     }
@@ -21,6 +24,8 @@ ReferencePointer<Shader> Shader::Create(const String& name, const String& vertex
     switch (Renderer::GetAPI()) {
     case RendererAPI::API::OpenGL:
         return NewReferencePointer<OpenGL::OpenGLShader>(name, vertexSrc, fragmentSrc, geometrySrc);
+    case RendererAPI::API::Vulkan:
+        return NewReferencePointer<Vulkan::VulkanShader>(name, vertexSrc, fragmentSrc, geometrySrc);
     default:
         HY_ASSERT_CHECK(false, "Invalid renderer API value returned from Renderer::GetRendererAPI()");
     }

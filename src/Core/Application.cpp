@@ -26,8 +26,7 @@ void Application::Run() {
 
     AssetManager::Init();
 
-    ReferencePointer<ShaderAsset> defaultShader = AssetManager::Get<ShaderAsset>("assets/BlinnPhong.glsl");
-    m_WindowRenderer = NewReferencePointer<Renderer>(defaultShader->GetShader(), 1280, 720);
+    // ReferencePointer<ShaderAsset> defaultShader = AssetManager::Get<ShaderAsset>("assets/BlinnPhong.glsl");
 
     CurrentScene = NewReferencePointer<Scene>();
 
@@ -57,8 +56,8 @@ void Application::Run() {
     vertexArray->AddVertexBuffer(vertexBuffer);
     vertexArray->SetIndexBuffer(indexBuffer);
 
-    Vector3 lightPositions[] = {Vector3(-3.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), Vector3(3.0f, 0.0f, 0.0f)};
-    Vector3 lightColors[] = {Vector3(0.25), Vector3(0.50), Vector3(0.75), Vector3(1.00)};
+    // Vector3 lightPositions[] = {Vector3(-3.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), Vector3(3.0f, 0.0f, 0.0f)};
+    // Vector3 lightColors[] = {Vector3(0.25), Vector3(0.50), Vector3(0.75), Vector3(1.00)};
 
     auto camera = NewReferencePointer<Camera>(90.0f, 1280.0f, 720.0f);
     camera->Translate(Vector3(0.0f, 3.0f, 12.0f));
@@ -70,12 +69,12 @@ void Application::Run() {
         TaskManager::Update();
         OnUpdate();
 
-        m_WindowRenderer->BeginFrame(camera);
-        m_WindowRenderer->Submit(vertexArray);
-        for (uint32_t i = 0; i < 4; i++) {
-            m_WindowRenderer->Submit(PointLight(1.0f, 1.0f, 1.0f, lightColors[i], lightColors[i], lightColors[i]), glm::translate(glm::mat4(1.0f), lightPositions[i]));
-        }
-        m_WindowRenderer->EndFrame();
+        // m_WindowRenderer->BeginFrame(camera);
+        // m_WindowRenderer->Submit(vertexArray);
+        // for (uint32_t i = 0; i < 4; i++) {
+        //     m_WindowRenderer->Submit(PointLight(1.0f, 1.0f, 1.0f, lightColors[i], lightColors[i], lightColors[i]), glm::translate(glm::mat4(1.0f), lightPositions[i]));
+        // }
+        // m_WindowRenderer->EndFrame();
 
         AppWindow->Render();
         AppWindow->UpdateEvents();
@@ -91,5 +90,5 @@ void Application::OnResize(const Event& event) {
         return;
     auto resizeEvent = dynamic_cast<const WindowResizeEvent&>(event);
     HY_LOG_DEBUG("Resizing renderer: {}, {}", resizeEvent.GetWidth(), resizeEvent.GetHeight());
-    m_WindowRenderer->OnResize(resizeEvent.GetWidth(), resizeEvent.GetHeight());
+    // m_WindowRenderer->OnResize(resizeEvent.GetWidth(), resizeEvent.GetHeight());
 }

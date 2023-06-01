@@ -36,6 +36,14 @@ set(HEADER_LIST
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLShader.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLTexture.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLVertexArray.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanBuffer.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanContext.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanFramebuffer.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanRenderbuffer.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanShader.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanTexture.hpp"
+    "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanVertexArray.hpp"
     "${PROJECT_SOURCE_DIR}/include/Hydrogen/Platform/MacOS/MacOSWindow.hpp")
 
 set(SOURCE_LIST
@@ -68,6 +76,14 @@ set(SOURCE_LIST
     Platform/OpenGL/OpenGLShader.cpp
     Platform/OpenGL/OpenGLTexture.cpp
     Platform/OpenGL/OpenGLVertexArray.cpp
+    Platform/Vulkan/VulkanBuffer.cpp
+    Platform/Vulkan/VulkanContext.cpp
+    Platform/Vulkan/VulkanFramebuffer.cpp
+    Platform/Vulkan/VulkanRenderbuffer.cpp
+    Platform/Vulkan/VulkanRendererAPI.cpp
+    Platform/Vulkan/VulkanShader.cpp
+    Platform/Vulkan/VulkanTexture.cpp
+    Platform/Vulkan/VulkanVertexArray.cpp
     Platform/MacOS/MacOSWindow.cpp)
 
 add_library(Hydrogen ${SOURCE_LIST} ${HEADER_LIST})
@@ -84,5 +100,5 @@ else()
     target_compile_options(Hydrogen PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
-target_link_libraries(Hydrogen PRIVATE glfw assimp glad)
+target_link_libraries(Hydrogen PRIVATE glfw assimp glad Vulkan::Vulkan)
 target_link_libraries(Hydrogen PUBLIC spdlog::spdlog glm EnTT::EnTT TracyClient)

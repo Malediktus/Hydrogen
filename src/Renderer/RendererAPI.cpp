@@ -1,6 +1,7 @@
 #include <Hydrogen/Renderer/RendererAPI.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <Hydrogen/Platform/OpenGL/OpenGLRendererAPI.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen;
@@ -12,6 +13,8 @@ ReferencePointer<RendererAPI> RendererAPI::Create() {
     switch (Renderer::GetAPI()) {
     case RendererAPI::API::OpenGL:
         return NewReferencePointer<OpenGL::OpenGLRendererAPI>();
+    case RendererAPI::API::Vulkan:
+        return NewReferencePointer<Vulkan::VulkanRendererAPI>();
     default:
         HY_ASSERT_CHECK(false, "Invalid renderer API value returned from Renderer::GetRendererAPI()");
     }

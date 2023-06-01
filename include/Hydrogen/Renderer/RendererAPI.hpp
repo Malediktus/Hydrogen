@@ -11,7 +11,7 @@
 namespace Hydrogen {
 class RendererAPI {
 public:
-    enum class API { OpenGL = 0 };
+    enum class API { OpenGL = 0, Vulkan = 1 };
     enum class ClearBuffer { COLOR = 0, DEPTH = 1, STENCIL = 2 };
     enum class DepthTestFunc { ALWAYS = 0, NEVER = 1, LESS = 2, EQUAL = 3, LEQUAL = 4, GREATER = 5, NOTEQUAL = 6, GEQUAL = 7 };
     enum class StencilTestFunc { ALWAYS = 0, NEVER = 1, LESS = 2, EQUAL = 3, LEQUAL = 4, GREATER = 5, NOTEQUAL = 6, GEQUAL = 7 };

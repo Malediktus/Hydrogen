@@ -64,16 +64,8 @@ struct SpotLight : public Light {
 
 class Renderer {
 public:
-    Renderer(const ReferencePointer<Shader>& defaultShader, const int width, const int height);
+    Renderer();
     ~Renderer() = default;
-
-    void OnResize(const int width, const int height);
-
-    void BeginFrame(const ReferencePointer<Camera>& camera);
-    void EndFrame();
-
-    void Submit(const ReferencePointer<VertexArray>& vertexArray, const Matrix4& transform = Matrix4(1.0f));
-    void Submit(const Light& light, const Matrix4& transform = Matrix4(1.0f));
 
     inline static RendererAPI::API GetAPI() {
         return RendererAPI::GetAPI();
@@ -83,15 +75,6 @@ public:
     static ReferencePointer<Context> GetContext();
 
 private:
-    ReferencePointer<Shader> m_Shader;
     static ReferencePointer<Context> s_Context;
-
-    struct Framedata {
-        ReferencePointer<Camera> FrameCamera;
-        DynamicArray<const ReferencePointer<VertexArray>> vertexArrays;
-        DynamicArray<Matrix4> vertexArrayTransforms;
-        DynamicArray<Light> lights;
-        DynamicArray<Matrix4> lightTransforms;
-    } m_Framedata;
 };
 } // namespace Hydrogen

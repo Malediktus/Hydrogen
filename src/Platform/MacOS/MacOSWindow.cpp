@@ -6,7 +6,7 @@ using namespace Hydrogen;
 MacOSWindow::MacOSWindow(const std::string& title, uint32_t width, uint32_t height) {
     HY_ASSERT(glfwInit(), "Init glfw");
 
-    auto api = RenderWindow::ChooseRenderingAPI();
+    auto api = RenderWindow::ChooseRenderingAPI(glfwVulkanSupported());
 
     glfwWindowHint(GLFW_NO_API, GLFW_TRUE);
     if (api == RendererAPI::API::OpenGL) {
@@ -14,8 +14,11 @@ MacOSWindow::MacOSWindow(const std::string& title, uint32_t width, uint32_t heig
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    }
+    if (api == RendererAPI::API::Vulkan) {
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     } else {
-        HY_INVOKE_ERROR("Only OpenGL is supported for now");
+        HY_INVOKE_ERROR("Unsupported graphics API");
     }
 
     m_Window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
