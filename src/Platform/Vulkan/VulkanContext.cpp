@@ -1,6 +1,7 @@
 #include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
 #include <Hydrogen/Core/Logger.hpp>
 #include <tracy/Tracy.hpp>
+#include <set>
 
 using namespace Hydrogen::Vulkan;
 
@@ -95,7 +96,9 @@ void VulkanContext::Init(ProjectInformation clientInfo, ProjectInformation engin
 
     CreateInstance(appInfo, VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR, extensions, {"VK_LAYER_KHRONOS_validation"}, Utils::VulkanDebugCallback);
     CreateDebugMessenger(Utils::VulkanDebugCallback);
-    PickPhysicalDevice([](VkPhysicalDevice device) -> bool {
+    m_WindowSurface = (VkSurfaceKHR) m_Window->GetVulkanWindowSurface();
+
+    PickPhysicalDevice([](VkPhysicalDevice device, VkSurfaceKHR surface) -> bool {
         uint32_t queueFamilyCount = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
 
@@ -103,19 +106,26 @@ void VulkanContext::Init(ProjectInformation clientInfo, ProjectInformation engin
         vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
         VkQueueFamily graphicsQueueFamily;
+        VkQueueFamily presentQueueFamily;
+
         int i = 0;
         for (const auto& queueFamily : queueFamilies) {
-            if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+            if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
                 graphicsQueueFamily = i;
-            }
 
-            if (graphicsQueueFamily.has_value())
+            VkBool32 presentSupport = false;
+            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+
+            if (presentSupport)
+                presentQueueFamily = i;
+
+            if (graphicsQueueFamily.has_value() && presentQueueFamily.has_value())
                 break;
 
             i++;
         }
 
-        return graphicsQueueFamily.has_value();
+        return graphicsQueueFamily.has_value() && presentQueueFamily.has_value();
     });
     GetQueueFamilies();
 
@@ -125,8 +135,7 @@ void VulkanContext::Init(ProjectInformation clientInfo, ProjectInformation engin
 #endif
     CreateLogicalDevice(deviceExtensions, {"VK_LAYER_KHRONOS_validation"});
     vkGetDeviceQueue(m_Device, m_GraphicsQueueFamily.value(), 0, &m_GraphicsQueue);
-
-    m_WindowSurface = (VkSurfaceKHR) m_Window->GetVulkanWindowSurface();
+    vkGetDeviceQueue(m_Device, m_PresentQueueFamily.value(), 0, &m_PresentQueue);
 
     HY_LOG_INFO("Created Vulkan context");
     HY_LOG_INFO("Using Vulkan API version 1.0");
@@ -236,7 +245,7 @@ void VulkanContext::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreate
     createInfo->pUserData = nullptr;
 }
 
-void VulkanContext::PickPhysicalDevice(std::function<bool(VkPhysicalDevice)> deviceRateFunction) {
+void VulkanContext::PickPhysicalDevice(std::function<bool(VkPhysicalDevice, VkSurfaceKHR)> deviceRateFunction) {
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(m_Instance, &deviceCount, nullptr);
     HY_ASSERT(deviceCount > 0, "Failed to find physical device with vulkan support");
@@ -249,7 +258,7 @@ void VulkanContext::PickPhysicalDevice(std::function<bool(VkPhysicalDevice)> dev
     size_t currentPhysicalDeviceMemorySize;
 
     for (const auto& device : devices) {
-        if (!deviceRateFunction(device))
+        if (!deviceRateFunction(device, m_WindowSurface))
             break;
 
         VkPhysicalDeviceProperties deviceProperties;
@@ -297,34 +306,45 @@ void VulkanContext::GetQueueFamilies() {
 
     int i = 0;
     for (const auto& queueFamily : queueFamilies) {
-        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
             m_GraphicsQueueFamily = i;
-        }
 
-        if (m_GraphicsQueueFamily.has_value())
+        VkBool32 presentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(m_PhysicalDevice, i, m_WindowSurface, &presentSupport);
+
+        if (presentSupport)
+            m_PresentQueueFamily = i;
+
+        if (m_GraphicsQueueFamily.has_value() && m_PresentQueueFamily.has_value())
             break;
 
         i++;
     }
 
-    HY_ASSERT(m_GraphicsQueueFamily.has_value(), "Graphics Family cant be found");
+    HY_ASSERT(m_GraphicsQueueFamily.has_value(), "Graphics Family can't be found");
+    HY_ASSERT(m_PresentQueueFamily.has_value(), "Present Family can't be found");
 }
 
 void VulkanContext::CreateLogicalDevice(const DynamicArray<const char*> extensions, const DynamicArray<const char*> validationLayers) {
-    float graphicsQueuePriority = 1.0f;
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    std::set<uint32_t> uniqueQueueFamilies = {m_GraphicsQueueFamily.value(), m_PresentQueueFamily.value()};
 
-    VkDeviceQueueCreateInfo graphicsQueueCreateInfo {};
-    graphicsQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    graphicsQueueCreateInfo.queueFamilyIndex = m_GraphicsQueueFamily.value();
-    graphicsQueueCreateInfo.queueCount = 1;
-    graphicsQueueCreateInfo.pQueuePriorities = &graphicsQueuePriority;
+    float queuePriority = 1.0f;
+    for (uint32_t queueFamily : uniqueQueueFamilies) {
+        VkDeviceQueueCreateInfo queueCreateInfo {};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = queueFamily;
+        queueCreateInfo.queueCount = 1;
+        queueCreateInfo.pQueuePriorities = &queuePriority;
+        queueCreateInfos.push_back(queueCreateInfo);
+    }
 
     VkPhysicalDeviceFeatures deviceFeatures {};
 
     VkDeviceCreateInfo createInfo {};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    createInfo.pQueueCreateInfos = &graphicsQueueCreateInfo;
-    createInfo.queueCreateInfoCount = 1;
+    createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+    createInfo.pQueueCreateInfos = queueCreateInfos.data();
     createInfo.pEnabledFeatures = &deviceFeatures;
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();

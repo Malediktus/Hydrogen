@@ -31,7 +31,7 @@ private:
                         PFN_vkDebugUtilsMessengerCallbackEXT debugCallback);
     void CreateDebugMessenger(PFN_vkDebugUtilsMessengerCallbackEXT callback);
     void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT* createInfo, PFN_vkDebugUtilsMessengerCallbackEXT callback);
-    void PickPhysicalDevice(std::function<bool(VkPhysicalDevice)> deviceRateFunction);
+    void PickPhysicalDevice(std::function<bool(VkPhysicalDevice, VkSurfaceKHR)> deviceRateFunction);
     void GetQueueFamilies();
     void CreateLogicalDevice(const DynamicArray<const char*> extensions, const DynamicArray<const char*> validationLayers);
 
@@ -41,7 +41,9 @@ private:
     VkDevice m_Device;
     VkPhysicalDevice m_PhysicalDevice;
     VkQueueFamily m_GraphicsQueueFamily;
+    VkQueueFamily m_PresentQueueFamily;
     VkQueue m_GraphicsQueue;
+    VkQueue m_PresentQueue;
     VkSurfaceKHR m_WindowSurface;
 };
 } // namespace Hydrogen::Vulkan
