@@ -5,7 +5,7 @@
 using namespace Hydrogen;
 
 Application::Application() {
-    Console = NewReferencePointer<Logger>("APP", Logger::LogLevel::Debug);
+    Console = NewReferencePointer<Logger>("APP", Logger::LogLevel::Info);
     SystemLogger::Init();
 }
 

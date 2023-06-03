@@ -85,18 +85,51 @@ VulkanContext::VulkanContext(const ReferencePointer<RenderWindow>& window, Proje
 #endif
 #ifdef HY_PLATFORM_APPLE
     extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+    extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
 #endif
     const auto requiredExtensions = m_Window->GetVulkanWindowExtensions();
     extensions.insert(extensions.end(), requiredExtensions.begin(), requiredExtensions.end());
 
     CreateInstance(appInfo, VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR, extensions, {"VK_LAYER_KHRONOS_validation"}, Utils::VulkanDebugCallback);
     CreateDebugMessenger(Utils::VulkanDebugCallback);
+    PickPhysicalDevice([](VkPhysicalDevice device) -> bool {
+        uint32_t queueFamilyCount = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+        std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+        VkQueueFamily graphicsQueueFamily;
+        int i = 0;
+        for (const auto& queueFamily : queueFamilies) {
+            if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+                graphicsQueueFamily = i;
+            }
+
+            if (graphicsQueueFamily.has_value())
+                break;
+
+            i++;
+        }
+
+        return graphicsQueueFamily.has_value();
+    });
+    GetQueueFamilies();
+
+    std::vector<const char*> deviceExtensions;
+#ifdef HY_PLATFORM_APPLE
+    deviceExtensions.push_back("VK_KHR_portability_subset");
+#endif
+    CreateLogicalDevice(deviceExtensions, {"VK_LAYER_KHRONOS_validation"});
+    vkGetDeviceQueue(m_Device, m_GraphicsQueueFamily.value(), 0, &m_GraphicsQueue);
 
     HY_LOG_INFO("Created Vulkan context");
     HY_LOG_INFO("Using Vulkan API version 1.0");
 }
 
 VulkanContext::~VulkanContext() {
+    vkDestroyDevice(m_Device, nullptr);
+
 #ifdef HY_DEBUG
     Functions::DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
 #endif
@@ -195,4 +228,107 @@ void VulkanContext::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreate
     createInfo->messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
     createInfo->pfnUserCallback = callback;
     createInfo->pUserData = nullptr;
+}
+
+void VulkanContext::PickPhysicalDevice(std::function<bool(VkPhysicalDevice)> deviceRateFunction) {
+    uint32_t deviceCount = 0;
+    vkEnumeratePhysicalDevices(m_Instance, &deviceCount, nullptr);
+    HY_ASSERT(deviceCount > 0, "Failed to find physical device with vulkan support");
+
+    std::vector<VkPhysicalDevice> devices(deviceCount);
+    vkEnumeratePhysicalDevices(m_Instance, &deviceCount, devices.data());
+
+    m_PhysicalDevice = VK_NULL_HANDLE;
+    VkPhysicalDeviceProperties currentPhysicalDeviceProperties;
+    size_t currentPhysicalDeviceMemorySize;
+
+    for (const auto& device : devices) {
+        if (!deviceRateFunction(device))
+            break;
+
+        VkPhysicalDeviceProperties deviceProperties;
+        vkGetPhysicalDeviceProperties(device, &deviceProperties);
+
+        VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
+        vkGetPhysicalDeviceMemoryProperties(device, &deviceMemoryProperties);
+
+        size_t deviceMemorySize = 0;
+        for (uint32_t i = 0; i < deviceMemoryProperties.memoryHeapCount; i++) {
+            deviceMemorySize += deviceMemoryProperties.memoryHeaps[i].size;
+        }
+
+        if (m_PhysicalDevice == VK_NULL_HANDLE) {
+            currentPhysicalDeviceProperties = deviceProperties;
+            currentPhysicalDeviceMemorySize = deviceMemorySize;
+            m_PhysicalDevice = device;
+            continue;
+        }
+
+        if (currentPhysicalDeviceProperties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+            currentPhysicalDeviceProperties = deviceProperties;
+            currentPhysicalDeviceMemorySize = deviceMemorySize;
+            m_PhysicalDevice = device;
+            continue;
+        }
+
+        if (deviceMemorySize > currentPhysicalDeviceMemorySize) {
+            currentPhysicalDeviceProperties = deviceProperties;
+            currentPhysicalDeviceMemorySize = deviceMemorySize;
+            m_PhysicalDevice = device;
+            continue;
+        }
+    }
+
+    HY_ASSERT(m_PhysicalDevice != VK_NULL_HANDLE, "Failed to find suitable physical device");
+}
+
+void VulkanContext::GetQueueFamilies() {
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(m_PhysicalDevice, &queueFamilyCount, nullptr);
+
+    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(m_PhysicalDevice, &queueFamilyCount, queueFamilies.data());
+
+    int i = 0;
+    for (const auto& queueFamily : queueFamilies) {
+        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+            m_GraphicsQueueFamily = i;
+        }
+
+        if (m_GraphicsQueueFamily.has_value())
+            break;
+
+        i++;
+    }
+
+    HY_ASSERT(m_GraphicsQueueFamily.has_value(), "Graphics Family cant be found");
+}
+
+void VulkanContext::CreateLogicalDevice(const DynamicArray<const char*> extensions, const DynamicArray<const char*> validationLayers) {
+    float graphicsQueuePriority = 1.0f;
+
+    VkDeviceQueueCreateInfo graphicsQueueCreateInfo {};
+    graphicsQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    graphicsQueueCreateInfo.queueFamilyIndex = m_GraphicsQueueFamily.value();
+    graphicsQueueCreateInfo.queueCount = 1;
+    graphicsQueueCreateInfo.pQueuePriorities = &graphicsQueuePriority;
+
+    VkPhysicalDeviceFeatures deviceFeatures {};
+
+    VkDeviceCreateInfo createInfo {};
+    createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    createInfo.pQueueCreateInfos = &graphicsQueueCreateInfo;
+    createInfo.queueCreateInfoCount = 1;
+    createInfo.pEnabledFeatures = &deviceFeatures;
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+    createInfo.ppEnabledExtensionNames = extensions.data();
+#ifdef HY_DEBUG
+    createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+    createInfo.ppEnabledLayerNames = validationLayers.data();
+#else
+    createInfo.enabledLayerCount = 0;
+    createInfo.ppEnabledLayerNames = nullptr;
+#endif
+
+    VK_CHECK_ERROR(vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device), "Failed to create logical vulkan device");
 }
