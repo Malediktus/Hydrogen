@@ -10,9 +10,10 @@ using VkQueueFamily = std::optional<uint32_t>;
 namespace Hydrogen::Vulkan {
 class VulkanContext : public Context {
 public:
-    VulkanContext(const ReferencePointer<RenderWindow>& window, ProjectInformation clientInfo, ProjectInformation engineInfo);
+    VulkanContext(const ReferencePointer<RenderWindow>& window);
     virtual ~VulkanContext();
 
+    virtual void Init(ProjectInformation clientInfo, ProjectInformation engineInfo) override;
     virtual ReferencePointer<RenderWindow> GetWindow() override {
         return m_Window;
     }
@@ -41,5 +42,6 @@ private:
     VkPhysicalDevice m_PhysicalDevice;
     VkQueueFamily m_GraphicsQueueFamily;
     VkQueue m_GraphicsQueue;
+    VkSurfaceKHR m_WindowSurface;
 };
 } // namespace Hydrogen::Vulkan

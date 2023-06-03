@@ -17,8 +17,9 @@ class Context {
 public:
     ~Context() = default;
 
+    virtual void Init(ProjectInformation clientInfo, ProjectInformation engineInfo) = 0;
     virtual ReferencePointer<RenderWindow> GetWindow() = 0;
 
-    static ReferencePointer<Context> Create(const ReferencePointer<RenderWindow>& window, ProjectInformation clientInfo, ProjectInformation engineInfo);
+    static ReferencePointer<Context> Create(const ReferencePointer<RenderWindow>& window);
 };
 } // namespace Hydrogen

@@ -21,9 +21,10 @@ void Application::Run() {
     engineProject.ProjectName = ApplicationInfo.Name;
     engineProject.ProjectVersion = ApplicationInfo.Version;
 
-    m_RenderContext = Context::Create(AppWindow, clientProject, engineProject);
-
+    m_RenderContext = Context::Create(AppWindow);
     Renderer::SetContext(m_RenderContext);
+    m_RenderContext->Init(clientProject, engineProject);
+
     RenderCommand::Init();
     RenderCommand::ConfigureAntiAliasing(true);
 

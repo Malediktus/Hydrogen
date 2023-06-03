@@ -67,7 +67,10 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 }
 } // namespace Hydrogen::Vulkan::Functions
 
-VulkanContext::VulkanContext(const ReferencePointer<RenderWindow>& window, ProjectInformation clientInfo, ProjectInformation engineInfo) : m_Window(window) {
+VulkanContext::VulkanContext(const ReferencePointer<RenderWindow>& window) : m_Window(window) {
+}
+
+void VulkanContext::Init(ProjectInformation clientInfo, ProjectInformation engineInfo) {
     ZoneScoped;
 
     VkApplicationInfo appInfo {};
@@ -123,6 +126,8 @@ VulkanContext::VulkanContext(const ReferencePointer<RenderWindow>& window, Proje
     CreateLogicalDevice(deviceExtensions, {"VK_LAYER_KHRONOS_validation"});
     vkGetDeviceQueue(m_Device, m_GraphicsQueueFamily.value(), 0, &m_GraphicsQueue);
 
+    m_WindowSurface = (VkSurfaceKHR) m_Window->GetVulkanWindowSurface();
+
     HY_LOG_INFO("Created Vulkan context");
     HY_LOG_INFO("Using Vulkan API version 1.0");
 }
@@ -134,6 +139,7 @@ VulkanContext::~VulkanContext() {
     Functions::DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
 #endif
 
+    vkDestroySurfaceKHR(m_Instance, m_WindowSurface, nullptr);
     vkDestroyInstance(m_Instance, nullptr);
 }
 

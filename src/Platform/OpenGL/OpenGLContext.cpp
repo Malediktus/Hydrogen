@@ -5,7 +5,10 @@
 
 using namespace Hydrogen::OpenGL;
 
-OpenGLContext::OpenGLContext(const ReferencePointer<RenderWindow>& window, ProjectInformation, ProjectInformation) : m_Window(window) {
+OpenGLContext::OpenGLContext(const ReferencePointer<RenderWindow>& window) : m_Window(window) {
+}
+
+void OpenGLContext::Init(ProjectInformation, ProjectInformation) {
     ZoneScoped;
     m_Window->SetupOpenglContext(3, 3);
     HY_ASSERT(gladLoadGLLoader((GLADloadproc) m_Window->GetWindowOpenGLProcAddress()), "Failed to initialize OpenGL Context");
