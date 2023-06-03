@@ -39,7 +39,7 @@ private:
 class SystemLogger {
 public:
     static void Init() {
-        s_Logger = NewReferencePointer<Logger>("SYS", Logger::LogLevel::Debug);
+        s_Logger = NewReferencePointer<Logger>("SYS", Logger::LogLevel::Info);
     }
 
     static ReferencePointer<Logger> GetLogger() {

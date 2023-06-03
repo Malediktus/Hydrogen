@@ -13,12 +13,15 @@ void Application::Run() {
     OnSetup();
     AppWindow = Window::Create(ApplicationInfo.Name, ApplicationInfo.WindowSize.x, ApplicationInfo.WindowSize.y);
 
-    ProjectInformation rendererProject;
-    rendererProject.ProjectName = ApplicationInfo.Name;
-    rendererProject.ProjectVersion = ApplicationInfo.Version;
+    ProjectInformation clientProject;
+    clientProject.ProjectName = ApplicationInfo.Name;
+    clientProject.ProjectVersion = ApplicationInfo.Version;
 
-    m_RenderContext = Context::Create(AppWindow, rendererProject);
-    m_RenderContext->Init();
+    ProjectInformation engineProject;
+    engineProject.ProjectName = ApplicationInfo.Name;
+    engineProject.ProjectVersion = ApplicationInfo.Version;
+
+    m_RenderContext = Context::Create(AppWindow, clientProject, engineProject);
 
     Renderer::SetContext(m_RenderContext);
     RenderCommand::Init();
@@ -82,7 +85,7 @@ void Application::Run() {
 
     OnShutdown();
     TaskManager::Shutdown();
-    m_RenderContext->Destroy();
+    Renderer::SetContext(nullptr);
 }
 
 void Application::OnResize(const Event& event) {

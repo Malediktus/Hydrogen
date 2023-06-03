@@ -5,13 +5,8 @@
 namespace Hydrogen::OpenGL {
 class OpenGLContext : public Context {
 public:
-    OpenGLContext(const ReferencePointer<RenderWindow>& window, ProjectInformation) : m_Window(window) {
-    }
+    OpenGLContext(const ReferencePointer<RenderWindow>& window, ProjectInformation clientInfo, ProjectInformation engineInfo);
     virtual ~OpenGLContext() = default;
-
-    virtual void Init() override;
-    virtual void Destroy() override {
-    }
 
     virtual ReferencePointer<RenderWindow> GetWindow() override {
         return m_Window;

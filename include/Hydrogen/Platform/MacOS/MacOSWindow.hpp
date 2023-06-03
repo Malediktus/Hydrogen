@@ -2,6 +2,7 @@
 
 #include "../../Core/Window.hpp"
 #include "../../Math/Math.hpp"
+#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <string>
 
@@ -32,6 +33,8 @@ public:
 
     void SetupOpenglContext(int major, int minor) override;
     void* GetWindowOpenGLProcAddress() override;
+    const std::vector<const char*> GetVulkanWindowExtensions() override;
+    void* GetVulkanWindowSurface() override;
 
 private:
     GLFWwindow* m_Window;

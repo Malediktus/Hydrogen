@@ -1,4 +1,5 @@
 #include <Hydrogen/Platform/MacOS/MacOSWindow.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
 #include <Hydrogen/Core/Logger.hpp>
 
 using namespace Hydrogen;
@@ -121,4 +122,24 @@ void MacOSWindow::SetupOpenglContext(int, int) {
 
 void* MacOSWindow::GetWindowOpenGLProcAddress() {
     return (void*) glfwGetProcAddress;
+}
+
+const std::vector<const char*> MacOSWindow::GetVulkanWindowExtensions() {
+    uint32_t glfwExtensionCount = 0;
+    const char** glfwExtensions;
+    glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+    std::vector<const char*> result;
+    result.reserve(glfwExtensionCount);
+    for (uint32_t i = 0; i < glfwExtensionCount; i++) {
+        result.push_back(glfwExtensions[i]);
+    }
+
+    return result;
+}
+
+void* MacOSWindow::GetVulkanWindowSurface() {
+    VkSurfaceKHR surface;
+    // VkResult err = glfwCreateWindowSurface(instance, window, NULL, &surface);
+    return &surface;
 }
