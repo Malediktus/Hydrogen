@@ -1,5 +1,6 @@
 #include <Hydrogen/Platform/MacOS/MacOSWindow.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
+#include <Hydrogen/Renderer/Renderer.hpp>
 #include <Hydrogen/Core/Logger.hpp>
 
 using namespace Hydrogen;
@@ -140,6 +141,7 @@ const std::vector<const char*> MacOSWindow::GetVulkanWindowExtensions() {
 
 void* MacOSWindow::GetVulkanWindowSurface() {
     VkSurfaceKHR surface;
-    // VkResult err = glfwCreateWindowSurface(instance, window, NULL, &surface);
-    return &surface;
+    VkInstance instance = Renderer::GetContext<Vulkan::VulkanContext>()->GetInstance();
+    VK_CHECK_ERROR(glfwCreateWindowSurface(instance, m_Window, NULL, &surface), "Failed to create window surface");
+    return (void*) surface;
 }

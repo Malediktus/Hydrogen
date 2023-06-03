@@ -17,6 +17,14 @@ public:
         return m_Window;
     }
 
+    VkInstance GetInstance() {
+        return m_Instance;
+    }
+
+    VkDevice GetDevice() {
+        return m_Device;
+    }
+
 private:
     void CreateInstance(VkApplicationInfo appInfo, VkInstanceCreateFlags flags, const DynamicArray<const char*> extensions, const DynamicArray<const char*> validationLayers,
                         PFN_vkDebugUtilsMessengerCallbackEXT debugCallback);

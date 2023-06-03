@@ -72,7 +72,10 @@ public:
     }
 
     static void SetContext(ReferencePointer<Context> context);
-    static ReferencePointer<Context> GetContext();
+    template <typename T> static ReferencePointer<T> GetContext() {
+        static_assert(std::is_base_of<Context, T>::value, "T must be derived from Context");
+        return std::dynamic_pointer_cast<T>(s_Context);
+    }
 
 private:
     static ReferencePointer<Context> s_Context;

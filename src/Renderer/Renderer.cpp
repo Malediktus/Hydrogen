@@ -17,7 +17,3 @@ Renderer::Renderer() {
 void Renderer::SetContext(ReferencePointer<Context> context) {
     s_Context = context;
 }
-
-ReferencePointer<Context> Renderer::GetContext() {
-    return s_Context;
-}
