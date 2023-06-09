@@ -40,7 +40,6 @@ private:
     void OnResize(const Event& event);
 
     ReferencePointer<Context> m_RenderContext;
-    ReferencePointer<Renderer> m_WindowRenderer;
 };
 
 extern ReferencePointer<Application> CreateApplication();

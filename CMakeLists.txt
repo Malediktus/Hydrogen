@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.15...3.26.2)
 
-set(HYDROGEN_BUILD_DEMO ON)
-set(HYDROGEN_BUILD_DOCS ON)
+option(HYDROGEN_BUILD_DOCS ON)
 
 project(Hydrogen VERSION 0.1.0
     DESCRIPTION "A lightweight game engine"
@@ -17,6 +16,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     set(XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+    set(HYDROGEN_BUILD_DOCS ON)
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif()
 
@@ -109,9 +109,8 @@ add_subdirectory(extern/glm)
 add_subdirectory(extern/spdlog)
 add_subdirectory(extern/tracy)
 add_subdirectory(extern/glad)
+add_subdirectory(extern/imgui)
 
-add_subdirectory(src)
-
-if(HYDROGEN_BUILD_DEMO)
-    add_subdirectory(apps)
-endif()
+add_subdirectory(hydrogen)
+add_subdirectory(hydrogen-editor)
+add_subdirectory(hydrogen-runtime)

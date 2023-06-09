@@ -17,9 +17,9 @@ void Application::Run() {
     clientProject.ProjectName = ApplicationInfo.Name;
     clientProject.ProjectVersion = ApplicationInfo.Version;
 
-    ProjectInformation engineProject;
-    engineProject.ProjectName = ApplicationInfo.Name;
-    engineProject.ProjectVersion = ApplicationInfo.Version;
+    Hydrogen::ProjectInformation engineProject;
+    engineProject.ProjectName = "Hydrogen Engine";
+    engineProject.ProjectVersion = glm::vec3(1, 0, 0);
 
     m_RenderContext = Context::Create(AppWindow);
     Renderer::SetContext(m_RenderContext);
