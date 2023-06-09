@@ -3,6 +3,7 @@
 #include <Hydrogen/Math/Math.hpp>
 #include <tracy/Tracy.hpp>
 #include <glad/glad.h>
+#include <backends/imgui_impl_opengl3.h>
 
 using namespace Hydrogen::OpenGL;
 
@@ -265,6 +266,22 @@ void OpenGLRendererAPI::ConfigureAntiAliasing(const bool enable) {
         glEnable(GL_MULTISAMPLE);
     else
         glDisable(GL_MULTISAMPLE);
+}
+
+void OpenGLRendererAPI::SetupImGui() {
+    ImGui_ImplOpenGL3_Init("#version 150");
+}
+
+void OpenGLRendererAPI::ImGuiNewFrame() {
+    ImGui_ImplOpenGL3_NewFrame();
+}
+
+void OpenGLRendererAPI::ImGuiRenderDrawData(ImDrawData* drawData) {
+    ImGui_ImplOpenGL3_RenderDrawData(drawData);
+}
+
+void OpenGLRendererAPI::DestroyImGui() {
+    ImGui_ImplOpenGL3_Shutdown();
 }
 
 void OpenGLRendererAPI::DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray, uint32_t indexCount) {

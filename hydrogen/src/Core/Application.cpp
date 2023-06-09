@@ -1,6 +1,7 @@
 #include <Hydrogen/Core/Application.hpp>
 #include <Hydrogen/Core/Task.hpp>
 #include <Hydrogen/Assets/AssetManager.hpp>
+#include <imgui.h>
 
 using namespace Hydrogen;
 
@@ -29,6 +30,28 @@ void Application::Run() {
     RenderCommand::ConfigureAntiAliasing(true);
 
     AssetManager::Init();
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    (void) io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
+    // io.ConfigViewportsNoAutoMerge = true;
+    // io.ConfigViewportsNoTaskBarIcon = true;
+
+    ImGui::StyleColorsDark();
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        style.WindowRounding = 0.0f;
+        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    }
+
+    AppWindow->SetupImGui();
+    RenderCommand::GetRendererAPI()->SetupImGui();
 
     // ReferencePointer<ShaderAsset> defaultShader = AssetManager::Get<ShaderAsset>("assets/BlinnPhong.glsl");
 
@@ -80,11 +103,27 @@ void Application::Run() {
         // }
         // m_WindowRenderer->EndFrame();
 
+        RenderCommand::GetRendererAPI()->ImGuiNewFrame();
+        AppWindow->ImGuiNewFrame();
+        ImGui::NewFrame();
+
+        OnImGuiDraw();
+
+        ImGui::Render();
+        RenderCommand::GetRendererAPI()->ImGuiRenderDrawData(ImGui::GetDrawData());
+
+        AppWindow->UpdateImGuiPlatformWindows();
+
         AppWindow->Render();
         AppWindow->UpdateEvents();
     }
 
     OnShutdown();
+
+    RenderCommand::GetRendererAPI()->DestroyImGui();
+    AppWindow->DestroyImGui();
+    ImGui::DestroyContext();
+
     TaskManager::Shutdown();
     Renderer::SetContext(nullptr);
 }

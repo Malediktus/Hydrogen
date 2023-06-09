@@ -7,6 +7,7 @@
 #include "VertexArray.hpp"
 #include <glm/glm.hpp>
 #include <cstdint>
+#include <imgui.h>
 
 namespace Hydrogen {
 class RendererAPI {
@@ -48,6 +49,11 @@ public:
     virtual void ConfigureCulling(const bool enable, const CullingType type) = 0;
     virtual void ConfigureWireframeView(const bool enable) = 0;
     virtual void ConfigureAntiAliasing(const bool enable) = 0;
+
+    virtual void SetupImGui() = 0;
+    virtual void ImGuiNewFrame() = 0;
+    virtual void ImGuiRenderDrawData(ImDrawData* drawData) = 0;
+    virtual void DestroyImGui() = 0;
 
     virtual void DrawIndexed(const ReferencePointer<VertexArray>& vertexArray, uint32_t indexCount = 0) = 0;
 

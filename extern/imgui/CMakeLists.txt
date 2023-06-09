@@ -24,4 +24,4 @@ add_library(imgui
 
 target_include_directories(imgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(imgui PUBLIC cxx_std_17)
-target_link_libraries(imgui PRIVATE glfw3 Vulkan::Vulkan)
+target_link_libraries(imgui PRIVATE glfw Vulkan::Vulkan)

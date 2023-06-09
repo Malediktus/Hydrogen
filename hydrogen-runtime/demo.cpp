@@ -44,6 +44,9 @@ public:
     void OnUpdate() override {
     }
 
+    void OnImGuiDraw() override {
+    }
+
     void OnEvent(const Hydrogen::Event&) override {
         Console->Debug("An event occured");
     }

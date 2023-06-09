@@ -23,6 +23,11 @@ public:
 
     virtual void SetViewport(const int width, const int height) override;
 
+    virtual void SetupImGui() override;
+    virtual void ImGuiNewFrame() override;
+    virtual void ImGuiRenderDrawData(ImDrawData* drawData) override;
+    virtual void DestroyImGui() override;
+
     virtual void DrawIndexed(const ReferencePointer<VertexArray>& vertexArray, uint32_t indexCount) override;
 };
 

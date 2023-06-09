@@ -31,7 +31,12 @@ public:
     void UpdateEvents() override;
     void Render() override;
 
+    void SetupImGui() override;
+    void ImGuiNewFrame() override;
     void SetupOpenglContext(int major, int minor) override;
+    void DestroyImGui() override;
+    void UpdateImGuiPlatformWindows() override;
+
     void* GetWindowOpenGLProcAddress() override;
     const std::vector<const char*> GetVulkanWindowExtensions() override;
     void* GetVulkanWindowSurface() override;

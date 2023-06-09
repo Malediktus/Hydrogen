@@ -52,6 +52,18 @@ void VulkanRendererAPI::ConfigureWireframeView(const bool enable) {
 void VulkanRendererAPI::ConfigureAntiAliasing(const bool enable) {
 }
 
+void VulkanRendererAPI::SetupImGui() {
+}
+
+void VulkanRendererAPI::ImGuiNewFrame() {
+}
+
+void VulkanRendererAPI::ImGuiRenderDrawData(ImDrawData* drawData) {
+}
+
+void VulkanRendererAPI::DestroyImGui() {
+}
+
 void VulkanRendererAPI::DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray, uint32_t indexCount) {
     ZoneScoped;
     HY_LOG_TRACE("Drew Vulkan indexed vertex array (elements: {})", 0);

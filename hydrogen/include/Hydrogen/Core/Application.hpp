@@ -23,6 +23,7 @@ public:
     virtual void OnInit() = 0;
     virtual void OnShutdown() = 0;
     virtual void OnUpdate() = 0;
+    virtual void OnImGuiDraw() = 0;
     virtual void OnEvent(const Event& event) = 0;
 
 protected:

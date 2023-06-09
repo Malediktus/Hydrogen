@@ -2,6 +2,8 @@
 #include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <Hydrogen/Core/Logger.hpp>
+#include <imgui.h>
+#include <backends/imgui_impl_glfw.h>
 
 using namespace Hydrogen;
 
@@ -16,8 +18,7 @@ MacOSWindow::MacOSWindow(const std::string& title, uint32_t width, uint32_t heig
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    }
-    if (api == RendererAPI::API::Vulkan) {
+    } else if (api == RendererAPI::API::Vulkan) {
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     } else {
         HY_INVOKE_ERROR("Unsupported graphics API");
@@ -117,12 +118,33 @@ void MacOSWindow::Render() {
     }
 }
 
+void MacOSWindow::SetupImGui() {
+    ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
+}
+
+void MacOSWindow::ImGuiNewFrame() {
+    ImGui_ImplGlfw_NewFrame();
+}
+
+void MacOSWindow::DestroyImGui() {
+    ImGui_ImplGlfw_Shutdown();
+}
+
 void MacOSWindow::SetupOpenglContext(int, int) {
     glfwMakeContextCurrent(m_Window);
 }
 
 void* MacOSWindow::GetWindowOpenGLProcAddress() {
     return (void*) glfwGetProcAddress;
+}
+
+void MacOSWindow::UpdateImGuiPlatformWindows() {
+    if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        GLFWwindow* backup_current_context = glfwGetCurrentContext();
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+        glfwMakeContextCurrent(backup_current_context);
+    }
 }
 
 const std::vector<const char*> MacOSWindow::GetVulkanWindowExtensions() {

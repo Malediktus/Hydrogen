@@ -101,4 +101,4 @@ else()
 endif()
 
 target_link_libraries(Hydrogen PRIVATE glfw assimp glad Vulkan::Vulkan)
-target_link_libraries(Hydrogen PUBLIC spdlog::spdlog glm EnTT::EnTT TracyClient)
+target_link_libraries(Hydrogen PUBLIC spdlog::spdlog imgui glm EnTT::EnTT TracyClient)

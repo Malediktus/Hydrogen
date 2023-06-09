@@ -56,6 +56,10 @@ public:
         s_RendererAPI->DrawIndexed(vertexArray, count);
     }
 
+    static ReferencePointer<RendererAPI> GetRendererAPI() {
+        return s_RendererAPI;
+    }
+
 private:
     static ReferencePointer<RendererAPI> s_RendererAPI;
 };
