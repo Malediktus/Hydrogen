@@ -110,6 +110,7 @@ add_subdirectory(extern/spdlog)
 add_subdirectory(extern/tracy)
 add_subdirectory(extern/glad)
 add_subdirectory(extern/imgui)
+add_subdirectory(extern/stb_image)
 
 add_subdirectory(hydrogen)
 add_subdirectory(hydrogen-editor)

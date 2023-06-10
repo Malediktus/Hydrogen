@@ -39,6 +39,8 @@ public:
 
     virtual void OnActivate() override {
         m_CurrentDirectory = "assets"; // TODO: Get from asset manager
+        m_DirectoryIcon = Hydrogen::AssetManager::Get<Hydrogen::SpriteAsset>("assets/Textures/DirectoryIcon.png")->GetTexture();
+        m_FileIcon = Hydrogen::AssetManager::Get<Hydrogen::SpriteAsset>("assets/Textures/FileIcon.png")->GetTexture();
     }
 
     virtual void OnUpdate() override {
@@ -49,5 +51,7 @@ public:
 
 private:
     std::filesystem::path m_CurrentDirectory;
+    Hydrogen::ReferencePointer<Hydrogen::Texture2D> m_DirectoryIcon;
+    Hydrogen::ReferencePointer<Hydrogen::Texture2D> m_FileIcon;
 };
 } // namespace HydrogenEditor

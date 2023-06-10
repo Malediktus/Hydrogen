@@ -3,6 +3,8 @@
 #include "../Core/Memory.hpp"
 #include "../Core/Logger.hpp"
 #include "../Renderer/Shader.hpp"
+#include "../Renderer/Texture.hpp"
+#include <stb_image.h>
 
 #include <filesystem>
 
@@ -41,8 +43,24 @@ public:
         m_AssetInfo.Preload = true;
     }
 
+    // TODO: This code entire loading code is temporary
     void Load(const String& filepath) override {
         HY_LOG_DEBUG("Loading sprite: {}", filepath);
+
+        int width, height, nrChannels;
+        uint8_t* data = stbi_load(filepath.c_str(), &width, &height, &nrChannels, 0);
+
+        Texture2DStorageType storageType = Texture2DStorageType::RGBA8F;
+        if (nrChannels == 3) {
+            storageType = Texture2DStorageType::RGB8F;
+        }
+
+        m_Texture = Texture2D::Create(width, height, data, storageType);
+        stbi_image_free(data);
+    }
+
+    const ReferencePointer<Texture2D>& GetTexture() {
+        return m_Texture;
     }
 
     static const DynamicArray<const String> GetFileExtensions() {
@@ -53,6 +71,9 @@ public:
         auto exts = GetFileExtensions();
         return std::find(exts.begin(), exts.end(), ext.c_str()) != exts.end();
     }
+
+private:
+    ReferencePointer<Texture2D> m_Texture;
 };
 
 class ShaderAsset : public Asset {
