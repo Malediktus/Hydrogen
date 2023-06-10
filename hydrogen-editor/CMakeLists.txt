@@ -1,4 +1,9 @@
-add_executable(HydrogenEditor src/EditorApp.cpp)
+add_executable(HydrogenEditor
+    include/Panels/AssetNavigatorPanel.hpp
+    include/Panel.hpp
+    src/EditorApp.cpp
+)
+
 target_compile_features(HydrogenEditor PRIVATE cxx_std_17)
 
 if(MSVC)
@@ -8,6 +13,7 @@ else()
 endif()
 
 target_link_libraries(HydrogenEditor PRIVATE Hydrogen glfw)
+target_include_directories(HydrogenEditor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(ASSET_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 set(ASSET_DEST_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets")

@@ -24,6 +24,17 @@ protected:
     AssetInfo m_AssetInfo;
 };
 
+class UnknownAsset : public Asset {
+public:
+    UnknownAsset() {
+        m_AssetInfo.Preload = false;
+    }
+
+    void Load(const String&) override {
+        HY_LOG_WARN("Trying to load asset of type unknown");
+    }
+};
+
 class SpriteAsset : public Asset {
 public:
     SpriteAsset() {
@@ -94,6 +105,9 @@ public:
                 auto ref = NewReferencePointer<ShaderAsset>();
                 if (ref->GetInfo().Preload)
                     ref->Load(filenameString);
+                s_Assets[filenameString] = ref;
+            } else {
+                auto ref = NewReferencePointer<UnknownAsset>();
                 s_Assets[filenameString] = ref;
             }
         }

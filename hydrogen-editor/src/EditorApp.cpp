@@ -1,30 +1,7 @@
-#include <Hydrogen/Hydrogen.hpp>
+#include <Panel.hpp>
+#include <Panels/AssetNavigatorPanel.hpp>
 
-namespace HydrogenEditor {
-class Panel : public Hydrogen::Task {
-public:
-    virtual ~Panel() = default;
-
-    virtual void OnImGuiRender() = 0;
-    virtual const Hydrogen::String& GetTitle() = 0;
-};
-
-class RenderTask : public Hydrogen::Task {
-public:
-    RenderTask() {
-    }
-
-    ~RenderTask() = default;
-
-    void OnActivate() override {
-    }
-
-    void OnUpdate() override {
-    }
-
-    void OnDeactivate() override {
-    }
-};
+using namespace HydrogenEditor;
 
 class EditorApp : public Hydrogen::Application {
 public:
@@ -35,7 +12,7 @@ public:
     }
 
     void OnInit() override {
-        Hydrogen::TaskManager::Activate(Hydrogen::NewReferencePointer<RenderTask>());
+        AttachPanel(Hydrogen::NewReferencePointer<AssetNavigatorPanel>());
     }
 
     void AttachPanel(Hydrogen::ReferencePointer<Panel> panel) {
@@ -71,8 +48,7 @@ private:
     Hydrogen::ReferencePointer<Hydrogen::Task> m_DemoTask;
     Hydrogen::DynamicArray<Hydrogen::ReferencePointer<Panel>> m_Panels;
 };
-} // namespace HydrogenEditor
 
 Hydrogen::ReferencePointer<Hydrogen::Application> Hydrogen::CreateApplication() {
-    return Hydrogen::NewReferencePointer<HydrogenEditor::EditorApp>();
+    return Hydrogen::NewReferencePointer<EditorApp>();
 }

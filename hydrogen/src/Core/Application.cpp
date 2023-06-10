@@ -96,6 +96,9 @@ void Application::Run() {
         TaskManager::Update();
         OnUpdate();
 
+        RenderCommand::Clear(RendererAPI::ClearBuffer::COLOR);
+        RenderCommand::Clear(RendererAPI::ClearBuffer::DEPTH);
+
         // m_WindowRenderer->BeginFrame(camera);
         // m_WindowRenderer->Submit(vertexArray);
         // for (uint32_t i = 0; i < 4; i++) {
