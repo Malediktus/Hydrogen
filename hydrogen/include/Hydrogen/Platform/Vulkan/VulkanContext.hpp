@@ -8,6 +8,12 @@
 using VkQueueFamily = std::optional<uint32_t>;
 
 namespace Hydrogen::Vulkan {
+struct SwapChainSupportDetails {
+    VkSurfaceCapabilitiesKHR Capabilities;
+    DynamicArray<VkSurfaceFormatKHR> Formats;
+    DynamicArray<VkPresentModeKHR> PresentModes;
+};
+
 class VulkanContext : public Context {
 public:
     VulkanContext(const ReferencePointer<RenderWindow>& window);
@@ -26,14 +32,29 @@ public:
         return m_Device;
     }
 
+    VkPhysicalDevice GetPhysicalDevice() {
+        return m_PhysicalDevice;
+    }
+
+    VkQueue GetGraphicsQueue() {
+        return m_GraphicsQueue;
+    }
+
+    SwapChainSupportDetails GetSwapChainSupport(VkPhysicalDevice physicalDevice);
+
 private:
     void CreateInstance(VkApplicationInfo appInfo, VkInstanceCreateFlags flags, const DynamicArray<const char*> extensions, const DynamicArray<const char*> validationLayers,
                         PFN_vkDebugUtilsMessengerCallbackEXT debugCallback);
     void CreateDebugMessenger(PFN_vkDebugUtilsMessengerCallbackEXT callback);
     void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT* createInfo, PFN_vkDebugUtilsMessengerCallbackEXT callback);
-    void PickPhysicalDevice(std::function<bool(VkPhysicalDevice, VkSurfaceKHR)> deviceRateFunction);
+    void PickPhysicalDevice(
+        DynamicArray<const char*> deviceExtensions, std::function<bool(VkPhysicalDevice, VkSurfaceKHR, VulkanContext*, DynamicArray<const char*>)> deviceRateFunction);
     void GetQueueFamilies();
     void CreateLogicalDevice(const DynamicArray<const char*> extensions, const DynamicArray<const char*> validationLayers);
+    VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const DynamicArray<VkSurfaceFormatKHR>& availableFormats);
+    VkPresentModeKHR ChooseSwapPresentMode(const DynamicArray<VkPresentModeKHR>& availablePresentModes);
+    VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+    void CreateSwapChain();
 
     ReferencePointer<RenderWindow> m_Window;
     VkInstance m_Instance;
@@ -45,5 +66,6 @@ private:
     VkQueue m_GraphicsQueue;
     VkQueue m_PresentQueue;
     VkSurfaceKHR m_WindowSurface;
+    VkSwapchainKHR m_SwapChain;
 };
 } // namespace Hydrogen::Vulkan

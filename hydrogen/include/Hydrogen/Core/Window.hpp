@@ -15,7 +15,6 @@ public:
     virtual void SetTitle(const String& title) = 0;
     virtual uint32_t GetWidth() const = 0;
     virtual uint32_t GetHeight() const = 0;
-    virtual Vector2 GetViewportSize() const = 0;
 
     virtual bool GetWindowClose() const = 0;
     virtual bool GetKeyDown(KeyCode key) const = 0;

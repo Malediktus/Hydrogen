@@ -9,28 +9,58 @@ public:
     ~AssetNavigatorPanel() = default;
 
     virtual void OnImGuiRender() override {
-        ImGui::Text("Assets");
-
         if (m_CurrentDirectory != std::filesystem::path("assets")) {
             if (ImGui::Button("<-")) {
                 m_CurrentDirectory = m_CurrentDirectory.parent_path();
             }
         }
 
+        // for (auto& directoryEntry : std::filesystem::directory_iterator(m_CurrentDirectory)) {
+        //     const auto& path = directoryEntry.path();
+        //     auto relativePath = std::filesystem::relative(path, "assets");
+        //     std::string filenameString = relativePath.filename().string();
+        //     if (directoryEntry.is_directory()) {
+        //         if (ImGui::Button(filenameString.c_str())) {
+        //             m_CurrentDirectory /= path.filename();
+        //         }
+        //     } else if (directoryEntry.is_regular_file()) {
+        //         if (ImGui::Button(filenameString.c_str())) {
+        //             // TODO: Open asset file panel
+        //         }
+        //     }
+        // }
+
+        static float padding = 16.0f;
+        static float thumbnailSize = 128.0f;
+        float cellSize = thumbnailSize + padding;
+
+        float panelWidth = ImGui::GetContentRegionAvail().x;
+        int columnCount = (int) (panelWidth / cellSize);
+        if (columnCount < 1)
+            columnCount = 1;
+
+        ImGui::Columns(columnCount, 0, false);
+
         for (auto& directoryEntry : std::filesystem::directory_iterator(m_CurrentDirectory)) {
             const auto& path = directoryEntry.path();
             auto relativePath = std::filesystem::relative(path, "assets");
             std::string filenameString = relativePath.filename().string();
-            if (directoryEntry.is_directory()) {
-                if (ImGui::Button(filenameString.c_str())) {
+
+            Hydrogen::ReferencePointer<Hydrogen::Texture2D> icon = directoryEntry.is_directory() ? m_DirectoryIcon : m_FileIcon;
+            ImGui::ImageButton(*(ImTextureID*) icon->GetNative(), {thumbnailSize, thumbnailSize}, {0, 1}, {1, 0});
+            if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+                if (directoryEntry.is_directory())
                     m_CurrentDirectory /= path.filename();
-                }
-            } else if (directoryEntry.is_regular_file()) {
-                if (ImGui::Button(filenameString.c_str())) {
-                    // TODO: Open asset file panel
-                }
             }
+            ImGui::TextWrapped("%s", filenameString.c_str());
+
+            ImGui::NextColumn();
         }
+
+        ImGui::Columns(1);
+
+        ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
+        ImGui::SliderFloat("Padding", &padding, 0, 32);
     }
 
     virtual const Hydrogen::String GetTitle() override {

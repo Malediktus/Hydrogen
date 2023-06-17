@@ -8,6 +8,7 @@ class RenderWindow {
 public:
     virtual ~RenderWindow() = default;
 
+    virtual Vector2 GetViewportSize() const = 0;
     virtual void SetupImGui() = 0;
     virtual void ImGuiNewFrame() = 0;
     virtual void DestroyImGui() = 0;
