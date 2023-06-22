@@ -9,9 +9,6 @@
 #include "../Renderer/Context.hpp"
 #include "../Renderer/Renderer.hpp"
 
-#include <string>
-#include <glm/glm.hpp>
-
 namespace Hydrogen {
 class Application {
 public:

@@ -63,7 +63,6 @@ add_subdirectory(extern/entt)
 add_subdirectory(extern/glm)
 add_subdirectory(extern/spdlog)
 add_subdirectory(extern/tracy)
-add_subdirectory(extern/glad)
 add_subdirectory(extern/imgui)
 add_subdirectory(extern/stb_image)
 

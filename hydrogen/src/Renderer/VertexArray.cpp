@@ -1,6 +1,5 @@
 #include <Hydrogen/Renderer/VertexArray.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
-#include <Hydrogen/Platform/OpenGL/OpenGLVertexArray.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanVertexArray.hpp>
 #include <tracy/Tracy.hpp>
 
@@ -9,8 +8,6 @@ using namespace Hydrogen;
 ReferencePointer<VertexArray> VertexArray::Create() {
     ZoneScoped;
     switch (Renderer::GetAPI()) {
-    case RendererAPI::API::OpenGL:
-        return NewReferencePointer<OpenGL::OpenGLVertexArray>();
     case RendererAPI::API::Vulkan:
         return NewReferencePointer<Vulkan::VulkanVertexArray>();
     default:

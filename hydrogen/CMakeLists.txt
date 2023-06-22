@@ -28,14 +28,6 @@ set(HEADER_LIST
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/VertexArray.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/RenderCommand.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/Renderer.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLBuffer.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLContext.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLFramebuffer.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLRenderbuffer.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLRendererAPI.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLShader.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLTexture.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/OpenGL/OpenGLVertexArray.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanBuffer.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanContext.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanFramebuffer.hpp"
@@ -53,7 +45,6 @@ set(SOURCE_LIST
     src/Core/Application.cpp
     src/Core/Task.cpp
     src/Core/Window.cpp
-    src/Core/Assert.cpp
     src/Assets/AssetManager.cpp
     src/Event/EventManager.cpp
     src/Scene/Scene.cpp
@@ -68,14 +59,6 @@ set(SOURCE_LIST
     src/Renderer/VertexArray.cpp
     src/Renderer/RenderCommand.cpp
     src/Renderer/Renderer.cpp
-    src/Platform/OpenGL/OpenGLBuffer.cpp
-    src/Platform/OpenGL/OpenGLContext.cpp
-    src/Platform/OpenGL/OpenGLFramebuffer.cpp
-    src/Platform/OpenGL/OpenGLRenderbuffer.cpp
-    src/Platform/OpenGL/OpenGLRendererAPI.cpp
-    src/Platform/OpenGL/OpenGLShader.cpp
-    src/Platform/OpenGL/OpenGLTexture.cpp
-    src/Platform/OpenGL/OpenGLVertexArray.cpp
     src/Platform/Vulkan/VulkanBuffer.cpp
     src/Platform/Vulkan/VulkanContext.cpp
     src/Platform/Vulkan/VulkanFramebuffer.cpp
@@ -100,5 +83,5 @@ else()
     target_compile_options(Hydrogen PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
-target_link_libraries(Hydrogen PRIVATE glfw assimp glad Vulkan::Vulkan)
+target_link_libraries(Hydrogen PRIVATE glfw assimp Vulkan::Vulkan)
 target_link_libraries(Hydrogen PUBLIC spdlog::spdlog stb_image imgui glm EnTT::EnTT TracyClient)

@@ -1,6 +1,5 @@
 #include <Hydrogen/Renderer/Context.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
-#include <Hydrogen/Platform/OpenGL/OpenGLContext.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
 #include <tracy/Tracy.hpp>
 
@@ -10,8 +9,6 @@ ReferencePointer<Context> Context::Create(const ReferencePointer<Hydrogen::Rende
     ZoneScoped;
 
     switch (Renderer::GetAPI()) {
-    case RendererAPI::API::OpenGL:
-        return NewReferencePointer<OpenGL::OpenGLContext>(window);
     case RendererAPI::API::Vulkan:
         return NewReferencePointer<Vulkan::VulkanContext>(window);
     default:

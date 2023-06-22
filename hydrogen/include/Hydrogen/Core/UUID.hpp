@@ -21,7 +21,7 @@ public:
         m_Value &= ~(0xc000'0000'0000'0000ULL); // Clear variant bits
         m_Value |= 0x8000'0000'0000'0000ULL;    // Set variant 10
 
-        HY_LOG_DEBUG("Created new UUID: {}", m_Value);
+        HY_LOG_DEBUG("Created new UUID: {}!", m_Value);
     }
 
     UUID(const uint64_t val) {

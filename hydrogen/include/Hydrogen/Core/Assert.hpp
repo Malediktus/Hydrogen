@@ -1,35 +1,27 @@
 #pragma once
 
 #include "Platform.hpp"
-#include "../Core/Memory.hpp"
-#include <string>
+#include "Logger.hpp"
+#include "Memory.hpp"
 
 #ifdef HY_DEBUG
-    #define HY_ASSERT_CHECK(expr, msg)                                                                                                                                             \
-        if (expr)                                                                                                                                                                  \
-            ;                                                                                                                                                                      \
-        else                                                                                                                                                                       \
-            Hydrogen::ReportAssertionFailure(__FILE__, __LINE__, true, msg)
-    #define HY_ASSERT(expr, msg)                                                                                                                                                   \
-        if (expr)                                                                                                                                                                  \
-            ;                                                                                                                                                                      \
-        else                                                                                                                                                                       \
-            Hydrogen::ReportAssertionFailure(__FILE__, __LINE__, false, msg)
+    #define HY_ASSERT_CHECK(expr, ...)                                                                                                                                             \
+        if (expr) {                                                                                                                                                                \
+        } else {                                                                                                                                                                   \
+            HY_LOG_FATAL("Assertion error in " __FILE__ ": '" #expr "' is not zero | " __VA_ARGS__);                                                                               \
+            exit(0);                                                                                                                                                               \
+        }
 #else
-    #define HY_ASSERT_CHECK(expr, msg)
-    #define HY_ASSERT(expr, msg)                                                                                                                                                   \
-        if (expr)                                                                                                                                                                  \
-            ;                                                                                                                                                                      \
-        else                                                                                                                                                                       \
-            Hydrogen::ReportAssertionFailure(__FILE__, __LINE__, false, msg)
+    #define HY_ASSERT_CHECK(expr, ...)
 #endif
 
-#define HY_INVOKE_ERROR(msg) Hydrogen::ReportAssertionFailure(__FILE__, __LINE__, false, msg)
+#define HY_ASSERT(expr, ...)                                                                                                                                                       \
+    if (expr) {                                                                                                                                                                    \
+    } else {                                                                                                                                                                       \
+        HY_LOG_FATAL("Hydrogen error: " __VA_ARGS__);                                                                                                                              \
+        exit(0);                                                                                                                                                                   \
+    }
 
-namespace Hydrogen {
-#ifdef HY_COMPILER_MSVC
-void ReportAssertionFailure(const char* filename, size_t line, bool check, const String& msg);
-#else
-__attribute__((noreturn)) void ReportAssertionFailure(const char* filename, size_t line, bool check, const String& msg);
-#endif
-} // namespace Hydrogen
+#define HY_INVOKE_ERROR(...)                                                                                                                                                       \
+    HY_LOG_FATAL("Hydrogen error: " __VA_ARGS__);                                                                                                                                  \
+    exit(0);
