@@ -50,5 +50,6 @@ private:
 };
 
 Hydrogen::ReferencePointer<Hydrogen::Application> Hydrogen::CreateApplication() {
+    std::filesystem::current_path(WORKING_DIR);
     return Hydrogen::NewReferencePointer<EditorApp>();
 }

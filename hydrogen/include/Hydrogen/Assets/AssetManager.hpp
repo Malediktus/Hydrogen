@@ -26,17 +26,6 @@ protected:
     AssetInfo m_AssetInfo;
 };
 
-class UnknownAsset : public Asset {
-public:
-    UnknownAsset() {
-        m_AssetInfo.Preload = false;
-    }
-
-    void Load(const String&) override {
-        HY_LOG_WARN("Trying to load asset of type unknown");
-    }
-};
-
 class SpriteAsset : public Asset {
 public:
     SpriteAsset() {
@@ -47,6 +36,7 @@ public:
     void Load(const String& filepath) override {
         HY_LOG_DEBUG("Loading sprite: {}", filepath);
 
+        stbi_set_flip_vertically_on_load(true);
         int width, height, nrChannels;
         uint8_t* data = stbi_load(filepath.c_str(), &width, &height, &nrChannels, 0);
 
@@ -107,8 +97,6 @@ private:
 class AssetManager {
 public:
     static void Init() {
-        HY_LOG_DEBUG("Current working directory: {}", std::filesystem::current_path());
-
         for (const auto& dirEntry : std::filesystem::recursive_directory_iterator("assets")) {
             HY_LOG_DEBUG("Asset file found: {}", dirEntry);
             if (dirEntry.is_directory() || dirEntry.is_symlink()) // TODO: Maybe use symlinks too
@@ -127,9 +115,6 @@ public:
                 if (ref->GetInfo().Preload)
                     ref->Load(filenameString);
                 s_Assets[filenameString] = ref;
-            } else {
-                auto ref = NewReferencePointer<UnknownAsset>();
-                s_Assets[filenameString] = ref;
             }
         }
     }
@@ -137,7 +122,7 @@ public:
     template <typename T> static ReferencePointer<T> Get(const String& filename) {
         static_assert(std::is_base_of<Asset, T>::value, "T must be derived from Asset");
 
-        if (s_Assets[filename])
+        if (s_Assets.count(filename))
             return std::dynamic_pointer_cast<T>(s_Assets[filename]);
 
         std::filesystem::path filepath(filename);

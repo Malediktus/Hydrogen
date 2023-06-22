@@ -39,7 +39,7 @@ public:
         if (columnCount < 1)
             columnCount = 1;
 
-        ImGui::Columns(columnCount, 0, false);
+        // ImGui::Columns(columnCount, 0, false);
 
         for (auto& directoryEntry : std::filesystem::directory_iterator(m_CurrentDirectory)) {
             const auto& path = directoryEntry.path();
@@ -47,20 +47,21 @@ public:
             std::string filenameString = relativePath.filename().string();
 
             Hydrogen::ReferencePointer<Hydrogen::Texture2D> icon = directoryEntry.is_directory() ? m_DirectoryIcon : m_FileIcon;
-            ImGui::ImageButton(*(ImTextureID*) icon->GetNative(), {thumbnailSize, thumbnailSize}, {0, 1}, {1, 0});
-            if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                if (directoryEntry.is_directory())
-                    m_CurrentDirectory /= path.filename();
-            }
-            ImGui::TextWrapped("%s", filenameString.c_str());
+            // ImGui::ImageButton(*(ImTextureID*) icon->GetNative(), {thumbnailSize, thumbnailSize}, {0, 1}, {1, 0});
+            // if (ImGui::IsItemHovered() && //ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+            //    if (directoryEntry.is_directory())
+            //        m_CurrentDirectory /= path.filename();
+            //}
+            // ImGui::TextWrapped("%s", filenameString.c_str());
 
-            ImGui::NextColumn();
+            // ImGui::NextColumn();
         }
 
-        ImGui::Columns(1);
+        // ImGui::Columns(1);
 
-        ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
-        ImGui::SliderFloat("Padding", &padding, 0, 32);
+        // ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
+        // ImGui::SliderFloat("Padding", &padding, 0, 32);
+        ImGui::Image(*(ImTextureID*) m_DirectoryIcon->GetNative(), {thumbnailSize, thumbnailSize}, {0, 1}, {1, 0});
     }
 
     virtual const Hydrogen::String GetTitle() override {
