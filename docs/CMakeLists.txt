@@ -12,4 +12,4 @@ set(HTML_COLORSTYLE LIGHT)
 doxygen_add_docs(docs
     Hydrogen/Hydrogen.hpp
     "${CMAKE_CURRENT_SOURCE_DIR}/mainpage.md"
-    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/include")
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/hydrogen/include")
