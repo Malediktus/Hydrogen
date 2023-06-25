@@ -16,3 +16,6 @@
 [submodule "extern/tracy"]
 	path = extern/tracy
 	url = https://github.com/wolfpld/tracy
+[submodule "extern/glslang"]
+	path = extern/glslang
+	url = https://github.com/KhronosGroup/glslang
