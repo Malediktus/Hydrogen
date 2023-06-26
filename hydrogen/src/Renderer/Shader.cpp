@@ -5,18 +5,8 @@
 
 using namespace Hydrogen;
 
-ReferencePointer<Shader> Shader::Create(const String& filepath) {
-    ZoneScoped;
-    switch (Renderer::GetAPI()) {
-    case RendererAPI::API::Vulkan:
-        return NewReferencePointer<Vulkan::VulkanShader>(filepath);
-    default:
-        HY_ASSERT_CHECK(false, "Invalid renderer API value returned from Renderer::GetRendererAPI()");
-    }
-    return nullptr;
-}
-
-ReferencePointer<Shader> Shader::Create(const String& name, const String& vertexSrc, const String& fragmentSrc, const String& geometrySrc) {
+ReferencePointer<Shader> Shader::Create(const String& name, const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc,
+                                        const DynamicArray<uint32_t>& geometrySrc) {
     ZoneScoped;
     switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
@@ -38,17 +28,10 @@ void ShaderLibrary::Add(const ReferencePointer<Shader>& shader) {
     auto& name = shader->GetName();
     Add(name, shader);
 }
-
-ReferencePointer<Shader> ShaderLibrary::Load(const String& filepath) {
+ReferencePointer<Shader> ShaderLibrary::Load(const String& name, const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc,
+                                             const DynamicArray<uint32_t>& geometrySrc) {
     ZoneScoped;
-    auto shader = Shader::Create(filepath);
-    Add(shader);
-    return shader;
-}
-
-ReferencePointer<Shader> ShaderLibrary::Load(const String& name, const String& filepath) {
-    ZoneScoped;
-    auto shader = Shader::Create(filepath);
+    auto shader = Shader::Create(name, vertexSrc, fragmentSrc, geometrySrc);
     Add(name, shader);
     return shader;
 }

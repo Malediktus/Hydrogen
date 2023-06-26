@@ -1,141 +1,42 @@
 #pragma once
 
+#include "ShaderAsset.hpp"
+#include "SpriteAsset.hpp"
+#include "Asset.hpp"
 #include "../Core/Memory.hpp"
 #include "../Core/Logger.hpp"
-#include "../Renderer/Shader.hpp"
-#include "../Renderer/Texture.hpp"
 
-#include <stb_image.h>
 #include <filesystem>
 
 namespace Hydrogen {
-class Asset {
-public:
-    struct AssetInfo {
-        bool Preload;
-    };
-
-    virtual ~Asset() = default;
-    virtual void Load(const String& filepath) = 0;
-
-    AssetInfo GetInfo() {
-        return m_AssetInfo;
-    }
-
-protected:
-    AssetInfo m_AssetInfo;
-};
-
-class SpriteAsset : public Asset {
-public:
-    SpriteAsset() {
-        m_AssetInfo.Preload = true;
-    }
-
-    void Load(const String& filepath) override {
-        HY_ASSERT(!filepath.empty(), "Parameter 'filepath' of type 'const String&' in function SpriteAsset::Load(const String& filepath) is an empty string!");
-        HY_LOG_INFO("Loading sprite asset '%s'!", filepath);
-        HY_LOG_INFO("Finished loading sprite asset '%s'!", filepath);
-    }
-
-    const ReferencePointer<Texture2D>& GetTexture() {
-        HY_ASSERT(m_Texture, "SpriteAsset::GetTexture() was about to return null! SpriteAsset::Load(const String& filename) shall be called first!");
-        return m_Texture;
-    }
-
-    static const DynamicArray<const String> GetFileExtensions() {
-        return DynamicArray<const String> {".png", ".jpg", ".bmp", ".tga", ".hdr"};
-    }
-
-    static bool CheckFileExtensions(const String& ext) {
-        auto exts = GetFileExtensions();
-        return std::find(exts.begin(), exts.end(), ext.c_str()) != exts.end();
-    }
-
-private:
-    ReferencePointer<Texture2D> m_Texture;
-};
-
-class ShaderAsset : public Asset {
-public:
-    ShaderAsset() {
-        m_AssetInfo.Preload = true;
-    }
-
-    void Load(const String& filepath) override {
-        HY_ASSERT(!filepath.empty(), "Parameter 'filepath' of type 'const String&' in function ShaderAsset::Load(const String& filepath) is an empty string!");
-        HY_LOG_INFO("Loading shader asset '%s'!", filepath);
-        m_Shader = Shader::Create(filepath);
-        HY_LOG_INFO("Finished loading shader asset '%s'!", filepath);
-    }
-
-    const ReferencePointer<Shader>& GetShader() {
-        HY_ASSERT(m_Shader, "ShaderAsset::GetShader() was about to return null! ShaderAsset::Load(const String& filename) shall be called first!");
-        return m_Shader;
-    }
-
-    static const DynamicArray<const String> GetFileExtensions() {
-        return DynamicArray<const String> {".glsl"};
-    }
-
-    static bool CheckFileExtensions(const String& ext) {
-        auto exts = GetFileExtensions();
-        return std::find(exts.begin(), exts.end(), ext.c_str()) != exts.end();
-    }
-
-private:
-    ReferencePointer<Shader> m_Shader;
-};
-
 class AssetManager {
 public:
-    static void Init() {
-        /*    for (const auto& dirEntry : std::filesystem::recursive_directory_iterator("assets")) {
-                HY_LOG_DEBUG("Asset file found: {}", dirEntry);
-                if (dirEntry.is_directory() || dirEntry.is_symlink()) // TODO: Maybe use symlinks too
-                    continue;
+    static void Init();
 
-                auto filename = dirEntry.path();
-                auto extension = filename.extension().string();
-                auto filenameString = filename.string();
-                if (SpriteAsset::CheckFileExtensions(extension)) {
-                    auto ref = NewReferencePointer<SpriteAsset>();
-                    if (ref->GetInfo().Preload)
-                        ref->Load(filenameString);
-                    s_Assets[filenameString] = ref;
-                } else if (ShaderAsset::CheckFileExtensions(extension)) {
-                    auto ref = NewReferencePointer<ShaderAsset>();
-                    if (ref->GetInfo().Preload)
-                        ref->Load(filenameString);
-                    s_Assets[filenameString] = ref;
-                }
-            }*/
-    }
+    template <typename T> static ReferencePointer<T> Get(const String& filename) {
+        static_assert(std::is_base_of<Asset, T>::value, "T must be derived from Asset");
 
-    template <typename T> static ReferencePointer<T> Get(const String&) {
-        /*    static_assert(std::is_base_of<Asset, T>::value, "T must be derived from Asset");
+        if (s_Assets.count(filename))
+            return std::dynamic_pointer_cast<T>(s_Assets[filename]);
 
-            if (s_Assets.count(filename))
-                return std::dynamic_pointer_cast<T>(s_Assets[filename]);
+        std::filesystem::path filepath(filename);
+        if (!(std::filesystem::exists(filepath))) {
+            return std::dynamic_pointer_cast<T>(s_Assets[filename]);
+        }
 
-            std::filesystem::path filepath(filename);
-            if (!(std::filesystem::exists(filepath))) {
-                return std::dynamic_pointer_cast<T>(s_Assets[filename]);
-            }
+        auto extension = filepath.extension().string();
+        auto filenameString = filepath.string();
+        if (SpriteAsset::CheckFileExtensions(extension)) {
+            auto ref = NewReferencePointer<SpriteAsset>();
+            ref->Load(filenameString);
+            s_Assets[filenameString] = ref;
+        } else if (ShaderAsset::CheckFileExtensions(extension)) {
+            auto ref = NewReferencePointer<ShaderAsset>();
+            ref->Load(filenameString);
+            s_Assets[filenameString] = ref;
+        }
 
-            auto extension = filepath.extension().string();
-            auto filenameString = filepath.string();
-            if (SpriteAsset::CheckFileExtensions(extension)) {
-                auto ref = NewReferencePointer<SpriteAsset>();
-                ref->Load(filenameString);
-                s_Assets[filenameString] = ref;
-            } else if (ShaderAsset::CheckFileExtensions(extension)) {
-                auto ref = NewReferencePointer<ShaderAsset>();
-                ref->Load(filenameString);
-                s_Assets[filenameString] = ref;
-            }
-
-            return std::dynamic_pointer_cast<T>(s_Assets[filenameString]);*/
+        return std::dynamic_pointer_cast<T>(s_Assets[filenameString]);
         return nullptr;
     }
 
