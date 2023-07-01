@@ -1,6 +1,8 @@
 #pragma once
 
+#include "VulkanContext.hpp"
 #include "../../Renderer/Shader.hpp"
+#include "../../Renderer/Renderer.hpp"
 #include "../../Math/Math.hpp"
 #include <unordered_map>
 
@@ -21,5 +23,8 @@ public:
 
 private:
     String m_Name;
+    VkShaderModule m_VertexShaderModule;
+    VkShaderModule m_FragmentShaderModule;
+    VkShaderModule m_GeometryShaderModule;
 };
 } // namespace Hydrogen::Vulkan
