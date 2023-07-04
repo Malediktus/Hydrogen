@@ -1,15 +1,15 @@
-#include <Hydrogen/Renderer/Renderbuffer.hpp>
+#include <Hydrogen/Renderer/RenderDevice.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanRenderbuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen;
 
-ReferencePointer<Renderbuffer> Renderbuffer::Create(uint32_t width, uint32_t height, RenderbufferUsageType usageType) {
+ReferencePointer<RenderDevice> RenderDevice::Create(std::function<std::size_t(const RenderDeviceProperties&)> deviceRateFunction) {
     ZoneScoped;
     switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
-        return NewReferencePointer<Vulkan::VulkanRenderbuffer>(width, height, usageType);
+        return NewReferencePointer<Vulkan::VulkanRenderDevice>(deviceRateFunction);
     default:
         HY_ASSERT_CHECK(false, "Invalid renderer API value returned from Renderer::GetRendererAPI()");
     }

@@ -7,6 +7,7 @@
 #include "Texture.hpp"
 #include "Context.hpp"
 #include "Camera.hpp"
+#include "RenderDevice.hpp"
 #include <glm/glm.hpp>
 #include <memory>
 #include <string>
@@ -71,13 +72,26 @@ public:
         return RendererAPI::GetAPI();
     }
 
-    static void SetContext(ReferencePointer<Context> context);
+    static void SetContext(ReferencePointer<Context> context) {
+        s_Context = context;
+    }
+
     template <typename T> static ReferencePointer<T> GetContext() {
         static_assert(std::is_base_of<Context, T>::value, "T must be derived from Context");
         return std::dynamic_pointer_cast<T>(s_Context);
     }
 
+    static void SetRenderDevice(ReferencePointer<RenderDevice> renderDevice) {
+        s_RenderDevice = renderDevice;
+    }
+
+    template <typename T> static ReferencePointer<T> GetRenderDevice() {
+        static_assert(std::is_base_of<RenderDevice, T>::value, "T must be derived from RenderDevice");
+        return std::dynamic_pointer_cast<T>(s_RenderDevice);
+    }
+
 private:
     static ReferencePointer<Context> s_Context;
+    static ReferencePointer<RenderDevice> s_RenderDevice;
 };
 } // namespace Hydrogen

@@ -64,27 +64,3 @@ void VulkanFramebuffer::AttachDepthStencilTexture(const ReferencePointer<Texture
     HY_ASSERT(numDepthStencilAttachments < 1 && numDepthAttachments < 1 && numStencilAttachments < 1, "Too many depth/stencil attachments");
     HY_LOG_TRACE("Attached texture of type depth_stencil buffer to Vulkan framebuffer (ID: {}, TextureID: {})", 0, 0);
 }
-
-void VulkanFramebuffer::AttachColorRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) {
-    ZoneScoped;
-    HY_ASSERT(numColorAttachments < 32, "Too many color attachments");
-    HY_LOG_TRACE("Attached renderbuffer of type color buffer to Vulkan framebuffer (ID: {}, RenderbufferID: {})", 0, 0)
-}
-
-void VulkanFramebuffer::AttachDepthRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) {
-    ZoneScoped;
-    HY_ASSERT(numDepthAttachments < 1 && numDepthStencilAttachments < 1, "Too many depth attachments");
-    HY_LOG_TRACE("Attached renderbuffer of type depth buffer to Vulkan framebuffer (ID: {}, RenderbufferID: {})", 0, 0)
-}
-
-void VulkanFramebuffer::AttachStencilRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) {
-    ZoneScoped;
-    HY_ASSERT(numStencilAttachments < 1 && numDepthStencilAttachments < 1, "Too many stencil attachments");
-    HY_LOG_TRACE("Attached renderbuffer of type stencil buffer to Vulkan framebuffer (ID: {}, RenderbufferID: {})", 0, 0)
-}
-
-void VulkanFramebuffer::AttachDepthStencilRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) {
-    ZoneScoped;
-    HY_ASSERT(numDepthStencilAttachments < 1 && numDepthAttachments < 1 && numStencilAttachments < 1, "Too many depth/stencil attachments");
-    HY_LOG_TRACE("Attached renderbuffer of type depth_stencil buffer to Vulkan framebuffer (ID: {}, RenderbufferID: {})", 0, 0)
-}

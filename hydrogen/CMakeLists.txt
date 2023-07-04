@@ -24,7 +24,7 @@ set(HEADER_LIST
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/Camera.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/Context.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/Framebuffer.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/Renderbuffer.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/RenderDevice.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/RendererAPI.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/RenderWindow.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/Shader.hpp"
@@ -36,7 +36,7 @@ set(HEADER_LIST
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanBuffer.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanContext.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanFramebuffer.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanRenderbuffer.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanShader.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanTexture.hpp"
@@ -57,7 +57,7 @@ set(SOURCE_LIST
     src/Renderer/Buffer.cpp
     src/Renderer/Context.cpp
     src/Renderer/Framebuffer.cpp
-    src/Renderer/Renderbuffer.cpp
+    src/Renderer/RenderDevice.cpp
     src/Renderer/RendererAPI.cpp
     src/Renderer/RenderWindow.cpp
     src/Renderer/Shader.cpp
@@ -69,7 +69,7 @@ set(SOURCE_LIST
     src/Platform/Vulkan/VulkanBuffer.cpp
     src/Platform/Vulkan/VulkanContext.cpp
     src/Platform/Vulkan/VulkanFramebuffer.cpp
-    src/Platform/Vulkan/VulkanRenderbuffer.cpp
+    src/Platform/Vulkan/VulkanRenderDevice.cpp
     src/Platform/Vulkan/VulkanRendererAPI.cpp
     src/Platform/Vulkan/VulkanShader.cpp
     src/Platform/Vulkan/VulkanTexture.cpp

@@ -4,7 +4,6 @@
 #include "../Core/Assert.hpp"
 #include "../Core/Memory.hpp"
 #include "Texture.hpp"
-#include "Renderbuffer.hpp"
 #include "RenderWindow.hpp"
 #include <memory>
 
@@ -26,11 +25,6 @@ public:
     virtual void AttachDepthTexture(const ReferencePointer<Texture2D>& texture) = 0;
     virtual void AttachStencilTexture(const ReferencePointer<Texture2D>& texture) = 0;
     virtual void AttachDepthStencilTexture(const ReferencePointer<Texture2D>& texture) = 0;
-
-    virtual void AttachColorRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) = 0;
-    virtual void AttachDepthRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) = 0;
-    virtual void AttachStencilRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) = 0;
-    virtual void AttachDepthStencilRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) = 0;
 
     static ReferencePointer<Framebuffer> Create(const ReferencePointer<RenderWindow>& window);
 };

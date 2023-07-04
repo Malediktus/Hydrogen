@@ -19,11 +19,6 @@ public:
     virtual void AttachStencilTexture(const ReferencePointer<Texture2D>& texture) override;
     virtual void AttachDepthStencilTexture(const ReferencePointer<Texture2D>& texture) override;
 
-    virtual void AttachColorRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) override;
-    virtual void AttachDepthRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) override;
-    virtual void AttachStencilRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) override;
-    virtual void AttachDepthStencilRenderbuffer(const ReferencePointer<Renderbuffer>& renderbuffer) override;
-
 private:
     uint32_t m_RendererID;
     uint32_t numAttachments;

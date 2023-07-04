@@ -13,7 +13,3 @@ Renderer::Renderer() {
 
     HY_LOG_INFO("Initialized renderer");
 }
-
-void Renderer::SetContext(ReferencePointer<Context> context) {
-    s_Context = context;
-}
