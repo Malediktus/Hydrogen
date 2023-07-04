@@ -1,104 +1,104 @@
-#include <Hydrogen/Core/Platform.hpp>
 #include <Hydrogen/Core/Logger.hpp>
+#include <Hydrogen/Core/Platform.hpp>
 
 using namespace Hydrogen;
 
 String Hydrogen::PlatformToString(Platform platform) {
-    switch (platform) {
+  switch (platform) {
     case Platform::Windows:
-        return "Windows";
-        break;
+      return "Windows";
+      break;
     case Platform::WindowsPC:
-        return "WindowsPC";
-        break;
+      return "WindowsPC";
+      break;
     case Platform::XBoxOne:
-        return "XBoxOne";
-        break;
+      return "XBoxOne";
+      break;
     case Platform::Unix:
-        return "Unix";
-        break;
+      return "Unix";
+      break;
     case Platform::Apple:
-        return "Apple";
-        break;
+      return "Apple";
+      break;
     case Platform::MacOS:
-        return "MacOS";
-        break;
+      return "MacOS";
+      break;
     case Platform::IOS:
-        return "IOS";
-        break;
+      return "IOS";
+      break;
     case Platform::Web:
-        return "Web";
-        break;
+      return "Web";
+      break;
     case Platform::Android:
-        return "Android";
-        break;
+      return "Android";
+      break;
     case Platform::Linux:
-        return "Linux";
-        break;
+      return "Linux";
+      break;
     case Platform::DragonFlyBSD:
-        return "DragonFlyBSD";
-        break;
+      return "DragonFlyBSD";
+      break;
     case Platform::FreeBSD:
-        return "FreeBSD";
-        break;
+      return "FreeBSD";
+      break;
     case Platform::NetBSD:
-        return "NetBSD";
-        break;
+      return "NetBSD";
+      break;
     case Platform::OpenBSD:
-        return "OpenBSD";
-        break;
+      return "OpenBSD";
+      break;
     case Platform::AkarOS:
-        return "AkarOS";
-        break;
+      return "AkarOS";
+      break;
     case Platform::Solaris:
-        return "Solaris";
-        break;
+      return "Solaris";
+      break;
     case Platform::Playstation:
-        return "Playstation";
-        break;
+      return "Playstation";
+      break;
     case Platform::Nintendo:
-        return "Nintendo";
-        break;
+      return "Nintendo";
+      break;
     default:
-        HY_INVOKE_ERROR("Invalid platform");
-    }
+      HY_INVOKE_ERROR("Invalid platform");
+  }
 }
 
 Platform Hydrogen::GetCurrentPlatform() {
 #if defined HY_PLATFORM_WINDOWS_STORE
-    return Platform::WindowsPC;
+  return Platform::WindowsPC;
 #elif defined HY_PLATFORM_XBOX_ONE
-    return Platform::XBoxOne;
+  return Platform::XBoxOne;
 #elif defined HY_PLATFORM_MACOS
-    return Platform::MacOS;
+  return Platform::MacOS;
 #elif defined HY_PLATFORM_IOS
-    return Platform::IOS;
+  return Platform::IOS;
 #elif defined HY_PLATFORM_WEB
-    return Platform::Web;
+  return Platform::Web;
 #elif defined HY_PLATFORM_ANDROID
-    return Platform::Android;
+  return Platform::Android;
 #elif defined HY_PLATFORM_LINUX
-    return Platform::Linux;
+  return Platform::Linux;
 #elif defined HY_PLATFORM_DRAGON_FLY_BSD
-    return Platform::DragonFlyBSD;
+  return Platform::DragonFlyBSD;
 #elif defined HY_PLATFORM_FREE_BSD
-    return Platform::FreeBSD;
+  return Platform::FreeBSD;
 #elif defined HY_PLATFORM_NET_BSD
-    return Platform::NetBSD;
+  return Platform::NetBSD;
 #elif defined HY_PLATFORM_OPEN_BSD
-    return Platform::OpenBSD;
+  return Platform::OpenBSD;
 #elif defined HY_PLATFORM_AKAROS
-    return Platform::AkarOS;
+  return Platform::AkarOS;
 #elif defined HY_PLATFORM_SOLARIS
-    return Platform::Solaris;
+  return Platform::Solaris;
 #elif defined HY_PLATFORM_PLAYSTATION
-    return Platform::Playstation;
+  return Platform::Playstation;
 #elif defined HY_PLATFORM_NINTENDO
-    return Platform::Nintendo;
+  return Platform::Nintendo;
 #endif
-    HY_INVOKE_ERROR("Invalid platform");
+  HY_INVOKE_ERROR("Invalid platform");
 }
 
 inline String Hydrogen::GetCurrentPlatformName() {
-    return PlatformToString(GetCurrentPlatform());
+  return PlatformToString(GetCurrentPlatform());
 }

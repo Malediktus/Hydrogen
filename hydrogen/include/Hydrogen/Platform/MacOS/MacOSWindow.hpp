@@ -7,40 +7,40 @@
 
 namespace Hydrogen {
 class MacOSWindow : public Window {
-public:
-    MacOSWindow(const String& title, uint32_t width, uint32_t height);
-    ~MacOSWindow();
+ public:
+  MacOSWindow(const String& title, uint32_t width, uint32_t height);
+  ~MacOSWindow();
 
-    void SetTitle(const String& title) override;
-    uint32_t GetWidth() const override;
-    uint32_t GetHeight() const override;
-    Vector2 GetViewportSize() const override;
+  void SetTitle(const String& title) override;
+  uint32_t GetWidth() const override;
+  uint32_t GetHeight() const override;
+  Vector2 GetViewportSize() const override;
 
-    bool GetWindowClose() const override;
-    bool GetKeyDown(KeyCode key) const override;
-    bool GetKey(KeyCode key) const override;
-    bool GetKeyUp(KeyCode key) const override;
-    bool GetMouseKeyDown(KeyCode key) const override;
-    bool GetMouseKey(KeyCode key) const override;
-    bool GetMouseKeyUp(KeyCode key) const override;
-    uint32_t GetMouseX() const override;
-    uint32_t GetMouseY() const override;
-    Vector2 GetMousePos() const override;
+  bool GetWindowClose() const override;
+  bool GetKeyDown(KeyCode key) const override;
+  bool GetKey(KeyCode key) const override;
+  bool GetKeyUp(KeyCode key) const override;
+  bool GetMouseKeyDown(KeyCode key) const override;
+  bool GetMouseKey(KeyCode key) const override;
+  bool GetMouseKeyUp(KeyCode key) const override;
+  uint32_t GetMouseX() const override;
+  uint32_t GetMouseY() const override;
+  Vector2 GetMousePos() const override;
 
-    void UpdateEvents() override;
-    void Render() override;
+  void UpdateEvents() override;
+  void Render() override;
 
-    void SetupImGui() override;
-    void ImGuiNewFrame() override;
-    void SetupOpenglContext(int major, int minor) override;
-    void DestroyImGui() override;
-    void UpdateImGuiPlatformWindows() override;
+  void SetupImGui() override;
+  void ImGuiNewFrame() override;
+  void SetupOpenglContext(int major, int minor) override;
+  void DestroyImGui() override;
+  void UpdateImGuiPlatformWindows() override;
 
-    void* GetWindowOpenGLProcAddress() override;
-    const std::vector<const char*> GetVulkanWindowExtensions() override;
-    void* GetVulkanWindowSurface() override;
+  void* GetWindowOpenGLProcAddress() override;
+  const std::vector<const char*> GetVulkanWindowExtensions() override;
+  void* GetVulkanWindowSurface() override;
 
-private:
-    GLFWwindow* m_Window;
+ private:
+  GLFWwindow* m_Window;
 };
-} // namespace Hydrogen
+}  // namespace Hydrogen

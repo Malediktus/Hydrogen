@@ -4,19 +4,17 @@
 
 namespace Hydrogen {
 class Asset {
-public:
-    struct AssetInfo {
-        bool Preload;
-    };
+ public:
+  struct AssetInfo {
+    bool Preload;
+  };
 
-    virtual ~Asset() = default;
-    virtual void Load(const String& filepath) = 0;
+  virtual ~Asset() = default;
+  virtual void Load(const String& filepath) = 0;
 
-    AssetInfo GetInfo() {
-        return m_AssetInfo;
-    }
+  AssetInfo GetInfo() { return m_AssetInfo; }
 
-protected:
-    AssetInfo m_AssetInfo;
+ protected:
+  AssetInfo m_AssetInfo;
 };
-} // namespace Hydrogen
+}  // namespace Hydrogen

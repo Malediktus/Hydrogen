@@ -28,4 +28,4 @@ using DMatrix3 = glm::dmat3;
 using DMatrix4 = glm::dmat4;
 
 using Quat = glm::quat;
-}; // namespace Hydrogen
+};  // namespace Hydrogen
