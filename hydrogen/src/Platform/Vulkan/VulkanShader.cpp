@@ -1,5 +1,6 @@
 #include <Hydrogen/Core/Logger.hpp>
 #include <Hydrogen/Core/Memory.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanShader.hpp>
 #include <array>
@@ -28,8 +29,9 @@ VulkanShader::VulkanShader(const String& name,
     createInfo.pCode = reinterpret_cast<const uint32_t*>(vertexSrc.data());
 
     VK_CHECK_ERROR(
-        vkCreateShaderModule(Renderer::GetContext<VulkanContext>()->GetDevice(),
-                             &createInfo, nullptr, &m_VertexShaderModule),
+        vkCreateShaderModule(
+            Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(),
+            &createInfo, nullptr, &m_VertexShaderModule),
         "Failed to create vulkan shader module!");
 
     VkPipelineShaderStageCreateInfo vertexShaderStageInfo{};
@@ -49,8 +51,9 @@ VulkanShader::VulkanShader(const String& name,
     createInfo.pCode = reinterpret_cast<const uint32_t*>(fragmentSrc.data());
 
     VK_CHECK_ERROR(
-        vkCreateShaderModule(Renderer::GetContext<VulkanContext>()->GetDevice(),
-                             &createInfo, nullptr, &m_FragmentShaderModule),
+        vkCreateShaderModule(
+            Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(),
+            &createInfo, nullptr, &m_FragmentShaderModule),
         "Failed to create vulkan shader module!");
 
     VkPipelineShaderStageCreateInfo fragmentShaderStageInfo{};
@@ -70,8 +73,9 @@ VulkanShader::VulkanShader(const String& name,
     createInfo.pCode = reinterpret_cast<const uint32_t*>(geometrySrc.data());
 
     VK_CHECK_ERROR(
-        vkCreateShaderModule(Renderer::GetContext<VulkanContext>()->GetDevice(),
-                             &createInfo, nullptr, &m_GeometryShaderModule),
+        vkCreateShaderModule(
+            Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(),
+            &createInfo, nullptr, &m_GeometryShaderModule),
         "Failed to create vulkan shader module!");
 
     VkPipelineShaderStageCreateInfo geometryShaderStageInfo{};
@@ -88,14 +92,17 @@ VulkanShader::VulkanShader(const String& name,
 VulkanShader::~VulkanShader() {
   ZoneScoped;
   if (m_VertexShaderModule != VK_NULL_HANDLE)
-    vkDestroyShaderModule(Renderer::GetContext<VulkanContext>()->GetDevice(),
-                          m_VertexShaderModule, nullptr);
+    vkDestroyShaderModule(
+        Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(),
+        m_VertexShaderModule, nullptr);
   if (m_FragmentShaderModule != VK_NULL_HANDLE)
-    vkDestroyShaderModule(Renderer::GetContext<VulkanContext>()->GetDevice(),
-                          m_FragmentShaderModule, nullptr);
+    vkDestroyShaderModule(
+        Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(),
+        m_FragmentShaderModule, nullptr);
   if (m_GeometryShaderModule != VK_NULL_HANDLE)
-    vkDestroyShaderModule(Renderer::GetContext<VulkanContext>()->GetDevice(),
-                          m_GeometryShaderModule, nullptr);
+    vkDestroyShaderModule(
+        Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(),
+        m_GeometryShaderModule, nullptr);
 }
 
 void VulkanShader::Bind() const { ZoneScoped; }

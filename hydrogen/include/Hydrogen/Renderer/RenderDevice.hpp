@@ -32,7 +32,7 @@ struct RenderDeviceProperties {
 
 class RenderDevice {
  public:
-  ~RenderDevice() = default;
+  virtual ~RenderDevice() = default;
 
   static ReferencePointer<RenderDevice> Create(
       std::function<std::size_t(const RenderDeviceProperties&)>

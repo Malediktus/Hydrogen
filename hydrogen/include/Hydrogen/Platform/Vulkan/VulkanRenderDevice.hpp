@@ -16,6 +16,8 @@ class VulkanRenderDevice : public RenderDevice {
                          deviceRateFunction);
   virtual ~VulkanRenderDevice();
 
+  VkDevice GetDevice() { return VK_NULL_HANDLE; }
+
  private:
   VkPhysicalDevice m_PhysicalDevice;
 };

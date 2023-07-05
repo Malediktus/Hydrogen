@@ -4,6 +4,7 @@
 #include <Hydrogen/Core/Logger.hpp>
 #include <Hydrogen/Math/Math.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <tracy/Tracy.hpp>
@@ -76,6 +77,7 @@ void VulkanRendererAPI::ConfigureAntiAliasing(const bool enable) {}
 
 void VulkanRendererAPI::SetupImGui() {
   const auto& context = Renderer::GetContext<VulkanContext>();
+  const auto& renderDevice = Renderer::GetRenderDevice<VulkanRenderDevice>();
 
   VkDescriptorPoolSize poolSizes[] = {
       {VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
@@ -97,22 +99,23 @@ void VulkanRendererAPI::SetupImGui() {
   createInfo.poolSizeCount = std::size(poolSizes);
   createInfo.pPoolSizes = poolSizes;
 
-  VkDescriptorPool imguiPool;
-  VK_CHECK_ERROR(vkCreateDescriptorPool(context->GetDevice(), &createInfo,
-                                        nullptr, &imguiPool),
-                 "Failed to create imgui descriptor pool");
+  // VkDescriptorPool imguiPool;
+  // VK_CHECK_ERROR(vkCreateDescriptorPool(renderDevice->GetDevice(),
+  // &createInfo,
+  //                                       nullptr, &imguiPool),
+  //                "Failed to create imgui descriptor pool");
 
-  ImGui_ImplVulkan_InitInfo initInfo = {};
-  initInfo.Instance = context->GetInstance();
-  initInfo.PhysicalDevice = context->GetPhysicalDevice();
-  initInfo.Device = context->GetDevice();
-  initInfo.Queue = context->GetGraphicsQueue();
-  initInfo.DescriptorPool = imguiPool;
-  initInfo.MinImageCount = 3;
-  initInfo.ImageCount = 3;
-  initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+  // ImGui_ImplVulkan_InitInfo initInfo = {};
+  // initInfo.Instance = context->GetInstance();
+  //  initInfo.PhysicalDevice = renderDevice->GetPhysicalDevice();
+  // initInfo.Device = renderDevice->GetDevice();
+  //  initInfo.Queue = renderDevice->GetGraphicsQueue();
+  // initInfo.DescriptorPool = imguiPool;
+  // initInfo.MinImageCount = 3;
+  // initInfo.ImageCount = 3;
+  // initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
-  // ImGui_ImplVulkan_Init(&initInfo, context->GetRenderPass());
+  // ImGui_ImplVulkan_Init(&initInfo, renderDevice->GetRenderPass());
   HY_INVOKE_ERROR("Unimplemented");
 }
 

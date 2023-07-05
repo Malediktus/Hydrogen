@@ -9,7 +9,7 @@ std::unordered_map<String, ReferencePointer<Asset>> AssetManager::s_Assets;
 void AssetManager::Init() {
   for (const auto& dirEntry :
        std::filesystem::recursive_directory_iterator("assets")) {
-    HY_LOG_DEBUG("Asset file found: {}", dirEntry);
+    HY_LOG_DEBUG("Asset file found: {}", dirEntry.path().string());
     if (dirEntry.is_directory() &&
         dirEntry.path().extension().string() != ".glsl")
       continue;

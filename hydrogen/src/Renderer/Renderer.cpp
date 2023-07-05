@@ -7,6 +7,7 @@
 using namespace Hydrogen;
 
 ReferencePointer<Context> Renderer::s_Context;
+ReferencePointer<RenderDevice> Renderer::s_RenderDevice;
 
 Renderer::Renderer() {
   ZoneScoped;
