@@ -19,6 +19,8 @@ VulkanRenderDevice::VulkanRenderDevice(
   DynamicArray<VkPhysicalDevice> devices(deviceCount);
   vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
+  std::multimap<std::size_t, VkPhysicalDevice> candidates;
+
   for (auto& device : devices) {
     VkPhysicalDeviceProperties deviceProperties;
     VkPhysicalDeviceFeatures deviceFeatures;
@@ -66,6 +68,15 @@ VulkanRenderDevice::VulkanRenderDevice(
       renderDeviceProperties.MemoryHeaps.push_back(
           {deviceMemoryProperties.memoryHeaps->size});
     }
+
+    candidates.insert(
+        std::make_pair(deviceRateFunction(renderDeviceProperties), device));
+  }
+
+  if (candidates.rbegin()->first > 0) {
+    m_PhysicalDevice = candidates.rbegin()->second;
+  } else {
+    HY_INVOKE_ERROR("Failed to find a suitable render device!");
   }
 }
 
