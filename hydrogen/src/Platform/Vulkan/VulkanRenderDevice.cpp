@@ -12,6 +12,7 @@ VulkanRenderDevice::VulkanRenderDevice(
   ZoneScoped;
   auto instance = Renderer::GetContext<VulkanContext>()->GetInstance();
 
+  // Physical device
   uint32_t deviceCount = 0;
   vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
   HY_ASSERT(deviceCount, "Failed to find GPU with vulkan support!");
@@ -22,6 +23,12 @@ VulkanRenderDevice::VulkanRenderDevice(
   std::multimap<std::size_t, VkPhysicalDevice> candidates;
 
   for (auto& device : devices) {
+    auto graphicsQueueFamily = GetGraphicsQueueFamily(m_PhysicalDevice);
+    auto presentQueueFamily = GetPresentQueueFamily(m_PhysicalDevice);
+
+    if (!graphicsQueueFamily.has_value() || !presentQueueFamily.has_value())
+      continue;
+
     VkPhysicalDeviceProperties deviceProperties;
     VkPhysicalDeviceFeatures deviceFeatures;
     VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
@@ -78,6 +85,53 @@ VulkanRenderDevice::VulkanRenderDevice(
   } else {
     HY_INVOKE_ERROR("Failed to find a suitable render device!");
   }
+
+  // Queue families
+  m_GraphicsQueueFamily = GetGraphicsQueueFamily(m_PhysicalDevice);
+  m_PresentQueueFamily = GetPresentQueueFamily(m_PhysicalDevice);
 }
 
 VulkanRenderDevice::~VulkanRenderDevice() { ZoneScoped; }
+
+VkQueueFamily VulkanRenderDevice::GetGraphicsQueueFamily(
+    VkPhysicalDevice device) {
+  uint32_t queueFamilyCount = 0;
+  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+  DynamicArray<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount,
+                                           queueFamilies.data());
+
+  int i = 0;
+  for (const auto& queueFamily : queueFamilies) {
+    if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+      return i;
+    }
+
+    i++;
+  }
+
+  return VkQueueFamily();
+}
+
+VkQueueFamily VulkanRenderDevice::GetPresentQueueFamily(
+    VkPhysicalDevice device) {
+  uint32_t queueFamilyCount = 0;
+  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+  for (uint32_t i = 0; i < queueFamilyCount; i++) {
+    VkBool32 presentSupport = false;
+    vkGetPhysicalDeviceSurfaceSupportKHR(
+        device, i,
+        static_cast<VkSurfaceKHR>(Renderer::GetContext<VulkanContext>()
+                                      ->GetWindow()
+                                      ->GetVulkanWindowSurface()),
+        &presentSupport);
+
+    if (presentSupport) {
+      return i;
+    }
+  }
+
+  return VkQueueFamily();
+}

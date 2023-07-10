@@ -19,6 +19,11 @@ class VulkanRenderDevice : public RenderDevice {
   VkDevice GetDevice() { return VK_NULL_HANDLE; }
 
  private:
+  VkQueueFamily GetGraphicsQueueFamily(VkPhysicalDevice device);
+  VkQueueFamily GetPresentQueueFamily(VkPhysicalDevice device);
+
   VkPhysicalDevice m_PhysicalDevice;
+  VkQueueFamily m_GraphicsQueueFamily;
+  VkQueueFamily m_PresentQueueFamily;
 };
 }  // namespace Hydrogen::Vulkan
