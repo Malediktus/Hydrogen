@@ -38,6 +38,8 @@ class Application {
   void OnResize(const Event& event);
 
   ReferencePointer<Context> m_RenderContext;
+  ReferencePointer<RenderDevice> m_RenderDevice;
+  ReferencePointer<SwapChain> m_SwapChain;
 };
 
 extern ReferencePointer<Application> CreateApplication();

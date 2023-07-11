@@ -28,6 +28,30 @@ void Application::Run() {
   Renderer::SetContext(m_RenderContext);
   m_RenderContext->Init(clientProject, engineProject);
 
+  m_RenderDevice = RenderDevice::Create(
+      [](const RenderDeviceProperties& deviceProperties) -> std::size_t {
+        size_t result = 0;
+
+        switch (deviceProperties.DeviceType) {
+          case RenderDeviceType::IntegratedGPU:
+            break;
+          case RenderDeviceType::DiscreteGPU:
+            result += 1000000;  // Always choose discrete GPUs
+            break;
+          default:
+            return 0;  // Support only GPUs
+        }
+
+        for (auto heap : deviceProperties.MemoryHeaps)
+          result += heap.MemorySize / 1024;  // Choose the GPU with most memory
+
+        return result;
+      });
+  Renderer::SetRenderDevice(m_RenderDevice);
+
+  m_SwapChain = SwapChain::Create();
+  Renderer::SetSwapChain(m_SwapChain);
+
   RenderCommand::Init();
   RenderCommand::ConfigureAntiAliasing(true);
 

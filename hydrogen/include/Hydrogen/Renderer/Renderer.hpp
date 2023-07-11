@@ -11,6 +11,7 @@
 #include "RenderDevice.hpp"
 #include "RendererAPI.hpp"
 #include "Shader.hpp"
+#include "SwapChain.hpp"
 #include "Texture.hpp"
 
 namespace Hydrogen {
@@ -90,15 +91,19 @@ class Renderer {
     s_Context = context;
   }
 
+  static void SetRenderDevice(ReferencePointer<RenderDevice> renderDevice) {
+    s_RenderDevice = renderDevice;
+  }
+
+  static void SetSwapChain(ReferencePointer<SwapChain> swapChain) {
+    s_SwapChain = swapChain;
+  }
+
   template <typename T>
   static ReferencePointer<T> GetContext() {
     static_assert(std::is_base_of<Context, T>::value,
                   "T must be derived from Context");
     return std::dynamic_pointer_cast<T>(s_Context);
-  }
-
-  static void SetRenderDevice(ReferencePointer<RenderDevice> renderDevice) {
-    s_RenderDevice = renderDevice;
   }
 
   template <typename T>
@@ -108,8 +113,16 @@ class Renderer {
     return std::dynamic_pointer_cast<T>(s_RenderDevice);
   }
 
+  template <typename T>
+  static ReferencePointer<T> GetSwapChain() {
+    static_assert(std::is_base_of<SwapChain, T>::value,
+                  "T must be derived from SwapChain");
+    return std::dynamic_pointer_cast<T>(s_SwapChain);
+  }
+
  private:
   static ReferencePointer<Context> s_Context;
   static ReferencePointer<RenderDevice> s_RenderDevice;
+  static ReferencePointer<SwapChain> s_SwapChain;
 };
 }  // namespace Hydrogen

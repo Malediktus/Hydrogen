@@ -27,8 +27,8 @@ VulkanRenderDevice::VulkanRenderDevice(
   std::multimap<std::size_t, VkPhysicalDevice> candidates;
 
   for (auto& device : devices) {
-    auto graphicsQueueFamily = GetGraphicsQueueFamily(m_PhysicalDevice);
-    auto presentQueueFamily = GetPresentQueueFamily(m_PhysicalDevice);
+    auto graphicsQueueFamily = GetGraphicsQueueFamily(device);
+    auto presentQueueFamily = GetPresentQueueFamily(device);
 
     if (!graphicsQueueFamily.has_value() || !presentQueueFamily.has_value())
       continue;

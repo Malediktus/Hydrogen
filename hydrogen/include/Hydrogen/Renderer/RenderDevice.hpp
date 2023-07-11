@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include "../Core/Assert.hpp"
 #include "../Core/Base.hpp"
 #include "../Core/Memory.hpp"
