@@ -11,6 +11,10 @@ VulkanRenderDevice::VulkanRenderDevice(
         deviceRateFunction) {
   ZoneScoped;
   auto instance = Renderer::GetContext<VulkanContext>()->GetInstance();
+  auto validationLayers =
+      Renderer::GetContext<VulkanContext>()->GetValidationLayers();
+  auto deviceExtensions =
+      Renderer::GetContext<VulkanContext>()->GetDeviceExtensions();
 
   // Physical device
   uint32_t deviceCount = 0;
@@ -89,9 +93,46 @@ VulkanRenderDevice::VulkanRenderDevice(
   // Queue families
   m_GraphicsQueueFamily = GetGraphicsQueueFamily(m_PhysicalDevice);
   m_PresentQueueFamily = GetPresentQueueFamily(m_PhysicalDevice);
+
+  // Logical device
+  float queuePriority = 1.0f;
+
+  VkDeviceQueueCreateInfo graphicsQueueCreateInfo{};
+  graphicsQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+  graphicsQueueCreateInfo.queueFamilyIndex = m_GraphicsQueueFamily.value();
+  graphicsQueueCreateInfo.queueCount = 1;
+  graphicsQueueCreateInfo.pQueuePriorities = &queuePriority;
+
+  VkPhysicalDeviceFeatures deviceFeatures{};
+
+  VkDeviceCreateInfo createInfo{};
+  createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+  createInfo.pQueueCreateInfos = &graphicsQueueCreateInfo;
+  createInfo.queueCreateInfoCount = 1;
+  createInfo.pEnabledFeatures = &deviceFeatures;
+  createInfo.enabledExtensionCount =
+      static_cast<uint32_t>(deviceExtensions.size());
+  createInfo.ppEnabledExtensionNames = deviceExtensions.data();
+  createInfo.enabledLayerCount = 0;
+  createInfo.ppEnabledLayerNames = nullptr;
+#ifdef HY_DEBUG
+  createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+  createInfo.ppEnabledLayerNames = validationLayers.data();
+#endif
+
+  VK_CHECK_ERROR(
+      vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device),
+      "Failed to create vulkan device!");
+
+  vkGetDeviceQueue(m_Device, m_GraphicsQueueFamily.value(), 0,
+                   &m_GraphicsQueue);
+  vkGetDeviceQueue(m_Device, m_PresentQueueFamily.value(), 0, &m_PresentQueue);
 }
 
-VulkanRenderDevice::~VulkanRenderDevice() { ZoneScoped; }
+VulkanRenderDevice::~VulkanRenderDevice() {
+  ZoneScoped;
+  vkDestroyDevice(m_Device, nullptr);
+}
 
 VkQueueFamily VulkanRenderDevice::GetGraphicsQueueFamily(
     VkPhysicalDevice device) {

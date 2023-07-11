@@ -18,12 +18,19 @@ class VulkanContext : public Context {
     return m_Window;
   }
 
+  const DynamicArray<const char*>& GetInstanceExtensions() {
+    return m_InstanceExtensions;
+  }
+  const DynamicArray<const char*>& GetDeviceExtensions() {
+    return m_DeviceExtensions;
+  }
+  const DynamicArray<const char*>& GetValidationLayers() {
+    return m_ValidationLayers;
+  }
   VkInstance GetInstance() { return m_Instance; }
 
  private:
   void CreateInstance(VkApplicationInfo appInfo, VkInstanceCreateFlags flags,
-                      const DynamicArray<const char*> extensions,
-                      const DynamicArray<const char*> validationLayers,
                       PFN_vkDebugUtilsMessengerCallbackEXT debugCallback);
   void CreateDebugMessenger(PFN_vkDebugUtilsMessengerCallbackEXT callback);
   void PopulateDebugMessengerCreateInfo(
@@ -33,5 +40,8 @@ class VulkanContext : public Context {
   ReferencePointer<RenderWindow> m_Window;
   VkInstance m_Instance;
   VkDebugUtilsMessengerEXT m_DebugMessenger;
+  DynamicArray<const char*> m_InstanceExtensions;
+  DynamicArray<const char*> m_DeviceExtensions;
+  DynamicArray<const char*> m_ValidationLayers;
 };
 }  // namespace Hydrogen::Vulkan

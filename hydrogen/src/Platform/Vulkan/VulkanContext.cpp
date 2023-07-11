@@ -81,6 +81,22 @@ void VulkanContext::Init(ProjectInformation clientInfo,
                          ProjectInformation engineInfo) {
   ZoneScoped;
 
+  // Configurations
+  m_ValidationLayers.push_back("VK_LAYER_KHRONOS_validation");
+
+#ifdef HY_DEBUG
+  m_InstanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+#endif
+#ifdef HY_PLATFORM_APPLE
+  m_InstanceExtensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+  m_InstanceExtensions.push_back(
+      VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+#endif
+  const auto requiredExtensions = m_Window->GetVulkanWindowExtensions();
+  m_InstanceExtensions.insert(m_InstanceExtensions.end(),
+                              requiredExtensions.begin(),
+                              requiredExtensions.end());
+
   VkApplicationInfo appInfo{};
   appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
   appInfo.pNext = nullptr;
@@ -94,20 +110,7 @@ void VulkanContext::Init(ProjectInformation clientInfo,
                       engineInfo.ProjectVersion.z);
   appInfo.apiVersion = VK_API_VERSION_1_0;
 
-  DynamicArray<const char*> extensions;
-#ifdef HY_DEBUG
-  extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-#endif
-#ifdef HY_PLATFORM_APPLE
-  extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
-  extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
-#endif
-  const auto requiredExtensions = m_Window->GetVulkanWindowExtensions();
-  extensions.insert(extensions.end(), requiredExtensions.begin(),
-                    requiredExtensions.end());
-
   CreateInstance(appInfo, VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR,
-                 extensions, {"VK_LAYER_KHRONOS_validation"},
                  Utils::VulkanDebugCallback);
   CreateDebugMessenger(Utils::VulkanDebugCallback);
 
@@ -126,8 +129,6 @@ VulkanContext::~VulkanContext() {
 
 void VulkanContext::CreateInstance(
     VkApplicationInfo appInfo, VkInstanceCreateFlags flags,
-    const DynamicArray<const char*> extensions,
-    const DynamicArray<const char*> validationLayers,
     PFN_vkDebugUtilsMessengerCallbackEXT debugCallback) {
   // Check for extensions
   uint32_t availableExtensionCount = 0;
@@ -139,7 +140,7 @@ void VulkanContext::CreateInstance(
   vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount,
                                          availableExtensions.data());
 
-  for (auto extension : extensions) {
+  for (auto extension : m_InstanceExtensions) {
     bool found = false;
     for (const auto& availableExtension : availableExtensions) {
       if (!strcmp(extension, availableExtension.extensionName)) {
@@ -163,7 +164,7 @@ void VulkanContext::CreateInstance(
   vkEnumerateInstanceLayerProperties(&availableLayerCount,
                                      availableLayers.data());
 
-  for (auto validationLayer : validationLayers) {
+  for (auto validationLayer : m_ValidationLayers) {
     bool found = false;
     for (const auto& availableLayer : availableLayers) {
       if (!strcmp(validationLayer, availableLayer.layerName)) {
@@ -186,20 +187,21 @@ void VulkanContext::CreateInstance(
 
   VkInstanceCreateInfo createInfo{};
   createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-#ifdef HY_DEBUG
-  createInfo.pNext =
-      (VkDebugUtilsMessengerCreateInfoEXT*)&debugMessengerCreateInfo;
-  createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-  createInfo.ppEnabledLayerNames = validationLayers.data();
-#else
   createInfo.pNext = nullptr;
   createInfo.enabledLayerCount = 0;
   createInfo.ppEnabledLayerNames = nullptr;
+#ifdef HY_DEBUG
+  createInfo.pNext =
+      (VkDebugUtilsMessengerCreateInfoEXT*)&debugMessengerCreateInfo;
+  createInfo.enabledLayerCount =
+      static_cast<uint32_t>(m_ValidationLayers.size());
+  createInfo.ppEnabledLayerNames = m_ValidationLayers.data();
 #endif
   createInfo.pApplicationInfo = &appInfo;
   createInfo.flags = flags;
-  createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-  createInfo.ppEnabledExtensionNames = extensions.data();
+  createInfo.enabledExtensionCount =
+      static_cast<uint32_t>(m_InstanceExtensions.size());
+  createInfo.ppEnabledExtensionNames = m_InstanceExtensions.data();
 
   VK_CHECK_ERROR(vkCreateInstance(&createInfo, nullptr, &m_Instance),
                  "Failed to create vulkan instance");

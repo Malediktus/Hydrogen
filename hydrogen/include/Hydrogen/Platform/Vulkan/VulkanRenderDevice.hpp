@@ -16,7 +16,9 @@ class VulkanRenderDevice : public RenderDevice {
                          deviceRateFunction);
   virtual ~VulkanRenderDevice();
 
-  VkDevice GetDevice() { return VK_NULL_HANDLE; }
+  VkDevice GetDevice() { return m_Device; }
+  VkQueue GetGraphicsQueue() { return m_GraphicsQueue; }
+  VkQueue GetPresentQueue() { return m_PresentQueue; }
 
  private:
   VkQueueFamily GetGraphicsQueueFamily(VkPhysicalDevice device);
@@ -25,5 +27,8 @@ class VulkanRenderDevice : public RenderDevice {
   VkPhysicalDevice m_PhysicalDevice;
   VkQueueFamily m_GraphicsQueueFamily;
   VkQueueFamily m_PresentQueueFamily;
+  VkDevice m_Device;
+  VkQueue m_GraphicsQueue;
+  VkQueue m_PresentQueue;
 };
 }  // namespace Hydrogen::Vulkan
