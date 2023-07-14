@@ -4,12 +4,6 @@
 namespace Hydrogen::Vulkan {
 using VkQueueFamily = std::optional<uint32_t>;
 
-struct SwapChainSupportDetails {
-  VkSurfaceCapabilitiesKHR Capabilities;
-  DynamicArray<VkSurfaceFormatKHR> Formats;
-  DynamicArray<VkPresentModeKHR> PresentModes;
-};
-
 class VulkanRenderDevice : public RenderDevice {
  public:
   VulkanRenderDevice(std::function<std::size_t(const RenderDeviceProperties&)>
@@ -23,6 +17,9 @@ class VulkanRenderDevice : public RenderDevice {
  private:
   VkQueueFamily GetGraphicsQueueFamily(VkPhysicalDevice device);
   VkQueueFamily GetPresentQueueFamily(VkPhysicalDevice device);
+  bool CheckDeviceExtensionSupport(
+      VkPhysicalDevice device,
+      const std::vector<const char*>& deviceExtensions);
 
   VkPhysicalDevice m_PhysicalDevice;
   VkQueueFamily m_GraphicsQueueFamily;

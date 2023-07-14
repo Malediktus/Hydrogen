@@ -1,7 +1,9 @@
 #include <Hydrogen/Core/Logger.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
+#include <set>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen::Vulkan;
@@ -32,6 +34,16 @@ VulkanRenderDevice::VulkanRenderDevice(
 
     if (!graphicsQueueFamily.has_value() || !presentQueueFamily.has_value())
       continue;
+
+    if (!CheckDeviceExtensionSupport(device, deviceExtensions)) continue;
+
+    bool swapChainAdequate = false;
+    SwapChainSupportDetails swapChainSupport =
+        VulkanSwapChain::QuerySwapChainSupportDetails(device);
+    swapChainAdequate = !swapChainSupport.Formats.empty() &&
+                        !swapChainSupport.PresentModes.empty();
+
+    if (!swapChainAdequate) continue;
 
     VkPhysicalDeviceProperties deviceProperties;
     VkPhysicalDeviceFeatures deviceFeatures;
@@ -175,4 +187,24 @@ VkQueueFamily VulkanRenderDevice::GetPresentQueueFamily(
   }
 
   return VkQueueFamily();
+}
+
+bool VulkanRenderDevice::CheckDeviceExtensionSupport(
+    VkPhysicalDevice device, const std::vector<const char*>& deviceExtensions) {
+  uint32_t extensionCount;
+  vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount,
+                                       nullptr);
+
+  std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+  vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount,
+                                       availableExtensions.data());
+
+  std::set<String> requiredExtensions(deviceExtensions.begin(),
+                                      deviceExtensions.end());
+
+  for (const auto& extension : availableExtensions) {
+    requiredExtensions.erase(extension.extensionName);
+  }
+
+  return requiredExtensions.empty();
 }

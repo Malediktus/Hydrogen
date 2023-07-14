@@ -98,6 +98,8 @@ void VulkanContext::Init(ProjectInformation clientInfo,
                               requiredExtensions.begin(),
                               requiredExtensions.end());
 
+  m_DeviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+
   VkApplicationInfo appInfo{};
   appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
   appInfo.pNext = nullptr;
