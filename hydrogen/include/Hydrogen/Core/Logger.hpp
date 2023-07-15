@@ -51,7 +51,7 @@ class Logger {
 class SystemLogger {
  public:
   static void Init() {
-    s_Logger = NewReferencePointer<Logger>("SYS", Logger::LogLevel::Trace);
+    s_Logger = NewReferencePointer<Logger>("SYS", Logger::LogLevel::Debug);
     HY_LOG_DEBUG("Initialized system logger!");
   }
 

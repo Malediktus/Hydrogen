@@ -14,6 +14,7 @@ Application::Application() {
 void Application::Run() {
   OnSetup();
   AppWindow = Window::Create(ApplicationInfo.Name, ApplicationInfo.WindowSize.x, ApplicationInfo.WindowSize.y);
+  auto testWindow = Window::Create("Test", 500, 500);
 
   ProjectInformation clientProject;
   clientProject.ProjectName = ApplicationInfo.Name;
@@ -122,6 +123,7 @@ void Application::Run() {
   while (!AppWindow->GetWindowClose()) {
     TaskManager::Update();
     OnUpdate();
+    if (testWindow != nullptr && testWindow->GetWindowClose()) testWindow.reset();
 
     RenderCommand::Clear(RendererAPI::ClearBuffer::COLOR);
     RenderCommand::Clear(RendererAPI::ClearBuffer::DEPTH);
@@ -137,11 +139,11 @@ void Application::Run() {
 
     RenderCommand::GetRendererAPI()->ImGuiNewFrame();
     AppWindow->ImGuiNewFrame();
-    ImGui::NewFrame();
+    // ImGui::NewFrame();
 
     OnImGuiDraw();
 
-    ImGui::Render();
+    // ImGui::Render();
     RenderCommand::GetRendererAPI()->ImGuiRenderDrawData(ImGui::GetDrawData());
 
     AppWindow->UpdateImGuiPlatformWindows();

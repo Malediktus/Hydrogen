@@ -104,7 +104,6 @@ class EventDispatcher {
  public:
   template <typename T>
   static void Subscribe(const std::function<void(const Event&)>& fn) {
-    HY_LOG_DEBUG("Registered new event listener!");
     m_EventMap.emplace(&typeid(T), fn);
   }
   static void Post(const Event& event);

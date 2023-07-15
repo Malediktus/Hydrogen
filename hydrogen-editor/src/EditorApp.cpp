@@ -11,7 +11,9 @@ class EditorApp : public Hydrogen::Application {
     ApplicationInfo.WindowSize = {1080, 720};
   }
 
-  void OnInit() override { AttachPanel(Hydrogen::NewReferencePointer<AssetNavigatorPanel>()); }
+  void OnInit() override {
+    // AttachPanel(Hydrogen::NewReferencePointer<AssetNavigatorPanel>());
+  }
 
   void AttachPanel(Hydrogen::ReferencePointer<Panel> panel) {
     Hydrogen::TaskManager::Activate(panel);

@@ -37,10 +37,11 @@ class MacOSWindow : public Window {
   void UpdateImGuiPlatformWindows() override;
 
   void* GetWindowOpenGLProcAddress() override;
-  const std::vector<const char*> GetVulkanWindowExtensions() override;
+  const DynamicArray<const char*> GetVulkanWindowExtensions() override;
   void* GetVulkanWindowSurface() override;
 
  private:
   GLFWwindow* m_Window;
+  static bool s_GlfwInitialized;
 };
 }  // namespace Hydrogen

@@ -8,8 +8,13 @@
 
 using namespace Hydrogen;
 
+bool MacOSWindow::s_GlfwInitialized;
+
 MacOSWindow::MacOSWindow(const std::string& title, uint32_t width, uint32_t height) {
-  HY_ASSERT(glfwInit(), "Init glfw");
+  if (!s_GlfwInitialized) {
+    HY_ASSERT(glfwInit(), "Init glfw");
+    s_GlfwInitialized = true;
+  }
 
   auto api = RenderWindow::ChooseRenderingAPI(glfwVulkanSupported());
 
@@ -29,7 +34,7 @@ MacOSWindow::MacOSWindow(const std::string& title, uint32_t width, uint32_t heig
   HY_ASSERT(m_Window, "glfw window is null");
 }
 
-MacOSWindow::~MacOSWindow() { glfwTerminate(); }
+MacOSWindow::~MacOSWindow() { glfwDestroyWindow(m_Window); }
 
 void MacOSWindow::SetTitle(const std::string& title) { glfwSetWindowTitle(m_Window, title.c_str()); }
 
@@ -99,23 +104,29 @@ void MacOSWindow::Render() {
   }
 }
 
-void MacOSWindow::SetupImGui() { ImGui_ImplGlfw_InitForOpenGL(m_Window, true); }
+void MacOSWindow::SetupImGui() {
+  // ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
+}
 
-void MacOSWindow::ImGuiNewFrame() { ImGui_ImplGlfw_NewFrame(); }
+void MacOSWindow::ImGuiNewFrame() {
+  // ImGui_ImplGlfw_NewFrame();
+}
 
-void MacOSWindow::DestroyImGui() { ImGui_ImplGlfw_Shutdown(); }
+void MacOSWindow::DestroyImGui() {
+  // ImGui_ImplGlfw_Shutdown();
+}
 
 void MacOSWindow::SetupOpenglContext(int, int) { glfwMakeContextCurrent(m_Window); }
 
 void* MacOSWindow::GetWindowOpenGLProcAddress() { return (void*)glfwGetProcAddress; }
 
 void MacOSWindow::UpdateImGuiPlatformWindows() {
-  if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-    GLFWwindow* backup_current_context = glfwGetCurrentContext();
-    ImGui::UpdatePlatformWindows();
-    ImGui::RenderPlatformWindowsDefault();
-    glfwMakeContextCurrent(backup_current_context);
-  }
+  // if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+  //   GLFWwindow* backup_current_context = glfwGetCurrentContext();
+  //   ImGui::UpdatePlatformWindows();
+  //   ImGui::RenderPlatformWindowsDefault();
+  //   glfwMakeContextCurrent(backup_current_context);
+  // }
 }
 
 const std::vector<const char*> MacOSWindow::GetVulkanWindowExtensions() {
