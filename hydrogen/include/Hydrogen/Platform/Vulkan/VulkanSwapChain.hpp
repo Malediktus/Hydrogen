@@ -1,5 +1,8 @@
+#pragma once
+
 #include "../../Renderer/SwapChain.hpp"
 #include "VulkanContext.hpp"
+#include "VulkanRenderDevice.hpp"
 
 namespace Hydrogen::Vulkan {
 struct SwapChainSupportDetails {
@@ -10,7 +13,7 @@ struct SwapChainSupportDetails {
 
 class VulkanSwapChain : public SwapChain {
  public:
-  VulkanSwapChain(bool verticalSync);
+  VulkanSwapChain(ReferencePointer<RenderDevice> renderDevice, bool verticalSync);
   virtual ~VulkanSwapChain();
 
   static SwapChainSupportDetails QuerySwapChainSupportDetails(VkPhysicalDevice device);
@@ -20,6 +23,7 @@ class VulkanSwapChain : public SwapChain {
   VkPresentModeKHR ChooseSwapPresentMode(const DynamicArray<VkPresentModeKHR>& availablePresentModes, bool prefereVerticalSync);
   VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
+  ReferencePointer<VulkanRenderDevice> m_RenderDevice;
   VkSwapchainKHR m_SwapChain;
 };
 }  // namespace Hydrogen::Vulkan

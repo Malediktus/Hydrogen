@@ -20,9 +20,7 @@ class ShaderAsset : public Asset {
               "ShaderAsset::Load(const String& filepath) is an empty string!");
     HY_LOG_INFO("Loading shader asset '{}'!", filepath);
 
-    DynamicArray<uint32_t> vertexShader;
-    DynamicArray<uint32_t> pixelShader;
-    DynamicArray<uint32_t> geometryShader;
+    m_Name = FILENAME_FROM_PATH(filepath);
 
     if (filepath.substr(filepath.find_last_of(".") + 1) == "glsl") {
       for (const auto& dirEntry : std::filesystem::directory_iterator(filepath)) {
@@ -30,13 +28,13 @@ class ShaderAsset : public Asset {
         DynamicArray<uint32_t>* currentShader;
 
         if (dirEntry.path().extension().string() == ".vert") {
-          currentShader = &vertexShader;
+          currentShader = &m_VertexShader;
           stage = ShaderStage::VertexShader;
         } else if (dirEntry.path().extension().string() == ".frag") {
-          currentShader = &pixelShader;
+          currentShader = &m_PixelShader;
           stage = ShaderStage::PixelShader;
         } else if (dirEntry.path().extension().string() == ".geo") {
-          currentShader = &geometryShader;
+          currentShader = &m_GeometryShader;
           stage = ShaderStage::GeometryShader;
         } else {
           continue;
@@ -93,8 +91,6 @@ class ShaderAsset : public Asset {
 
         cache.UpdateCacheChecksum();
       }
-
-      m_Shader = Shader::Create(FILENAME_FROM_PATH(filepath), vertexShader, pixelShader, geometryShader);
     } else {
       HY_INVOKE_ERROR("Only glsl is supported for now!");
     }
@@ -102,12 +98,10 @@ class ShaderAsset : public Asset {
     HY_LOG_INFO("Finished loading shader asset '{}'!", filepath);
   }
 
-  const ReferencePointer<Shader>& GetShader() {
-    HY_ASSERT(m_Shader,
-              "ShaderAsset::GetShader() was about to return null! "
-              "ShaderAsset::Load(const String& filename) shall be called first!");
-    return m_Shader;
-  }
+  const DynamicArray<uint32_t>& GetVertexShader() { return m_VertexShader; }
+  const DynamicArray<uint32_t>& GetPixelShader() { return m_PixelShader; }
+  const DynamicArray<uint32_t>& GetGeometryShader() { return m_GeometryShader; }
+  const String& GetName() { return m_Name; }
 
   static const DynamicArray<const String> GetFileExtensions() { return DynamicArray<const String>{".glsl"}; }
 
@@ -117,6 +111,9 @@ class ShaderAsset : public Asset {
   }
 
  private:
-  ReferencePointer<Shader> m_Shader;
+  DynamicArray<uint32_t> m_VertexShader;
+  DynamicArray<uint32_t> m_PixelShader;
+  DynamicArray<uint32_t> m_GeometryShader;
+  String m_Name;
 };
 }  // namespace Hydrogen

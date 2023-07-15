@@ -7,10 +7,10 @@
 
 using namespace Hydrogen::Vulkan;
 
-VulkanSwapChain::VulkanSwapChain(bool verticalSync) {
+VulkanSwapChain::VulkanSwapChain(ReferencePointer<RenderDevice> renderDevice, bool verticalSync) : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)) {
   ZoneScoped;
 
-  SwapChainSupportDetails swapChainSupport = QuerySwapChainSupportDetails(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetPhysicalDevice());
+  SwapChainSupportDetails swapChainSupport = QuerySwapChainSupportDetails(m_RenderDevice->GetPhysicalDevice());
 
   VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.Formats);
   VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.PresentModes, verticalSync);
@@ -23,7 +23,7 @@ VulkanSwapChain::VulkanSwapChain(bool verticalSync) {
 
   VkSwapchainCreateInfoKHR createInfo{};
   createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-  createInfo.surface = static_cast<VkSurfaceKHR>(Renderer::GetContext<VulkanContext>()->GetWindow()->GetVulkanWindowSurface());
+  createInfo.surface = Renderer::GetContext<VulkanContext>()->GetWindowSurface();
   createInfo.minImageCount = imageCount;
   createInfo.imageFormat = surfaceFormat.format;
   createInfo.imageColorSpace = surfaceFormat.colorSpace;
@@ -36,8 +36,8 @@ VulkanSwapChain::VulkanSwapChain(bool verticalSync) {
   createInfo.clipped = VK_TRUE;
   createInfo.oldSwapchain = VK_NULL_HANDLE;
 
-  VkQueueFamily graphicsFamily = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetGraphicsQueueFamily();
-  VkQueueFamily presentFamily = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetPresentQueueFamily();
+  VkQueueFamily graphicsFamily = m_RenderDevice->GetGraphicsQueueFamily();
+  VkQueueFamily presentFamily = m_RenderDevice->GetPresentQueueFamily();
   uint32_t queueFamilyIndices[] = {graphicsFamily.value(), presentFamily.value()};
 
   if (graphicsFamily != presentFamily) {
@@ -50,17 +50,17 @@ VulkanSwapChain::VulkanSwapChain(bool verticalSync) {
     createInfo.pQueueFamilyIndices = nullptr;  // Optional
   }
 
-  VK_CHECK_ERROR(vkCreateSwapchainKHR(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &createInfo, nullptr, &m_SwapChain), "Failed to create vulkan swap chain!");
+  VK_CHECK_ERROR(vkCreateSwapchainKHR(m_RenderDevice->GetDevice(), &createInfo, nullptr, &m_SwapChain), "Failed to create vulkan swap chain!");
 }
 
 VulkanSwapChain::~VulkanSwapChain() {
   ZoneScoped;
-  vkDestroySwapchainKHR(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_SwapChain, nullptr);
+  vkDestroySwapchainKHR(m_RenderDevice->GetDevice(), m_SwapChain, nullptr);
 }
 
 SwapChainSupportDetails VulkanSwapChain::QuerySwapChainSupportDetails(VkPhysicalDevice device) {
   SwapChainSupportDetails details;
-  auto surface = static_cast<VkSurfaceKHR>(Renderer::GetContext<VulkanContext>()->GetWindow()->GetVulkanWindowSurface());
+  auto surface = Renderer::GetContext<VulkanContext>()->GetWindowSurface();
 
   vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.Capabilities);
 

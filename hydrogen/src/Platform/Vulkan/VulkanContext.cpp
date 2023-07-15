@@ -99,6 +99,8 @@ void VulkanContext::Init(ProjectInformation clientInfo, ProjectInformation engin
   CreateInstance(appInfo, VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR, Utils::VulkanDebugCallback);
   CreateDebugMessenger(Utils::VulkanDebugCallback);
 
+  m_WindowSurface = static_cast<VkSurfaceKHR>(m_Window->GetVulkanWindowSurface());
+
   HY_LOG_INFO("Created Vulkan context");
   HY_LOG_INFO("Using Vulkan API version 1.0");
 }
@@ -108,6 +110,7 @@ VulkanContext::~VulkanContext() {
   Functions::DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
 #endif
 
+  vkDestroySurfaceKHR(m_Instance, m_WindowSurface, nullptr);
   vkDestroyInstance(m_Instance, nullptr);
 }
 

@@ -155,7 +155,7 @@ VkQueueFamily VulkanRenderDevice::GetPresentQueueFamily(VkPhysicalDevice device)
 
   for (uint32_t i = 0; i < queueFamilyCount; i++) {
     VkBool32 presentSupport = false;
-    vkGetPhysicalDeviceSurfaceSupportKHR(device, i, static_cast<VkSurfaceKHR>(Renderer::GetContext<VulkanContext>()->GetWindow()->GetVulkanWindowSurface()), &presentSupport);
+    vkGetPhysicalDeviceSurfaceSupportKHR(device, i, Renderer::GetContext<VulkanContext>()->GetWindowSurface(), &presentSupport);
 
     if (presentSupport) {
       return i;

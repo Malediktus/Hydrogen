@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../../Renderer/RenderDevice.hpp"
 #include "VulkanContext.hpp"
 
