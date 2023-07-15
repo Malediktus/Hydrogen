@@ -18,6 +18,10 @@ class VulkanSwapChain : public SwapChain {
 
   static SwapChainSupportDetails QuerySwapChainSupportDetails(VkPhysicalDevice device);
 
+  VkSwapchainKHR GetSwapChain() { return m_SwapChain; }
+  VkExtent2D GetExtent() { return m_Extent; }
+  VkFormat GetSwapChainImageFormat() { return m_SwapChainImageFormat; }
+
  private:
   VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const DynamicArray<VkSurfaceFormatKHR>& availableFormats);
   VkPresentModeKHR ChooseSwapPresentMode(const DynamicArray<VkPresentModeKHR>& availablePresentModes, bool prefereVerticalSync);

@@ -11,8 +11,11 @@ class VulkanRenderPass : public RenderPass {
   VulkanRenderPass(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain);
   virtual ~VulkanRenderPass();
 
+  VkRenderPass GetRenderPass() { return m_RenderPass; }
+
  private:
   ReferencePointer<VulkanRenderDevice> m_RenderDevice;
   ReferencePointer<VulkanSwapChain> m_SwapChain;
+  VkRenderPass m_RenderPass;
 };
 }  // namespace Hydrogen::Vulkan
