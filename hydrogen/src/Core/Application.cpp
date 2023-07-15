@@ -16,6 +16,8 @@ void Application::Run() {
   AppWindow = Window::Create(ApplicationInfo.Name, ApplicationInfo.WindowSize.x, ApplicationInfo.WindowSize.y);
   auto testWindow = Window::Create("Test", 500, 500);
 
+  AssetManager::Init();
+
   ProjectInformation clientProject;
   clientProject.ProjectName = ApplicationInfo.Name;
   clientProject.ProjectVersion = ApplicationInfo.Version;
@@ -48,11 +50,12 @@ void Application::Run() {
 
   m_SwapChain = SwapChain::Create(m_RenderDevice, true);
   m_RenderPass = RenderPass::Create(m_RenderDevice, m_SwapChain);
+  auto shaderAsset = AssetManager::Get<ShaderAsset>("assets/Raw.glsl");
+  auto shader = Shader::Create(m_RenderDevice, m_SwapChain, m_RenderPass, shaderAsset->GetName(), shaderAsset->GetVertexShader(), shaderAsset->GetPixelShader(),
+                               shaderAsset->GetGeometryShader());
 
   RenderCommand::Init();
   RenderCommand::ConfigureAntiAliasing(true);
-
-  AssetManager::Init();
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();

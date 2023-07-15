@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <iostream>
 #include <ostream>
 #include <sstream>
 
@@ -56,7 +57,7 @@ class ShaderAsset : public Asset {
         if (!cache.CacheValid()) {
           HY_LOG_INFO("Shader cache {} is invalid. Recompiling!", shaderFilepath)
 
-          ShaderCompiler compiler(ShaderLanguage::GLSL, ShaderClient::Vulkan_1_3, SpriVVersion::SpriV_1_6, stage, 330);
+          ShaderCompiler compiler(ShaderLanguage::GLSL, ShaderClient::Vulkan_1_0, SpriVVersion::SpriV_1_0, stage, 330);
           compiler.AddShader(inbuf);
           compiler.Link();
           auto spirv = compiler.GetSpriv();
@@ -70,21 +71,21 @@ class ShaderAsset : public Asset {
           std::ofstream outfile;
           outfile.open(outfilepath, std::ios::out | std::ios::binary);
           HY_ASSERT(outfile.is_open(), "Failed to open file {}!", outfilepath);
-          for (auto t : *currentShader) outfile << t;
+          outfile.write(reinterpret_cast<const char*>(currentShader->data()), currentShader->size() * sizeof(uint32_t));
           outfile.close();
         } else {
+          std::uintmax_t fileSize = std::filesystem::file_size(outfilepath);
           std::ifstream infile;
+
           infile.open(outfilepath, std::ios::in | std::ios::binary);
           HY_ASSERT(infile.is_open(), "Failed to open file {}!", outfilepath);
-
           infile.unsetf(std::ios::skipws);
-          std::streampos fileSize;
-          infile.seekg(0, std::ios::end);
-          fileSize = infile.tellg();
-          infile.seekg(0, std::ios::beg);
 
-          currentShader->reserve(fileSize);
-          currentShader->insert(currentShader->begin(), std::istream_iterator<uint32_t>(infile), std::istream_iterator<uint32_t>());
+          DynamicArray<char> fileData(fileSize);
+          infile.read(fileData.data(), fileSize);
+
+          currentShader->resize(fileSize / sizeof(uint32_t));
+          std::memcpy(currentShader->data(), fileData.data(), fileSize);
 
           infile.close();
         }
