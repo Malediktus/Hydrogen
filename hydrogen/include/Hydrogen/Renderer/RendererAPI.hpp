@@ -16,36 +16,9 @@ class RendererAPI {
  public:
   enum class API { OpenGL = 0, Vulkan = 1 };
   enum class ClearBuffer { COLOR = 0, DEPTH = 1, STENCIL = 2 };
-  enum class DepthTestFunc {
-    ALWAYS = 0,
-    NEVER = 1,
-    LESS = 2,
-    EQUAL = 3,
-    LEQUAL = 4,
-    GREATER = 5,
-    NOTEQUAL = 6,
-    GEQUAL = 7
-  };
-  enum class StencilTestFunc {
-    ALWAYS = 0,
-    NEVER = 1,
-    LESS = 2,
-    EQUAL = 3,
-    LEQUAL = 4,
-    GREATER = 5,
-    NOTEQUAL = 6,
-    GEQUAL = 7
-  };
-  enum class StencilTestAction {
-    KEEP = 0,
-    ZERO = 1,
-    REPLACE = 2,
-    INCR = 3,
-    INCR_WRAP = 4,
-    DECR = 5,
-    DECR_WRAP = 6,
-    INVERT = 7
-  };
+  enum class DepthTestFunc { ALWAYS = 0, NEVER = 1, LESS = 2, EQUAL = 3, LEQUAL = 4, GREATER = 5, NOTEQUAL = 6, GEQUAL = 7 };
+  enum class StencilTestFunc { ALWAYS = 0, NEVER = 1, LESS = 2, EQUAL = 3, LEQUAL = 4, GREATER = 5, NOTEQUAL = 6, GEQUAL = 7 };
+  enum class StencilTestAction { KEEP = 0, ZERO = 1, REPLACE = 2, INCR = 3, INCR_WRAP = 4, DECR = 5, DECR_WRAP = 6, INVERT = 7 };
   enum class BlendingFunc {
     ZERO = 0,
     ONE = 1,
@@ -69,21 +42,12 @@ class RendererAPI {
   virtual void Clear(const ClearBuffer clearBuffer) = 0;
   virtual void SetViewport(const int width, const int height) = 0;
 
-  virtual void ConfigureDepthTesting(const bool enable, const bool depthMask,
-                                     const DepthTestFunc func) = 0;
-  virtual void ConfigureStencilTesting(
-      const bool enable, const int writeMask, const int readMask,
-      const StencilTestFunc func, const int ref,
-      const StencilTestAction stencilFailAction,
-      const StencilTestAction stencilPassDepthFailAction,
-      const StencilTestAction stencilPassDepthPassAction) = 0;
-  virtual void ConfigureBlending(const bool enable,
-                                 const BlendingFunc blendingFunc1,
-                                 const BlendingFunc blendingFunc2,
-                                 const BlendingFunc blendingFuncR,
-                                 const BlendingFunc blendingFuncG,
-                                 const BlendingFunc blendingFuncB,
-                                 const BlendingFunc blendingFuncA) = 0;
+  virtual void ConfigureDepthTesting(const bool enable, const bool depthMask, const DepthTestFunc func) = 0;
+  virtual void ConfigureStencilTesting(const bool enable, const int writeMask, const int readMask, const StencilTestFunc func, const int ref,
+                                       const StencilTestAction stencilFailAction, const StencilTestAction stencilPassDepthFailAction,
+                                       const StencilTestAction stencilPassDepthPassAction) = 0;
+  virtual void ConfigureBlending(const bool enable, const BlendingFunc blendingFunc1, const BlendingFunc blendingFunc2, const BlendingFunc blendingFuncR,
+                                 const BlendingFunc blendingFuncG, const BlendingFunc blendingFuncB, const BlendingFunc blendingFuncA) = 0;
   virtual void ConfigureCulling(const bool enable, const CullingType type) = 0;
   virtual void ConfigureWireframeView(const bool enable) = 0;
   virtual void ConfigureAntiAliasing(const bool enable) = 0;
@@ -93,8 +57,7 @@ class RendererAPI {
   virtual void ImGuiRenderDrawData(ImDrawData* drawData) = 0;
   virtual void DestroyImGui() = 0;
 
-  virtual void DrawIndexed(const ReferencePointer<VertexArray>& vertexArray,
-                           uint32_t indexCount = 0) = 0;
+  virtual void DrawIndexed(const ReferencePointer<VertexArray>& vertexArray, uint32_t indexCount = 0) = 0;
 
   inline static RendererAPI::API GetAPI() { return s_API; }
 

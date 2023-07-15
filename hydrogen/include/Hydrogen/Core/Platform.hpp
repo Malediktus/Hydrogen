@@ -122,26 +122,7 @@
 #endif
 
 namespace Hydrogen {
-enum class Platform {
-  Windows,
-  WindowsPC,
-  XBoxOne,
-  Unix,
-  Apple,
-  MacOS,
-  IOS,
-  Web,
-  Android,
-  Linux,
-  DragonFlyBSD,
-  FreeBSD,
-  NetBSD,
-  OpenBSD,
-  AkarOS,
-  Solaris,
-  Playstation,
-  Nintendo
-};
+enum class Platform { Windows, WindowsPC, XBoxOne, Unix, Apple, MacOS, IOS, Web, Android, Linux, DragonFlyBSD, FreeBSD, NetBSD, OpenBSD, AkarOS, Solaris, Playstation, Nintendo };
 
 String PlatformToString(Platform platform);
 Platform GetCurrentPlatform();

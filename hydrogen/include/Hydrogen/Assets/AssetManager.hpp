@@ -15,11 +15,9 @@ class AssetManager {
 
   template <typename T>
   static ReferencePointer<T> Get(const String& filename) {
-    static_assert(std::is_base_of<Asset, T>::value,
-                  "T must be derived from Asset");
+    static_assert(std::is_base_of<Asset, T>::value, "T must be derived from Asset");
 
-    if (s_Assets.count(filename))
-      return std::dynamic_pointer_cast<T>(s_Assets[filename]);
+    if (s_Assets.count(filename)) return std::dynamic_pointer_cast<T>(s_Assets[filename]);
 
     std::filesystem::path filepath(filename);
     if (!(std::filesystem::exists(filepath))) {

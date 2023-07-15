@@ -9,18 +9,8 @@
 namespace Hydrogen {
 class Logger {
  public:
-  enum class LogLevel {
-    Trace = 0,
-    Debug = 1,
-    Info = 2,
-    Warn = 3,
-    Error = 4,
-    Fatal = 5,
-    Disable = 6
-  };
-  Logger(String name, LogLevel logLevel = LogLevel::Info,
-         String format = "%^[%T] %n: %v%$", bool out = true,
-         String filename = "");
+  enum class LogLevel { Trace = 0, Debug = 1, Info = 2, Warn = 3, Error = 4, Fatal = 5, Disable = 6 };
+  Logger(String name, LogLevel logLevel = LogLevel::Info, String format = "%^[%T] %n: %v%$", bool out = true, String filename = "");
 
   template <typename... Args>
   inline void Trace(Args&&... args) {
@@ -51,16 +41,12 @@ class Logger {
   ReferencePointer<spdlog::logger> m_Logger;
 };
 
-#define HY_LOG_TRACE(...) \
-  Hydrogen::SystemLogger::GetLogger()->Trace(__VA_ARGS__);
-#define HY_LOG_DEBUG(...) \
-  Hydrogen::SystemLogger::GetLogger()->Debug(__VA_ARGS__);
+#define HY_LOG_TRACE(...) Hydrogen::SystemLogger::GetLogger()->Trace(__VA_ARGS__);
+#define HY_LOG_DEBUG(...) Hydrogen::SystemLogger::GetLogger()->Debug(__VA_ARGS__);
 #define HY_LOG_INFO(...) Hydrogen::SystemLogger::GetLogger()->Info(__VA_ARGS__);
 #define HY_LOG_WARN(...) Hydrogen::SystemLogger::GetLogger()->Warn(__VA_ARGS__);
-#define HY_LOG_ERROR(...) \
-  Hydrogen::SystemLogger::GetLogger()->Error(__VA_ARGS__);
-#define HY_LOG_FATAL(...) \
-  Hydrogen::SystemLogger::GetLogger()->Fatal(__VA_ARGS__);
+#define HY_LOG_ERROR(...) Hydrogen::SystemLogger::GetLogger()->Error(__VA_ARGS__);
+#define HY_LOG_FATAL(...) Hydrogen::SystemLogger::GetLogger()->Fatal(__VA_ARGS__);
 
 class SystemLogger {
  public:

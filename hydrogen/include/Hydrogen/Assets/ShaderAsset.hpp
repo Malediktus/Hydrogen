@@ -25,8 +25,7 @@ class ShaderAsset : public Asset {
     DynamicArray<uint32_t> geometryShader;
 
     if (filepath.substr(filepath.find_last_of(".") + 1) == "glsl") {
-      for (const auto& dirEntry :
-           std::filesystem::directory_iterator(filepath)) {
+      for (const auto& dirEntry : std::filesystem::directory_iterator(filepath)) {
         ShaderStage stage;
         DynamicArray<uint32_t>* currentShader;
 
@@ -57,17 +56,13 @@ class ShaderAsset : public Asset {
         CacheFile cache(outfilepath, inbuf);
 
         if (!cache.CacheValid()) {
-          HY_LOG_INFO("Shader cache {} is invalid. Recompiling!",
-                      shaderFilepath)
+          HY_LOG_INFO("Shader cache {} is invalid. Recompiling!", shaderFilepath)
 
-          ShaderCompiler compiler(ShaderLanguage::GLSL,
-                                  ShaderClient::Vulkan_1_3,
-                                  SpriVVersion::SpriV_1_6, stage, 330);
+          ShaderCompiler compiler(ShaderLanguage::GLSL, ShaderClient::Vulkan_1_3, SpriVVersion::SpriV_1_6, stage, 330);
           compiler.AddShader(inbuf);
           compiler.Link();
           auto spirv = compiler.GetSpriv();
-          currentShader->insert(currentShader->end(), spirv.begin(),
-                                spirv.end());
+          currentShader->insert(currentShader->end(), spirv.begin(), spirv.end());
 
           String directory = DIRECTORY_FROM_PATH(outfilepath);
           if (!std::filesystem::exists(directory)) {
@@ -91,9 +86,7 @@ class ShaderAsset : public Asset {
           infile.seekg(0, std::ios::beg);
 
           currentShader->reserve(fileSize);
-          currentShader->insert(currentShader->begin(),
-                                std::istream_iterator<uint32_t>(infile),
-                                std::istream_iterator<uint32_t>());
+          currentShader->insert(currentShader->begin(), std::istream_iterator<uint32_t>(infile), std::istream_iterator<uint32_t>());
 
           infile.close();
         }
@@ -101,8 +94,7 @@ class ShaderAsset : public Asset {
         cache.UpdateCacheChecksum();
       }
 
-      m_Shader = Shader::Create(FILENAME_FROM_PATH(filepath), vertexShader,
-                                pixelShader, geometryShader);
+      m_Shader = Shader::Create(FILENAME_FROM_PATH(filepath), vertexShader, pixelShader, geometryShader);
     } else {
       HY_INVOKE_ERROR("Only glsl is supported for now!");
     }
@@ -111,16 +103,13 @@ class ShaderAsset : public Asset {
   }
 
   const ReferencePointer<Shader>& GetShader() {
-    HY_ASSERT(
-        m_Shader,
-        "ShaderAsset::GetShader() was about to return null! "
-        "ShaderAsset::Load(const String& filename) shall be called first!");
+    HY_ASSERT(m_Shader,
+              "ShaderAsset::GetShader() was about to return null! "
+              "ShaderAsset::Load(const String& filename) shall be called first!");
     return m_Shader;
   }
 
-  static const DynamicArray<const String> GetFileExtensions() {
-    return DynamicArray<const String>{".glsl"};
-  }
+  static const DynamicArray<const String> GetFileExtensions() { return DynamicArray<const String>{".glsl"}; }
 
   static bool CheckFileExtensions(const String& ext) {
     auto exts = GetFileExtensions();

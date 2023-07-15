@@ -28,9 +28,7 @@ class Entity {
   Entity() = default;
   ~Entity() { m_Scene->m_Registry.destroy(m_EntityHandle); }
   Entity(const Entity& other) = default;
-  Entity(Scene* scene) : m_Scene(scene) {
-    m_EntityHandle = m_Scene->m_Registry.create();
-  }
+  Entity(Scene* scene) : m_Scene(scene) { m_EntityHandle = m_Scene->m_Registry.create(); }
 
   template <typename T>
   bool HasComponent() {
@@ -40,14 +38,12 @@ class Entity {
   template <typename T, typename... Args>
   T& AddComponent(Args&&... args) {
     HY_ASSERT(!HasComponent<T>(), "Entity already has component!");
-    return m_Scene->m_Registry.emplace<T>(m_EntityHandle,
-                                          std::forward<Args>(args)...);
+    return m_Scene->m_Registry.emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
   }
 
   template <typename T, typename... Args>
   T& AddOrReplaceComponent(Args&&... args) {
-    return m_Scene->m_Registry.emplace_or_replace<T>(
-        m_EntityHandle, std::forward<Args>(args)...);
+    return m_Scene->m_Registry.emplace_or_replace<T>(m_EntityHandle, std::forward<Args>(args)...);
   }
 
   template <typename T>
@@ -73,9 +69,7 @@ class Entity {
 
   const String& GetName() { return GetComponent<TagComponent>().Tag; }
 
-  bool operator==(const Entity& other) const {
-    return m_EntityHandle == other.m_EntityHandle && m_Scene == other.m_Scene;
-  }
+  bool operator==(const Entity& other) const { return m_EntityHandle == other.m_EntityHandle && m_Scene == other.m_Scene; }
 
   bool operator!=(const Entity& other) const { return !(*this == other); }
 

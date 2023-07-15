@@ -73,11 +73,7 @@ class Texture2D : public Texture {
     return nullptr;
   }
 
-  static ReferencePointer<Texture2D> Create(
-      const int width, const int height,
-      Texture2DStorageType storageType = Texture2DStorageType::RGBA8F);
-  static ReferencePointer<Texture2D> Create(
-      const int width, const int height, const void* data,
-      Texture2DStorageType storageType = Texture2DStorageType::RGBA8F);
+  static ReferencePointer<Texture2D> Create(const int width, const int height, Texture2DStorageType storageType = Texture2DStorageType::RGBA8F);
+  static ReferencePointer<Texture2D> Create(const int width, const int height, const void* data, Texture2DStorageType storageType = Texture2DStorageType::RGBA8F);
 };
 }  // namespace Hydrogen

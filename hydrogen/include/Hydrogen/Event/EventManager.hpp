@@ -14,8 +14,7 @@ class Event {
 
 class WindowResizeEvent : public Event {
  public:
-  WindowResizeEvent(const int& width, const int& height)
-      : m_Width(width), m_Height(height) {}
+  WindowResizeEvent(const int& width, const int& height) : m_Width(width), m_Height(height) {}
 
   const int& GetWidth() const { return m_Width; }
   const int& GetHeight() const { return m_Height; }
@@ -99,8 +98,7 @@ class MouseScrollEvent : public Event {
   const int m_Value;
 };
 
-using EventMap = std::multimap<const std::type_info*,
-                               const std::function<void(const Event&)>>;
+using EventMap = std::multimap<const std::type_info*, const std::function<void(const Event&)>>;
 
 class EventDispatcher {
  public:

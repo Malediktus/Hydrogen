@@ -120,10 +120,7 @@ const TBuiltInResource DefaultTBuiltInResource = {
         /* .generalConstantMatrixVectorIndexing = */ 1,
     }};
 
-ShaderCompiler::ShaderCompiler(ShaderLanguage frontEnd, ShaderClient client,
-                               SpriVVersion spirvVersion, ShaderStage stage,
-                               uint32_t version)
-    : m_Version(version) {
+ShaderCompiler::ShaderCompiler(ShaderLanguage frontEnd, ShaderClient client, SpriVVersion spirvVersion, ShaderStage stage, uint32_t version) : m_Version(version) {
   glslang_initialize_process();
 
   switch (frontEnd) {
@@ -224,20 +221,17 @@ void ShaderCompiler::AddShader(const String& source) {
       .force_default_version_and_profile = false,
       .forward_compatible = false,
       .messages = GLSLANG_MSG_DEFAULT_BIT,
-      .resource =
-          reinterpret_cast<const glslang_resource_t*>(&DefaultTBuiltInResource),
+      .resource = reinterpret_cast<const glslang_resource_t*>(&DefaultTBuiltInResource),
   };
 
   glslang_shader_t* shader = glslang_shader_create(&input);
 
   if (!glslang_shader_preprocess(shader, &input)) {
-    HY_INVOKE_ERROR("Shader preprocessing failed:\n{}",
-                    glslang_shader_get_info_log(shader))
+    HY_INVOKE_ERROR("Shader preprocessing failed:\n{}", glslang_shader_get_info_log(shader))
   }
 
   if (!glslang_shader_parse(shader, &input)) {
-    HY_INVOKE_ERROR("Shader compilation failed:\n{}",
-                    glslang_shader_get_info_log(shader))
+    HY_INVOKE_ERROR("Shader compilation failed:\n{}", glslang_shader_get_info_log(shader))
   }
 
   glslang_program_add_shader(m_Program, shader);
@@ -245,10 +239,8 @@ void ShaderCompiler::AddShader(const String& source) {
 }
 
 void ShaderCompiler::Link() {
-  if (!glslang_program_link(m_Program, GLSLANG_MSG_SPV_RULES_BIT |
-                                           GLSLANG_MSG_VULKAN_RULES_BIT)) {
-    HY_INVOKE_ERROR("Shader linking failed:\n{}",
-                    glslang_program_get_info_log(m_Program))
+  if (!glslang_program_link(m_Program, GLSLANG_MSG_SPV_RULES_BIT | GLSLANG_MSG_VULKAN_RULES_BIT)) {
+    HY_INVOKE_ERROR("Shader linking failed:\n{}", glslang_program_get_info_log(m_Program))
   }
 }
 

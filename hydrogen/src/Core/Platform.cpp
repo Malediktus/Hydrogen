@@ -99,6 +99,4 @@ Platform Hydrogen::GetCurrentPlatform() {
   HY_INVOKE_ERROR("Invalid platform");
 }
 
-inline String Hydrogen::GetCurrentPlatformName() {
-  return PlatformToString(GetCurrentPlatform());
-}
+inline String Hydrogen::GetCurrentPlatformName() { return PlatformToString(GetCurrentPlatform()); }

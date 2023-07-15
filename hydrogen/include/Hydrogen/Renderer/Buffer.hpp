@@ -8,20 +8,7 @@
 #include "../Core/Memory.hpp"
 
 namespace Hydrogen {
-enum class ShaderDataType {
-  None = 0,
-  Float = 1,
-  Float2 = 2,
-  Float3 = 3,
-  Float4 = 4,
-  Mat3 = 5,
-  Mat4 = 6,
-  Int = 7,
-  Int2 = 8,
-  Int3 = 9,
-  Int4 = 10,
-  Bool = 11
-};
+enum class ShaderDataType { None = 0, Float = 1, Float2 = 2, Float3 = 3, Float4 = 4, Mat3 = 5, Mat4 = 6, Int = 7, Int2 = 8, Int3 = 9, Int4 = 10, Bool = 11 };
 
 namespace Utils {
 static uint32_t ShaderDataTypeSize(ShaderDataType type) {
@@ -62,19 +49,10 @@ struct BufferElement {
   uint64_t Offset;
   bool Normalized;
 
-  BufferElement()
-      : Type(ShaderDataType::Float),
-        Size(Utils::ShaderDataTypeSize(ShaderDataType::Float)),
-        Offset(0),
-        Normalized(false) {}
+  BufferElement() : Type(ShaderDataType::Float), Size(Utils::ShaderDataTypeSize(ShaderDataType::Float)), Offset(0), Normalized(false) {}
 
-  BufferElement(ShaderDataType type, const std::string& name,
-                bool normalized = false)
-      : Name(name),
-        Type(type),
-        Size(Utils::ShaderDataTypeSize(type)),
-        Offset(0),
-        Normalized(normalized) {}
+  BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
+      : Name(name), Type(type), Size(Utils::ShaderDataTypeSize(type)), Offset(0), Normalized(normalized) {}
 
   uint32_t GetComponentCount() const {
     switch (Type) {
@@ -112,24 +90,15 @@ class BufferLayout {
  public:
   BufferLayout() {}
 
-  BufferLayout(const std::initializer_list<BufferElement>& elements)
-      : m_Elements(elements) {
-    CalculateOffsetsAndStride();
-  }
+  BufferLayout(const std::initializer_list<BufferElement>& elements) : m_Elements(elements) { CalculateOffsetsAndStride(); }
 
   inline uint32_t GetStride() const { return m_Stride; }
-  inline const std::vector<BufferElement>& GetElements() const {
-    return m_Elements;
-  }
+  inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }
 
   std::vector<BufferElement>::iterator begin() { return m_Elements.begin(); }
   std::vector<BufferElement>::iterator end() { return m_Elements.end(); }
-  std::vector<BufferElement>::const_iterator begin() const {
-    return m_Elements.begin();
-  }
-  std::vector<BufferElement>::const_iterator end() const {
-    return m_Elements.end();
-  }
+  std::vector<BufferElement>::const_iterator begin() const { return m_Elements.begin(); }
+  std::vector<BufferElement>::const_iterator end() const { return m_Elements.end(); }
 
  private:
   void CalculateOffsetsAndStride() {

@@ -2,9 +2,7 @@
 
 class DemoTask : public Hydrogen::Task {
  public:
-  DemoTask(Hydrogen::ReferencePointer<Hydrogen::Logger> console) {
-    Console = console;
-  }
+  DemoTask(Hydrogen::ReferencePointer<Hydrogen::Logger> console) { Console = console; }
 
   void OnActivate() override { Console->Debug("Activate"); }
 
@@ -26,14 +24,11 @@ class DemoApplication : public Hydrogen::Application {
 
   void OnInit() override {
     Console->Debug("Started App");
-    m_DemoTask = Hydrogen::TaskManager::Activate(
-        Hydrogen::NewReferencePointer<DemoTask>(Console));
+    m_DemoTask = Hydrogen::TaskManager::Activate(Hydrogen::NewReferencePointer<DemoTask>(Console));
 
     auto entity = CurrentScene->AddEntity("PointLight");
-    entity->AddComponent<Hydrogen::TransformComponent>(
-        glm::vec3(-3.0f, 0.0f, 0.0f));
-    entity->AddComponent<Hydrogen::PointLightComponent>(Hydrogen::PointLight(
-        1.0f, 1.0f, 1.0f, glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f)));
+    entity->AddComponent<Hydrogen::TransformComponent>(glm::vec3(-3.0f, 0.0f, 0.0f));
+    entity->AddComponent<Hydrogen::PointLightComponent>(Hydrogen::PointLight(1.0f, 1.0f, 1.0f, glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f)));
   }
 
   void OnShutdown() override {}
@@ -42,16 +37,13 @@ class DemoApplication : public Hydrogen::Application {
 
   void OnImGuiDraw() override {}
 
-  void OnEvent(const Hydrogen::Event&) override {
-    Console->Debug("An event occured");
-  }
+  void OnEvent(const Hydrogen::Event&) override { Console->Debug("An event occured"); }
 
  private:
   Hydrogen::ReferencePointer<Hydrogen::Task> m_DemoTask;
 };
 
-Hydrogen::ReferencePointer<Hydrogen::Application>
-Hydrogen::CreateApplication() {
+Hydrogen::ReferencePointer<Hydrogen::Application> Hydrogen::CreateApplication() {
   std::filesystem::current_path(WORKING_DIR);
   return Hydrogen::NewReferencePointer<DemoApplication>();
 }

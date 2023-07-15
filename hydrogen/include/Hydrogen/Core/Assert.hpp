@@ -5,20 +5,18 @@
 #include "Platform.hpp"
 
 #ifndef HY_RELEASE
-#define HY_ASSERT_CHECK(expr, ...)                          \
-  if (expr) {                                               \
-  } else {                                                  \
-    HY_LOG_FATAL("Assertion error in " __FILE__ ": '" #expr \
-                 "' is not zero | " __VA_ARGS__);           \
-    exit(0);                                                \
+#define HY_ASSERT_CHECK(expr, ...)                                                           \
+  if (expr) {                                                                                \
+  } else {                                                                                   \
+    HY_LOG_FATAL("Assertion error in " __FILE__ ": '" #expr "' is not zero | " __VA_ARGS__); \
+    exit(0);                                                                                 \
   }
 
-#define HY_ASSERT(expr, ...)                                \
-  if (expr) {                                               \
-  } else {                                                  \
-    HY_LOG_FATAL("Assertion error in " __FILE__ ": '" #expr \
-                 "' is not zero | " __VA_ARGS__);           \
-    exit(0);                                                \
+#define HY_ASSERT(expr, ...)                                                                 \
+  if (expr) {                                                                                \
+  } else {                                                                                   \
+    HY_LOG_FATAL("Assertion error in " __FILE__ ": '" #expr "' is not zero | " __VA_ARGS__); \
+    exit(0);                                                                                 \
   }
 
 #define HY_INVOKE_ERROR(...)                                    \

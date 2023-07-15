@@ -12,8 +12,7 @@ ReferencePointer<Task> TaskManager::Activate(ReferencePointer<Task> task) {
 }
 
 void TaskManager::Deactivate(ReferencePointer<Task> task) {
-  DynamicArray<ReferencePointer<Task>>::iterator position =
-      std::find(s_Tasks.begin(), s_Tasks.end(), task);
+  DynamicArray<ReferencePointer<Task>>::iterator position = std::find(s_Tasks.begin(), s_Tasks.end(), task);
   if (position != s_Tasks.end()) {
     task->OnDeactivate();
     s_Tasks.erase(position);

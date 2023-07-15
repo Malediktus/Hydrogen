@@ -12,30 +12,18 @@ class VulkanContext : public Context {
   VulkanContext(const ReferencePointer<RenderWindow>& window);
   virtual ~VulkanContext();
 
-  virtual void Init(ProjectInformation clientInfo,
-                    ProjectInformation engineInfo) override;
-  virtual ReferencePointer<RenderWindow> GetWindow() override {
-    return m_Window;
-  }
+  virtual void Init(ProjectInformation clientInfo, ProjectInformation engineInfo) override;
+  virtual ReferencePointer<RenderWindow> GetWindow() override { return m_Window; }
 
-  const DynamicArray<const char*>& GetInstanceExtensions() {
-    return m_InstanceExtensions;
-  }
-  const DynamicArray<const char*>& GetDeviceExtensions() {
-    return m_DeviceExtensions;
-  }
-  const DynamicArray<const char*>& GetValidationLayers() {
-    return m_ValidationLayers;
-  }
+  const DynamicArray<const char*>& GetInstanceExtensions() { return m_InstanceExtensions; }
+  const DynamicArray<const char*>& GetDeviceExtensions() { return m_DeviceExtensions; }
+  const DynamicArray<const char*>& GetValidationLayers() { return m_ValidationLayers; }
   VkInstance GetInstance() { return m_Instance; }
 
  private:
-  void CreateInstance(VkApplicationInfo appInfo, VkInstanceCreateFlags flags,
-                      PFN_vkDebugUtilsMessengerCallbackEXT debugCallback);
+  void CreateInstance(VkApplicationInfo appInfo, VkInstanceCreateFlags flags, PFN_vkDebugUtilsMessengerCallbackEXT debugCallback);
   void CreateDebugMessenger(PFN_vkDebugUtilsMessengerCallbackEXT callback);
-  void PopulateDebugMessengerCreateInfo(
-      VkDebugUtilsMessengerCreateInfoEXT* createInfo,
-      PFN_vkDebugUtilsMessengerCallbackEXT callback);
+  void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT* createInfo, PFN_vkDebugUtilsMessengerCallbackEXT callback);
 
   ReferencePointer<RenderWindow> m_Window;
   VkInstance m_Instance;

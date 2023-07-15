@@ -6,8 +6,7 @@ using VkQueueFamily = std::optional<uint32_t>;
 
 class VulkanRenderDevice : public RenderDevice {
  public:
-  VulkanRenderDevice(std::function<std::size_t(const RenderDeviceProperties&)>
-                         deviceRateFunction);
+  VulkanRenderDevice(std::function<std::size_t(const RenderDeviceProperties&)> deviceRateFunction);
   virtual ~VulkanRenderDevice();
 
   VkDevice GetDevice() { return m_Device; }
@@ -17,9 +16,7 @@ class VulkanRenderDevice : public RenderDevice {
  private:
   VkQueueFamily GetGraphicsQueueFamily(VkPhysicalDevice device);
   VkQueueFamily GetPresentQueueFamily(VkPhysicalDevice device);
-  bool CheckDeviceExtensionSupport(
-      VkPhysicalDevice device,
-      const std::vector<const char*>& deviceExtensions);
+  bool CheckDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char*>& deviceExtensions);
 
   VkPhysicalDevice m_PhysicalDevice;
   VkQueueFamily m_GraphicsQueueFamily;

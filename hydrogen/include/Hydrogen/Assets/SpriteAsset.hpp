@@ -19,16 +19,13 @@ class SpriteAsset : public Asset {
   }
 
   const ReferencePointer<Texture2D>& GetTexture() {
-    HY_ASSERT(
-        m_Texture,
-        "SpriteAsset::GetTexture() was about to return null! "
-        "SpriteAsset::Load(const String& filename) shall be called first!");
+    HY_ASSERT(m_Texture,
+              "SpriteAsset::GetTexture() was about to return null! "
+              "SpriteAsset::Load(const String& filename) shall be called first!");
     return m_Texture;
   }
 
-  static const DynamicArray<const String> GetFileExtensions() {
-    return DynamicArray<const String>{".png", ".jpg", ".bmp", ".tga", ".hdr"};
-  }
+  static const DynamicArray<const String> GetFileExtensions() { return DynamicArray<const String>{".png", ".jpg", ".bmp", ".tga", ".hdr"}; }
 
   static bool CheckFileExtensions(const String& ext) {
     auto exts = GetFileExtensions();

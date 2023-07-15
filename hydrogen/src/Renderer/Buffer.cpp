@@ -5,8 +5,7 @@
 
 using namespace Hydrogen;
 
-ReferencePointer<VertexBuffer> VertexBuffer::Create(float* vertices,
-                                                    uint32_t size) {
+ReferencePointer<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size) {
   ZoneScoped;
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
@@ -32,8 +31,7 @@ ReferencePointer<VertexBuffer> VertexBuffer::Create(uint32_t size) {
   return nullptr;
 }
 
-ReferencePointer<IndexBuffer> IndexBuffer::Create(uint32_t* indices,
-                                                  uint32_t size) {
+ReferencePointer<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t size) {
   ZoneScoped;
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:

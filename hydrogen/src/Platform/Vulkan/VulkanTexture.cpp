@@ -5,15 +5,12 @@
 
 using namespace Hydrogen::Vulkan;
 
-VulkanTexture2D::VulkanTexture2D(const int width, const int height,
-                                 Texture2DStorageType storageType) {
+VulkanTexture2D::VulkanTexture2D(const int width, const int height, Texture2DStorageType storageType) {
   ZoneScoped;
   HY_LOG_TRACE("Created Vulkan texture2D from file (ID: {})", m_RendererID);
 }
 
-VulkanTexture2D::VulkanTexture2D(const int width, const int height,
-                                 const void* data,
-                                 Texture2DStorageType storageType) {
+VulkanTexture2D::VulkanTexture2D(const int width, const int height, const void* data, Texture2DStorageType storageType) {
   ZoneScoped;
   HY_LOG_TRACE("Created Vulkan texture2D from file (ID: {})", m_RendererID);
 }

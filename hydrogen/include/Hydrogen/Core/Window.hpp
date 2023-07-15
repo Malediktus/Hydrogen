@@ -30,7 +30,6 @@ class Window : public RenderWindow {
   virtual void UpdateEvents() = 0;
   virtual void Render() = 0;
 
-  static ReferencePointer<Window> Create(const String& title, uint32_t width,
-                                         uint32_t height);
+  static ReferencePointer<Window> Create(const String& title, uint32_t width, uint32_t height);
 };
 }  // namespace Hydrogen

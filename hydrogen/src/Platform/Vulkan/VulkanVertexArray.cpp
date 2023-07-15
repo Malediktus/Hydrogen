@@ -22,18 +22,13 @@ void VulkanVertexArray::Unbind() const {
   HY_LOG_TRACE("Unbount Vulkan vertex array (ID: {})", m_RendererID);
 }
 
-void VulkanVertexArray::AddVertexBuffer(
-    const ReferencePointer<VertexBuffer>& vertexBuffer) {
+void VulkanVertexArray::AddVertexBuffer(const ReferencePointer<VertexBuffer>& vertexBuffer) {
   ZoneScoped;
-  HY_ASSERT(vertexBuffer->GetLayout().GetElements().size(),
-            "At lease one value is needed in vertex buffer layout");
-  HY_LOG_TRACE("Attached vertex buffer to Vulkan vertex array (ID: {})",
-               m_RendererID);
+  HY_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "At lease one value is needed in vertex buffer layout");
+  HY_LOG_TRACE("Attached vertex buffer to Vulkan vertex array (ID: {})", m_RendererID);
 }
 
-void VulkanVertexArray::SetIndexBuffer(
-    const ReferencePointer<IndexBuffer>& indexBuffer) {
+void VulkanVertexArray::SetIndexBuffer(const ReferencePointer<IndexBuffer>& indexBuffer) {
   ZoneScoped;
-  HY_LOG_TRACE("Set index buffer of Vulkan vertex array (ID: {})",
-               m_RendererID);
+  HY_LOG_TRACE("Set index buffer of Vulkan vertex array (ID: {})", m_RendererID);
 }

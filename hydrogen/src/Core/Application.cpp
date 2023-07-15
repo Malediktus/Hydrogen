@@ -13,8 +13,7 @@ Application::Application() {
 
 void Application::Run() {
   OnSetup();
-  AppWindow = Window::Create(ApplicationInfo.Name, ApplicationInfo.WindowSize.x,
-                             ApplicationInfo.WindowSize.y);
+  AppWindow = Window::Create(ApplicationInfo.Name, ApplicationInfo.WindowSize.x, ApplicationInfo.WindowSize.y);
 
   ProjectInformation clientProject;
   clientProject.ProjectName = ApplicationInfo.Name;
@@ -28,25 +27,23 @@ void Application::Run() {
   Renderer::SetContext(m_RenderContext);
   m_RenderContext->Init(clientProject, engineProject);
 
-  m_RenderDevice = RenderDevice::Create(
-      [](const RenderDeviceProperties& deviceProperties) -> std::size_t {
-        size_t result = 0;
+  m_RenderDevice = RenderDevice::Create([](const RenderDeviceProperties& deviceProperties) -> std::size_t {
+    size_t result = 0;
 
-        switch (deviceProperties.DeviceType) {
-          case RenderDeviceType::IntegratedGPU:
-            break;
-          case RenderDeviceType::DiscreteGPU:
-            result += 1000000;  // Always choose discrete GPUs
-            break;
-          default:
-            return 0;  // Support only GPUs
-        }
+    switch (deviceProperties.DeviceType) {
+      case RenderDeviceType::IntegratedGPU:
+        break;
+      case RenderDeviceType::DiscreteGPU:
+        result += 1000000;  // Always choose discrete GPUs
+        break;
+      default:
+        return 0;  // Support only GPUs
+    }
 
-        for (auto heap : deviceProperties.MemoryHeaps)
-          result += heap.MemorySize / 1024;  // Choose the GPU with most memory
+    for (auto heap : deviceProperties.MemoryHeaps) result += heap.MemorySize / 1024;  // Choose the GPU with most memory
 
-        return result;
-      });
+    return result;
+  });
   Renderer::SetRenderDevice(m_RenderDevice);
 
   m_SwapChain = SwapChain::Create();
@@ -61,13 +58,11 @@ void Application::Run() {
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO();
   (void)io;
-  io.ConfigFlags |=
-      ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
-  io.ConfigFlags |=
-      ImGuiConfigFlags_NavEnableGamepad;             // Enable Gamepad Controls
-  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;  // Enable Docking
-  io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;  // Enable Multi-Viewport
-                                                       // / Platform Windows
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable Docking
+  io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable Multi-Viewport
+                                                         // / Platform Windows
   // io.ConfigViewportsNoAutoMerge = true;
   // io.ConfigViewportsNoTaskBarIcon = true;
 
@@ -88,42 +83,26 @@ void Application::Run() {
   CurrentScene = NewReferencePointer<Scene>();
 
   // Register event callbacks
-  EventDispatcher::Subscribe<WindowResizeEvent>(
-      std::bind(&Application::OnEvent, this, std::placeholders::_1));
-  EventDispatcher::Subscribe<WindowCloseEvent>(
-      std::bind(&Application::OnEvent, this, std::placeholders::_1));
-  EventDispatcher::Subscribe<KeyPressEvent>(
-      std::bind(&Application::OnEvent, this, std::placeholders::_1));
-  EventDispatcher::Subscribe<KeyReleaseEvent>(
-      std::bind(&Application::OnEvent, this, std::placeholders::_1));
-  EventDispatcher::Subscribe<KeyRepeatEvent>(
-      std::bind(&Application::OnEvent, this, std::placeholders::_1));
-  EventDispatcher::Subscribe<MouseMoveEvent>(
-      std::bind(&Application::OnEvent, this, std::placeholders::_1));
-  EventDispatcher::Subscribe<MousePressEvent>(
-      std::bind(&Application::OnEvent, this, std::placeholders::_1));
-  EventDispatcher::Subscribe<MouseReleaseEvent>(
-      std::bind(&Application::OnEvent, this, std::placeholders::_1));
-  EventDispatcher::Subscribe<MouseScrollEvent>(
-      std::bind(&Application::OnEvent, this, std::placeholders::_1));
+  EventDispatcher::Subscribe<WindowResizeEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+  EventDispatcher::Subscribe<WindowCloseEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+  EventDispatcher::Subscribe<KeyPressEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+  EventDispatcher::Subscribe<KeyReleaseEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+  EventDispatcher::Subscribe<KeyRepeatEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+  EventDispatcher::Subscribe<MouseMoveEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+  EventDispatcher::Subscribe<MousePressEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+  EventDispatcher::Subscribe<MouseReleaseEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+  EventDispatcher::Subscribe<MouseScrollEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
-  EventDispatcher::Subscribe<WindowResizeEvent>(
-      std::bind(&Application::OnResize, this, std::placeholders::_1));
+  EventDispatcher::Subscribe<WindowResizeEvent>(std::bind(&Application::OnResize, this, std::placeholders::_1));
 
-  float planeVertices[] = {
-      10.0f, -0.5f, 10.0f,  0.0f,  1.0f,   0.0f,  10.0f,  0.0f,  -10.0f, -0.5f,
-      10.0f, 0.0f,  1.0f,   0.0f,  0.0f,   0.0f,  -10.0f, -0.5f, -10.0f, 0.0f,
-      1.0f,  0.0f,  0.0f,   10.0f, 10.0f,  -0.5f, 10.0f,  0.0f,  1.0f,   0.0f,
-      10.0f, 0.0f,  -10.0f, -0.5f, -10.0f, 0.0f,  1.0f,   0.0f,  0.0f,   10.0f,
-      10.0f, -0.5f, -10.0f, 0.0f,  1.0f,   0.0f,  10.0f,  10.0f};
+  float planeVertices[] = {10.0f,  -0.5f, 10.0f,  0.0f, 1.0f, 0.0f, 10.0f, 0.0f,  -10.0f, -0.5f, 10.0f,  0.0f, 1.0f, 0.0f, 0.0f,  0.0f,
+                           -10.0f, -0.5f, -10.0f, 0.0f, 1.0f, 0.0f, 0.0f,  10.0f, 10.0f,  -0.5f, 10.0f,  0.0f, 1.0f, 0.0f, 10.0f, 0.0f,
+                           -10.0f, -0.5f, -10.0f, 0.0f, 1.0f, 0.0f, 0.0f,  10.0f, 10.0f,  -0.5f, -10.0f, 0.0f, 1.0f, 0.0f, 10.0f, 10.0f};
 
   uint32_t planeIndices[] = {0, 1, 2, 3, 4, 5};
 
-  auto vertexBuffer =
-      VertexBuffer::Create(planeVertices, sizeof(planeVertices));
-  vertexBuffer->SetLayout({{ShaderDataType::Float3, "Position", false},
-                           {ShaderDataType::Float3, "Normal", false},
-                           {ShaderDataType::Float2, "TexCoord", false}});
+  auto vertexBuffer = VertexBuffer::Create(planeVertices, sizeof(planeVertices));
+  vertexBuffer->SetLayout({{ShaderDataType::Float3, "Position", false}, {ShaderDataType::Float3, "Normal", false}, {ShaderDataType::Float2, "TexCoord", false}});
   auto indexBuffer = IndexBuffer::Create(planeIndices, sizeof(planeIndices));
   auto vertexArray = VertexArray::Create();
   vertexArray->AddVertexBuffer(vertexBuffer);
@@ -184,8 +163,7 @@ void Application::Run() {
 void Application::OnResize(const Event& event) {
   if (!m_Initialized) return;
   auto resizeEvent = dynamic_cast<const WindowResizeEvent&>(event);
-  HY_LOG_DEBUG("Resizing renderer: {}, {}", resizeEvent.GetWidth(),
-               resizeEvent.GetHeight());
+  HY_LOG_DEBUG("Resizing renderer: {}, {}", resizeEvent.GetWidth(), resizeEvent.GetHeight());
   // m_WindowRenderer->OnResize(resizeEvent.GetWidth(),
   // resizeEvent.GetHeight());
 }

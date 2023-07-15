@@ -5,8 +5,7 @@
 
 using namespace Hydrogen;
 
-ReferencePointer<Framebuffer> Framebuffer::Create(
-    const ReferencePointer<RenderWindow>& window) {
+ReferencePointer<Framebuffer> Framebuffer::Create(const ReferencePointer<RenderWindow>& window) {
   ZoneScoped;
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:

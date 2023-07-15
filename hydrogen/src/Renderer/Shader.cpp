@@ -5,15 +5,12 @@
 
 using namespace Hydrogen;
 
-ReferencePointer<Shader> Shader::Create(
-    const String& name, const DynamicArray<uint32_t>& vertexSrc,
-    const DynamicArray<uint32_t>& fragmentSrc,
-    const DynamicArray<uint32_t>& geometrySrc) {
+ReferencePointer<Shader> Shader::Create(const String& name, const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc,
+                                        const DynamicArray<uint32_t>& geometrySrc) {
   ZoneScoped;
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
-      return NewReferencePointer<Vulkan::VulkanShader>(
-          name, vertexSrc, fragmentSrc, geometrySrc);
+      return NewReferencePointer<Vulkan::VulkanShader>(name, vertexSrc, fragmentSrc, geometrySrc);
     default:
       HY_ASSERT_CHECK(false,
                       "Invalid renderer API value returned from "
@@ -22,8 +19,7 @@ ReferencePointer<Shader> Shader::Create(
   return nullptr;
 }
 
-void ShaderLibrary::Add(const String& name,
-                        const ReferencePointer<Shader>& shader) {
+void ShaderLibrary::Add(const String& name, const ReferencePointer<Shader>& shader) {
   ZoneScoped;
   HY_ASSERT(Exists(name), "Shader name already registered in ShaderLibrary");
   m_Shaders[name] = shader;
@@ -34,10 +30,8 @@ void ShaderLibrary::Add(const ReferencePointer<Shader>& shader) {
   auto& name = shader->GetName();
   Add(name, shader);
 }
-ReferencePointer<Shader> ShaderLibrary::Load(
-    const String& name, const DynamicArray<uint32_t>& vertexSrc,
-    const DynamicArray<uint32_t>& fragmentSrc,
-    const DynamicArray<uint32_t>& geometrySrc) {
+ReferencePointer<Shader> ShaderLibrary::Load(const String& name, const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc,
+                                             const DynamicArray<uint32_t>& geometrySrc) {
   ZoneScoped;
   auto shader = Shader::Create(name, vertexSrc, fragmentSrc, geometrySrc);
   Add(name, shader);

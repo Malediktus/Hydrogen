@@ -7,14 +7,12 @@ using namespace Hydrogen::Vulkan;
 
 VulkanVertexBuffer::VulkanVertexBuffer(uint32_t size) {
   ZoneScoped;
-  HY_LOG_TRACE("Created Vulkan vertex buffer of type dynamic (ID: {})",
-               m_RendererID);
+  HY_LOG_TRACE("Created Vulkan vertex buffer of type dynamic (ID: {})", m_RendererID);
 }
 
 VulkanVertexBuffer::VulkanVertexBuffer(float* vertices, uint32_t size) {
   ZoneScoped;
-  HY_LOG_TRACE("Created Vulkan vertex buffer of type static (ID: {})",
-               m_RendererID);
+  HY_LOG_TRACE("Created Vulkan vertex buffer of type static (ID: {})", m_RendererID);
 }
 
 VulkanVertexBuffer::~VulkanVertexBuffer() {
@@ -39,8 +37,7 @@ void VulkanVertexBuffer::SetData(const void* data, uint32_t size) {
 
 VulkanIndexBuffer::VulkanIndexBuffer(uint32_t* indices, uint32_t count) {
   ZoneScoped;
-  HY_LOG_TRACE("Created Vulkan index buffer of type static (ID: {})",
-               m_RendererID);
+  HY_LOG_TRACE("Created Vulkan index buffer of type static (ID: {})", m_RendererID);
 }
 
 VulkanIndexBuffer::~VulkanIndexBuffer() {

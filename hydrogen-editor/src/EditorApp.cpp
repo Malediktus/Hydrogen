@@ -11,9 +11,7 @@ class EditorApp : public Hydrogen::Application {
     ApplicationInfo.WindowSize = {1080, 720};
   }
 
-  void OnInit() override {
-    AttachPanel(Hydrogen::NewReferencePointer<AssetNavigatorPanel>());
-  }
+  void OnInit() override { AttachPanel(Hydrogen::NewReferencePointer<AssetNavigatorPanel>()); }
 
   void AttachPanel(Hydrogen::ReferencePointer<Panel> panel) {
     Hydrogen::TaskManager::Activate(panel);
@@ -22,8 +20,7 @@ class EditorApp : public Hydrogen::Application {
 
   void DetachPanel(Hydrogen::ReferencePointer<Panel> panel) {
     Hydrogen::TaskManager::Deactivate(panel);
-    Hydrogen::DynamicArray<Hydrogen::ReferencePointer<Panel>>::iterator
-        position = std::find(m_Panels.begin(), m_Panels.end(), panel);
+    Hydrogen::DynamicArray<Hydrogen::ReferencePointer<Panel>>::iterator position = std::find(m_Panels.begin(), m_Panels.end(), panel);
     if (position != m_Panels.end()) m_Panels.erase(position);
   }
 
@@ -46,8 +43,7 @@ class EditorApp : public Hydrogen::Application {
   Hydrogen::DynamicArray<Hydrogen::ReferencePointer<Panel>> m_Panels;
 };
 
-Hydrogen::ReferencePointer<Hydrogen::Application>
-Hydrogen::CreateApplication() {
+Hydrogen::ReferencePointer<Hydrogen::Application> Hydrogen::CreateApplication() {
   std::filesystem::current_path(WORKING_DIR);
   return Hydrogen::NewReferencePointer<EditorApp>();
 }

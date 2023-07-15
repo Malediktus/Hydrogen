@@ -5,8 +5,7 @@
 
 using namespace Hydrogen;
 
-ReferencePointer<Context> Context::Create(
-    const ReferencePointer<Hydrogen::RenderWindow>& window) {
+ReferencePointer<Context> Context::Create(const ReferencePointer<Hydrogen::RenderWindow>& window) {
   ZoneScoped;
 
   switch (Renderer::GetAPI()) {

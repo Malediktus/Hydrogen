@@ -8,8 +8,7 @@
 
 using namespace Hydrogen;
 
-MacOSWindow::MacOSWindow(const std::string& title, uint32_t width,
-                         uint32_t height) {
+MacOSWindow::MacOSWindow(const std::string& title, uint32_t width, uint32_t height) {
   HY_ASSERT(glfwInit(), "Init glfw");
 
   auto api = RenderWindow::ChooseRenderingAPI(glfwVulkanSupported());
@@ -32,9 +31,7 @@ MacOSWindow::MacOSWindow(const std::string& title, uint32_t width,
 
 MacOSWindow::~MacOSWindow() { glfwTerminate(); }
 
-void MacOSWindow::SetTitle(const std::string& title) {
-  glfwSetWindowTitle(m_Window, title.c_str());
-}
+void MacOSWindow::SetTitle(const std::string& title) { glfwSetWindowTitle(m_Window, title.c_str()); }
 
 uint32_t MacOSWindow::GetWidth() const {
   int width, height;
@@ -54,33 +51,19 @@ Vector2 MacOSWindow::GetViewportSize() const {
   return Vector2(width, height);
 }
 
-bool MacOSWindow::GetWindowClose() const {
-  return glfwWindowShouldClose(m_Window);
-}
+bool MacOSWindow::GetWindowClose() const { return glfwWindowShouldClose(m_Window); }
 
-bool MacOSWindow::GetKeyDown(KeyCode key) const {
-  return glfwGetKey(m_Window, (int)key) == GLFW_PRESS;
-}
+bool MacOSWindow::GetKeyDown(KeyCode key) const { return glfwGetKey(m_Window, (int)key) == GLFW_PRESS; }
 
-bool MacOSWindow::GetKey(KeyCode key) const {
-  return glfwGetKey(m_Window, (int)key) == GLFW_PRESS;
-}
+bool MacOSWindow::GetKey(KeyCode key) const { return glfwGetKey(m_Window, (int)key) == GLFW_PRESS; }
 
-bool MacOSWindow::GetKeyUp(KeyCode key) const {
-  return glfwGetKey(m_Window, (int)key) == GLFW_RELEASE;
-}
+bool MacOSWindow::GetKeyUp(KeyCode key) const { return glfwGetKey(m_Window, (int)key) == GLFW_RELEASE; }
 
-bool MacOSWindow::GetMouseKeyDown(KeyCode key) const {
-  return glfwGetMouseButton(m_Window, (int)key) == GLFW_PRESS;
-}
+bool MacOSWindow::GetMouseKeyDown(KeyCode key) const { return glfwGetMouseButton(m_Window, (int)key) == GLFW_PRESS; }
 
-bool MacOSWindow::GetMouseKey(KeyCode key) const {
-  return glfwGetMouseButton(m_Window, (int)key) == GLFW_PRESS;
-}
+bool MacOSWindow::GetMouseKey(KeyCode key) const { return glfwGetMouseButton(m_Window, (int)key) == GLFW_PRESS; }
 
-bool MacOSWindow::GetMouseKeyUp(KeyCode key) const {
-  return glfwGetMouseButton(m_Window, (int)key) == GLFW_RELEASE;
-}
+bool MacOSWindow::GetMouseKeyUp(KeyCode key) const { return glfwGetMouseButton(m_Window, (int)key) == GLFW_RELEASE; }
 
 uint32_t MacOSWindow::GetMouseX() const {
   double x, y;
@@ -122,13 +105,9 @@ void MacOSWindow::ImGuiNewFrame() { ImGui_ImplGlfw_NewFrame(); }
 
 void MacOSWindow::DestroyImGui() { ImGui_ImplGlfw_Shutdown(); }
 
-void MacOSWindow::SetupOpenglContext(int, int) {
-  glfwMakeContextCurrent(m_Window);
-}
+void MacOSWindow::SetupOpenglContext(int, int) { glfwMakeContextCurrent(m_Window); }
 
-void* MacOSWindow::GetWindowOpenGLProcAddress() {
-  return (void*)glfwGetProcAddress;
-}
+void* MacOSWindow::GetWindowOpenGLProcAddress() { return (void*)glfwGetProcAddress; }
 
 void MacOSWindow::UpdateImGuiPlatformWindows() {
   if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
@@ -155,9 +134,7 @@ const std::vector<const char*> MacOSWindow::GetVulkanWindowExtensions() {
 
 void* MacOSWindow::GetVulkanWindowSurface() {
   VkSurfaceKHR surface;
-  VkInstance instance =
-      Renderer::GetContext<Vulkan::VulkanContext>()->GetInstance();
-  VK_CHECK_ERROR(glfwCreateWindowSurface(instance, m_Window, NULL, &surface),
-                 "Failed to create window surface");
+  VkInstance instance = Renderer::GetContext<Vulkan::VulkanContext>()->GetInstance();
+  VK_CHECK_ERROR(glfwCreateWindowSurface(instance, m_Window, NULL, &surface), "Failed to create window surface");
   return (void*)surface;
 }

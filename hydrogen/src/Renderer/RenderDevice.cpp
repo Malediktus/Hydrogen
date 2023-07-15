@@ -5,14 +5,11 @@
 
 using namespace Hydrogen;
 
-ReferencePointer<RenderDevice> RenderDevice::Create(
-    std::function<std::size_t(const RenderDeviceProperties&)>
-        deviceRateFunction) {
+ReferencePointer<RenderDevice> RenderDevice::Create(std::function<std::size_t(const RenderDeviceProperties&)> deviceRateFunction) {
   ZoneScoped;
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
-      return NewReferencePointer<Vulkan::VulkanRenderDevice>(
-          deviceRateFunction);
+      return NewReferencePointer<Vulkan::VulkanRenderDevice>(deviceRateFunction);
     default:
       HY_ASSERT_CHECK(false,
                       "Invalid renderer API value returned from "

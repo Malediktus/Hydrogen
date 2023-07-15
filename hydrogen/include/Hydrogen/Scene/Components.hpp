@@ -37,8 +37,7 @@ struct TransformComponent {
   Matrix4 GetTransform() const {
     Matrix4 rotation = glm::toMat4(glm::quat(Rotation));
 
-    return glm::translate(Matrix4(1.0f), Translation) * rotation *
-           glm::scale(Matrix4(1.0f), Scale);
+    return glm::translate(Matrix4(1.0f), Translation) * rotation * glm::scale(Matrix4(1.0f), Scale);
   }
 };
 
@@ -51,8 +50,7 @@ struct MeshRendererComponent {
 };
 
 struct PointLightComponent {
-  PointLight _PointLight = {1.0f,          1.0f,          1.0f,
-                            Vector3(1.0f), Vector3(1.0f), Vector3(1.0f)};
+  PointLight _PointLight = {1.0f, 1.0f, 1.0f, Vector3(1.0f), Vector3(1.0f), Vector3(1.0f)};
 
   PointLightComponent() = default;
   // PointLightComponent(const PointLightComponent&) = default;
@@ -60,8 +58,7 @@ struct PointLightComponent {
 };
 
 struct SpotLightComponent {
-  SpotLight _SpotLight = {1.0f, 1.0f,          1.0f,          1.0f,
-                          1.0f, Vector3(1.0f), Vector3(1.0f), Vector3(1.0f)};
+  SpotLight _SpotLight = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, Vector3(1.0f), Vector3(1.0f), Vector3(1.0f)};
 
   SpotLightComponent() = default;
   SpotLightComponent(const SpotLightComponent&) = default;
@@ -69,12 +66,10 @@ struct SpotLightComponent {
 };
 
 struct DirectionalLightComponent {
-  DirectionalLight _DirectionalLight = {Vector3(1.0f), Vector3(1.0f),
-                                        Vector3(1.0f)};
+  DirectionalLight _DirectionalLight = {Vector3(1.0f), Vector3(1.0f), Vector3(1.0f)};
 
   DirectionalLightComponent() = default;
   DirectionalLightComponent(const DirectionalLightComponent&) = default;
-  DirectionalLightComponent(const DirectionalLight& directionalLight)
-      : _DirectionalLight(directionalLight) {}
+  DirectionalLightComponent(const DirectionalLight& directionalLight) : _DirectionalLight(directionalLight) {}
 };
 }  // namespace Hydrogen

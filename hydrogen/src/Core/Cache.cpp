@@ -27,10 +27,7 @@ CacheFile::CacheFile(const String& path, const String& content) {
   m_CacheCecksum = val;
 }
 
-bool CacheFile::CacheValid() {
-  return m_CacheCecksum.has_value() &&
-         m_ContentChecksum == m_CacheCecksum.value();
-}
+bool CacheFile::CacheValid() { return m_CacheCecksum.has_value() && m_ContentChecksum == m_CacheCecksum.value(); }
 
 void CacheFile::UpdateCacheChecksum() {
   String directory = DIRECTORY_FROM_PATH(m_CacheFilepath);

@@ -5,10 +5,8 @@
 namespace Hydrogen::Vulkan {
 class VulkanTexture2D : public Texture2D {
  public:
-  VulkanTexture2D(const int width, const int height,
-                  Texture2DStorageType storageType);
-  VulkanTexture2D(const int width, const int height, const void* data,
-                  Texture2DStorageType usageType);
+  VulkanTexture2D(const int width, const int height, Texture2DStorageType storageType);
+  VulkanTexture2D(const int width, const int height, const void* data, Texture2DStorageType usageType);
   virtual ~VulkanTexture2D();
 
   virtual uint32_t GetWidth() const override { return m_Width; }

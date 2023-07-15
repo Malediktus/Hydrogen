@@ -13,8 +13,7 @@ class VulkanSwapChain : public SwapChain {
   VulkanSwapChain();
   virtual ~VulkanSwapChain();
 
-  static SwapChainSupportDetails QuerySwapChainSupportDetails(
-      VkPhysicalDevice device);
+  static SwapChainSupportDetails QuerySwapChainSupportDetails(VkPhysicalDevice device);
 
  private:
 };

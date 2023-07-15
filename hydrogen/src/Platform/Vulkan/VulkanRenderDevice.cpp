@@ -8,15 +8,11 @@
 
 using namespace Hydrogen::Vulkan;
 
-VulkanRenderDevice::VulkanRenderDevice(
-    std::function<std::size_t(const RenderDeviceProperties&)>
-        deviceRateFunction) {
+VulkanRenderDevice::VulkanRenderDevice(std::function<std::size_t(const RenderDeviceProperties&)> deviceRateFunction) {
   ZoneScoped;
   auto instance = Renderer::GetContext<VulkanContext>()->GetInstance();
-  auto validationLayers =
-      Renderer::GetContext<VulkanContext>()->GetValidationLayers();
-  auto deviceExtensions =
-      Renderer::GetContext<VulkanContext>()->GetDeviceExtensions();
+  auto validationLayers = Renderer::GetContext<VulkanContext>()->GetValidationLayers();
+  auto deviceExtensions = Renderer::GetContext<VulkanContext>()->GetDeviceExtensions();
 
   // Physical device
   uint32_t deviceCount = 0;
@@ -32,16 +28,13 @@ VulkanRenderDevice::VulkanRenderDevice(
     auto graphicsQueueFamily = GetGraphicsQueueFamily(device);
     auto presentQueueFamily = GetPresentQueueFamily(device);
 
-    if (!graphicsQueueFamily.has_value() || !presentQueueFamily.has_value())
-      continue;
+    if (!graphicsQueueFamily.has_value() || !presentQueueFamily.has_value()) continue;
 
     if (!CheckDeviceExtensionSupport(device, deviceExtensions)) continue;
 
     bool swapChainAdequate = false;
-    SwapChainSupportDetails swapChainSupport =
-        VulkanSwapChain::QuerySwapChainSupportDetails(device);
-    swapChainAdequate = !swapChainSupport.Formats.empty() &&
-                        !swapChainSupport.PresentModes.empty();
+    SwapChainSupportDetails swapChainSupport = VulkanSwapChain::QuerySwapChainSupportDetails(device);
+    swapChainAdequate = !swapChainSupport.Formats.empty() && !swapChainSupport.PresentModes.empty();
 
     if (!swapChainAdequate) continue;
 
@@ -80,20 +73,15 @@ VulkanRenderDevice::VulkanRenderDevice(
     renderDeviceProperties.DeviceType = renderDeviceType;
     renderDeviceProperties.DeviceName = deviceProperties.deviceName;
     renderDeviceProperties.MemoryHeaps = DynamicArray<RenderDeviceHeap>();
-    renderDeviceProperties.MemoryHeaps.reserve(
-        deviceMemoryProperties.memoryHeapCount);
-    renderDeviceProperties.GeometryShaderSupport =
-        deviceFeatures.geometryShader;
-    renderDeviceProperties.TesslationShaderSupport =
-        deviceFeatures.tessellationShader;
+    renderDeviceProperties.MemoryHeaps.reserve(deviceMemoryProperties.memoryHeapCount);
+    renderDeviceProperties.GeometryShaderSupport = deviceFeatures.geometryShader;
+    renderDeviceProperties.TesslationShaderSupport = deviceFeatures.tessellationShader;
 
     for (uint32_t i = 0; i < deviceMemoryProperties.memoryHeapCount; i++) {
-      renderDeviceProperties.MemoryHeaps.push_back(
-          {deviceMemoryProperties.memoryHeaps->size});
+      renderDeviceProperties.MemoryHeaps.push_back({deviceMemoryProperties.memoryHeaps->size});
     }
 
-    candidates.insert(
-        std::make_pair(deviceRateFunction(renderDeviceProperties), device));
+    candidates.insert(std::make_pair(deviceRateFunction(renderDeviceProperties), device));
   }
 
   if (candidates.rbegin()->first > 0) {
@@ -122,8 +110,7 @@ VulkanRenderDevice::VulkanRenderDevice(
   createInfo.pQueueCreateInfos = &graphicsQueueCreateInfo;
   createInfo.queueCreateInfoCount = 1;
   createInfo.pEnabledFeatures = &deviceFeatures;
-  createInfo.enabledExtensionCount =
-      static_cast<uint32_t>(deviceExtensions.size());
+  createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
   createInfo.ppEnabledExtensionNames = deviceExtensions.data();
   createInfo.enabledLayerCount = 0;
   createInfo.ppEnabledLayerNames = nullptr;
@@ -132,12 +119,9 @@ VulkanRenderDevice::VulkanRenderDevice(
   createInfo.ppEnabledLayerNames = validationLayers.data();
 #endif
 
-  VK_CHECK_ERROR(
-      vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device),
-      "Failed to create vulkan device!");
+  VK_CHECK_ERROR(vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device), "Failed to create vulkan device!");
 
-  vkGetDeviceQueue(m_Device, m_GraphicsQueueFamily.value(), 0,
-                   &m_GraphicsQueue);
+  vkGetDeviceQueue(m_Device, m_GraphicsQueueFamily.value(), 0, &m_GraphicsQueue);
   vkGetDeviceQueue(m_Device, m_PresentQueueFamily.value(), 0, &m_PresentQueue);
 }
 
@@ -146,14 +130,12 @@ VulkanRenderDevice::~VulkanRenderDevice() {
   vkDestroyDevice(m_Device, nullptr);
 }
 
-VkQueueFamily VulkanRenderDevice::GetGraphicsQueueFamily(
-    VkPhysicalDevice device) {
+VkQueueFamily VulkanRenderDevice::GetGraphicsQueueFamily(VkPhysicalDevice device) {
   uint32_t queueFamilyCount = 0;
   vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
 
   DynamicArray<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount,
-                                           queueFamilies.data());
+  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
   int i = 0;
   for (const auto& queueFamily : queueFamilies) {
@@ -167,19 +149,13 @@ VkQueueFamily VulkanRenderDevice::GetGraphicsQueueFamily(
   return VkQueueFamily();
 }
 
-VkQueueFamily VulkanRenderDevice::GetPresentQueueFamily(
-    VkPhysicalDevice device) {
+VkQueueFamily VulkanRenderDevice::GetPresentQueueFamily(VkPhysicalDevice device) {
   uint32_t queueFamilyCount = 0;
   vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
 
   for (uint32_t i = 0; i < queueFamilyCount; i++) {
     VkBool32 presentSupport = false;
-    vkGetPhysicalDeviceSurfaceSupportKHR(
-        device, i,
-        static_cast<VkSurfaceKHR>(Renderer::GetContext<VulkanContext>()
-                                      ->GetWindow()
-                                      ->GetVulkanWindowSurface()),
-        &presentSupport);
+    vkGetPhysicalDeviceSurfaceSupportKHR(device, i, static_cast<VkSurfaceKHR>(Renderer::GetContext<VulkanContext>()->GetWindow()->GetVulkanWindowSurface()), &presentSupport);
 
     if (presentSupport) {
       return i;
@@ -189,18 +165,14 @@ VkQueueFamily VulkanRenderDevice::GetPresentQueueFamily(
   return VkQueueFamily();
 }
 
-bool VulkanRenderDevice::CheckDeviceExtensionSupport(
-    VkPhysicalDevice device, const std::vector<const char*>& deviceExtensions) {
+bool VulkanRenderDevice::CheckDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char*>& deviceExtensions) {
   uint32_t extensionCount;
-  vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount,
-                                       nullptr);
+  vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
 
   std::vector<VkExtensionProperties> availableExtensions(extensionCount);
-  vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount,
-                                       availableExtensions.data());
+  vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
 
-  std::set<String> requiredExtensions(deviceExtensions.begin(),
-                                      deviceExtensions.end());
+  std::set<String> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
 
   for (const auto& extension : availableExtensions) {
     requiredExtensions.erase(extension.extensionName);

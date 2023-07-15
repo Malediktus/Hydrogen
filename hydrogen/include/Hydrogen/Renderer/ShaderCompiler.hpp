@@ -7,32 +7,13 @@
 
 namespace Hydrogen {
 enum class ShaderLanguage { GLSL = 0, HLSL = 1 };
-enum class ShaderClient {
-  Vulkan_1_0 = 0,
-  Vulkan_1_1 = 1,
-  Vulkan_1_2 = 2,
-  Vulkan_1_3 = 3
-};
-enum class SpriVVersion {
-  SpriV_1_0 = 0,
-  SpriV_1_1 = 1,
-  SpriV_1_2 = 2,
-  SpriV_1_3 = 3,
-  SpriV_1_4 = 4,
-  SpriV_1_5 = 5,
-  SpriV_1_6 = 6
-};
-enum class ShaderStage {
-  VertexShader = 0,
-  PixelShader = 1,
-  GeometryShader = 2
-};
+enum class ShaderClient { Vulkan_1_0 = 0, Vulkan_1_1 = 1, Vulkan_1_2 = 2, Vulkan_1_3 = 3 };
+enum class SpriVVersion { SpriV_1_0 = 0, SpriV_1_1 = 1, SpriV_1_2 = 2, SpriV_1_3 = 3, SpriV_1_4 = 4, SpriV_1_5 = 5, SpriV_1_6 = 6 };
+enum class ShaderStage { VertexShader = 0, PixelShader = 1, GeometryShader = 2 };
 
 class ShaderCompiler {
  public:
-  ShaderCompiler(ShaderLanguage frontEnd, ShaderClient client,
-                 SpriVVersion spirvVersion, ShaderStage stage,
-                 uint32_t version);
+  ShaderCompiler(ShaderLanguage frontEnd, ShaderClient client, SpriVVersion spirvVersion, ShaderStage stage, uint32_t version);
   ~ShaderCompiler();
 
   void AddShader(const String& source);
