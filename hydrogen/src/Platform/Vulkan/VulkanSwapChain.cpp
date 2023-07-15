@@ -7,7 +7,8 @@
 
 using namespace Hydrogen::Vulkan;
 
-VulkanSwapChain::VulkanSwapChain(ReferencePointer<RenderDevice> renderDevice, bool verticalSync) : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)) {
+VulkanSwapChain::VulkanSwapChain(const ReferencePointer<RenderDevice>& renderDevice, bool verticalSync)
+    : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)) {
   ZoneScoped;
 
   // Swap chain

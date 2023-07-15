@@ -10,6 +10,6 @@ class SwapChain {
  public:
   virtual ~SwapChain() = default;
 
-  static ReferencePointer<SwapChain> Create(ReferencePointer<RenderDevice> renderDevice, bool verticalSync);
+  static ReferencePointer<SwapChain> Create(const ReferencePointer<RenderDevice>& renderDevice, bool verticalSync);
 };
 }  // namespace Hydrogen

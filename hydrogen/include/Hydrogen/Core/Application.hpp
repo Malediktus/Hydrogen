@@ -3,6 +3,7 @@
 #include "../Event/EventManager.hpp"
 #include "../Math/Math.hpp"
 #include "../Renderer/Context.hpp"
+#include "../Renderer/RenderPass.hpp"
 #include "../Renderer/Renderer.hpp"
 #include "../Scene/Scene.hpp"
 #include "Logger.hpp"
@@ -40,6 +41,7 @@ class Application {
   ReferencePointer<Context> m_RenderContext;
   ReferencePointer<RenderDevice> m_RenderDevice;
   ReferencePointer<SwapChain> m_SwapChain;
+  ReferencePointer<RenderPass> m_RenderPass;
 };
 
 extern ReferencePointer<Application> CreateApplication();

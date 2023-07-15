@@ -13,7 +13,7 @@ struct SwapChainSupportDetails {
 
 class VulkanSwapChain : public SwapChain {
  public:
-  VulkanSwapChain(ReferencePointer<RenderDevice> renderDevice, bool verticalSync);
+  VulkanSwapChain(const ReferencePointer<RenderDevice>& renderDevice, bool verticalSync);
   virtual ~VulkanSwapChain();
 
   static SwapChainSupportDetails QuerySwapChainSupportDetails(VkPhysicalDevice device);

@@ -47,6 +47,7 @@ void Application::Run() {
   });
 
   m_SwapChain = SwapChain::Create(m_RenderDevice, true);
+  m_RenderPass = RenderPass::Create(m_RenderDevice, m_SwapChain);
 
   RenderCommand::Init();
   RenderCommand::ConfigureAntiAliasing(true);
