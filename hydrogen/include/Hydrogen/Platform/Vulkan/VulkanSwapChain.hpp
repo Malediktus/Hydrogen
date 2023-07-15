@@ -10,11 +10,16 @@ struct SwapChainSupportDetails {
 
 class VulkanSwapChain : public SwapChain {
  public:
-  VulkanSwapChain();
+  VulkanSwapChain(bool verticalSync);
   virtual ~VulkanSwapChain();
 
   static SwapChainSupportDetails QuerySwapChainSupportDetails(VkPhysicalDevice device);
 
  private:
+  VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const DynamicArray<VkSurfaceFormatKHR>& availableFormats);
+  VkPresentModeKHR ChooseSwapPresentMode(const DynamicArray<VkPresentModeKHR>& availablePresentModes, bool prefereVerticalSync);
+  VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+
+  VkSwapchainKHR m_SwapChain;
 };
 }  // namespace Hydrogen::Vulkan

@@ -46,7 +46,7 @@ void Application::Run() {
   });
   Renderer::SetRenderDevice(m_RenderDevice);
 
-  m_SwapChain = SwapChain::Create();
+  m_SwapChain = SwapChain::Create(true);
   Renderer::SetSwapChain(m_SwapChain);
 
   RenderCommand::Init();

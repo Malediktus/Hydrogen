@@ -9,6 +9,6 @@ class SwapChain {
  public:
   virtual ~SwapChain() = default;
 
-  static ReferencePointer<SwapChain> Create();
+  static ReferencePointer<SwapChain> Create(bool verticalSync);
 };
 }  // namespace Hydrogen

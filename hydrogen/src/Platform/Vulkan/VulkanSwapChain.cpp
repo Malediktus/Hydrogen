@@ -1,4 +1,5 @@
 #include <Hydrogen/Core/Logger.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
@@ -6,9 +7,56 @@
 
 using namespace Hydrogen::Vulkan;
 
-VulkanSwapChain::VulkanSwapChain() { ZoneScoped; }
+VulkanSwapChain::VulkanSwapChain(bool verticalSync) {
+  ZoneScoped;
 
-VulkanSwapChain::~VulkanSwapChain() { ZoneScoped; }
+  SwapChainSupportDetails swapChainSupport = QuerySwapChainSupportDetails(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetPhysicalDevice());
+
+  VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.Formats);
+  VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.PresentModes, verticalSync);
+  VkExtent2D extent = ChooseSwapExtent(swapChainSupport.Capabilities);
+
+  uint32_t imageCount = swapChainSupport.Capabilities.minImageCount + 1;
+  if (swapChainSupport.Capabilities.maxImageCount > 0 && imageCount > swapChainSupport.Capabilities.maxImageCount) {
+    imageCount = swapChainSupport.Capabilities.maxImageCount;
+  }
+
+  VkSwapchainCreateInfoKHR createInfo{};
+  createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+  createInfo.surface = static_cast<VkSurfaceKHR>(Renderer::GetContext<VulkanContext>()->GetWindow()->GetVulkanWindowSurface());
+  createInfo.minImageCount = imageCount;
+  createInfo.imageFormat = surfaceFormat.format;
+  createInfo.imageColorSpace = surfaceFormat.colorSpace;
+  createInfo.imageExtent = extent;
+  createInfo.imageArrayLayers = 1;
+  createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+  createInfo.preTransform = swapChainSupport.Capabilities.currentTransform;
+  createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+  createInfo.presentMode = presentMode;
+  createInfo.clipped = VK_TRUE;
+  createInfo.oldSwapchain = VK_NULL_HANDLE;
+
+  VkQueueFamily graphicsFamily = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetGraphicsQueueFamily();
+  VkQueueFamily presentFamily = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetPresentQueueFamily();
+  uint32_t queueFamilyIndices[] = {graphicsFamily.value(), presentFamily.value()};
+
+  if (graphicsFamily != presentFamily) {
+    createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+    createInfo.queueFamilyIndexCount = 2;
+    createInfo.pQueueFamilyIndices = queueFamilyIndices;
+  } else {
+    createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    createInfo.queueFamilyIndexCount = 0;      // Optional
+    createInfo.pQueueFamilyIndices = nullptr;  // Optional
+  }
+
+  VK_CHECK_ERROR(vkCreateSwapchainKHR(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &createInfo, nullptr, &m_SwapChain), "Failed to create vulkan swap chain!");
+}
+
+VulkanSwapChain::~VulkanSwapChain() {
+  ZoneScoped;
+  vkDestroySwapchainKHR(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_SwapChain, nullptr);
+}
 
 SwapChainSupportDetails VulkanSwapChain::QuerySwapChainSupportDetails(VkPhysicalDevice device) {
   SwapChainSupportDetails details;
@@ -33,4 +81,39 @@ SwapChainSupportDetails VulkanSwapChain::QuerySwapChainSupportDetails(VkPhysical
   }
 
   return details;
+}
+
+VkSurfaceFormatKHR VulkanSwapChain::ChooseSwapSurfaceFormat(const DynamicArray<VkSurfaceFormatKHR>& availableFormats) {
+  for (const auto& availableFormat : availableFormats) {
+    if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+      return availableFormat;
+    }
+  }
+
+  return availableFormats[0];
+}
+
+VkPresentModeKHR VulkanSwapChain::ChooseSwapPresentMode(const DynamicArray<VkPresentModeKHR>& availablePresentModes, bool prefereVerticalSync) {
+  for (const auto& availablePresentMode : availablePresentModes) {
+    if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR && !prefereVerticalSync) {
+      return availablePresentMode;
+    }
+  }
+
+  return VK_PRESENT_MODE_FIFO_KHR;
+}
+
+VkExtent2D VulkanSwapChain::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) {
+  if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+    return capabilities.currentExtent;
+  } else {
+    Vector2 viewportSize = Renderer::GetContext<VulkanContext>()->GetWindow()->GetViewportSize();
+
+    VkExtent2D actualExtent = {static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y)};
+
+    actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+    actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+
+    return actualExtent;
+  }
 }

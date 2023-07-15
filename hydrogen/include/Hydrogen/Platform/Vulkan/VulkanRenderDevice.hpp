@@ -9,9 +9,12 @@ class VulkanRenderDevice : public RenderDevice {
   VulkanRenderDevice(std::function<std::size_t(const RenderDeviceProperties&)> deviceRateFunction);
   virtual ~VulkanRenderDevice();
 
+  VkPhysicalDevice GetPhysicalDevice() { return m_PhysicalDevice; }
   VkDevice GetDevice() { return m_Device; }
   VkQueue GetGraphicsQueue() { return m_GraphicsQueue; }
   VkQueue GetPresentQueue() { return m_PresentQueue; }
+  VkQueueFamily GetGraphicsQueueFamily() { return m_GraphicsQueueFamily; }
+  VkQueueFamily GetPresentQueueFamily() { return m_PresentQueueFamily; }
 
  private:
   VkQueueFamily GetGraphicsQueueFamily(VkPhysicalDevice device);
