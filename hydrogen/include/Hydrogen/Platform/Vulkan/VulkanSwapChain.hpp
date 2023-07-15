@@ -23,7 +23,9 @@ class VulkanSwapChain : public SwapChain {
   VkPresentModeKHR ChooseSwapPresentMode(const DynamicArray<VkPresentModeKHR>& availablePresentModes, bool prefereVerticalSync);
   VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
-  ReferencePointer<VulkanRenderDevice> m_RenderDevice;
   VkSwapchainKHR m_SwapChain;
+  VkExtent2D m_Extent;
+  ReferencePointer<VulkanRenderDevice> m_RenderDevice;
+  DynamicArray<VkImage> m_SwapChainImages;
 };
 }  // namespace Hydrogen::Vulkan

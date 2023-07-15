@@ -14,7 +14,7 @@ VulkanSwapChain::VulkanSwapChain(ReferencePointer<RenderDevice> renderDevice, bo
 
   VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.Formats);
   VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.PresentModes, verticalSync);
-  VkExtent2D extent = ChooseSwapExtent(swapChainSupport.Capabilities);
+  m_Extent = ChooseSwapExtent(swapChainSupport.Capabilities);
 
   uint32_t imageCount = swapChainSupport.Capabilities.minImageCount + 1;
   if (swapChainSupport.Capabilities.maxImageCount > 0 && imageCount > swapChainSupport.Capabilities.maxImageCount) {
@@ -27,7 +27,7 @@ VulkanSwapChain::VulkanSwapChain(ReferencePointer<RenderDevice> renderDevice, bo
   createInfo.minImageCount = imageCount;
   createInfo.imageFormat = surfaceFormat.format;
   createInfo.imageColorSpace = surfaceFormat.colorSpace;
-  createInfo.imageExtent = extent;
+  createInfo.imageExtent = m_Extent;
   createInfo.imageArrayLayers = 1;
   createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
   createInfo.preTransform = swapChainSupport.Capabilities.currentTransform;
@@ -49,6 +49,10 @@ VulkanSwapChain::VulkanSwapChain(ReferencePointer<RenderDevice> renderDevice, bo
     createInfo.queueFamilyIndexCount = 0;      // Optional
     createInfo.pQueueFamilyIndices = nullptr;  // Optional
   }
+
+  vkGetSwapchainImagesKHR(m_RenderDevice->GetDevice(), m_SwapChain, &imageCount, nullptr);
+  m_SwapChainImages.resize(imageCount);
+  vkGetSwapchainImagesKHR(m_RenderDevice->GetDevice(), m_SwapChain, &imageCount, m_SwapChainImages.data());
 
   VK_CHECK_ERROR(vkCreateSwapchainKHR(m_RenderDevice->GetDevice(), &createInfo, nullptr, &m_SwapChain), "Failed to create vulkan swap chain!");
 }
