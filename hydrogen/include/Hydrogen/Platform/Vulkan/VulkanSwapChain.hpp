@@ -25,7 +25,9 @@ class VulkanSwapChain : public SwapChain {
 
   VkSwapchainKHR m_SwapChain;
   VkExtent2D m_Extent;
+  VkFormat m_SwapChainImageFormat;
   ReferencePointer<VulkanRenderDevice> m_RenderDevice;
   DynamicArray<VkImage> m_SwapChainImages;
+  DynamicArray<VkImageView> m_SwapChainImageViews;
 };
 }  // namespace Hydrogen::Vulkan

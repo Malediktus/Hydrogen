@@ -10,11 +10,13 @@ using namespace Hydrogen::Vulkan;
 VulkanSwapChain::VulkanSwapChain(ReferencePointer<RenderDevice> renderDevice, bool verticalSync) : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)) {
   ZoneScoped;
 
+  // Swap chain
   SwapChainSupportDetails swapChainSupport = QuerySwapChainSupportDetails(m_RenderDevice->GetPhysicalDevice());
 
   VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.Formats);
   VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.PresentModes, verticalSync);
   m_Extent = ChooseSwapExtent(swapChainSupport.Capabilities);
+  m_SwapChainImageFormat = surfaceFormat.format;
 
   uint32_t imageCount = swapChainSupport.Capabilities.minImageCount + 1;
   if (swapChainSupport.Capabilities.maxImageCount > 0 && imageCount > swapChainSupport.Capabilities.maxImageCount) {
@@ -50,15 +52,41 @@ VulkanSwapChain::VulkanSwapChain(ReferencePointer<RenderDevice> renderDevice, bo
     createInfo.pQueueFamilyIndices = nullptr;  // Optional
   }
 
+  VK_CHECK_ERROR(vkCreateSwapchainKHR(m_RenderDevice->GetDevice(), &createInfo, nullptr, &m_SwapChain), "Failed to create vulkan swap chain!");
+
   vkGetSwapchainImagesKHR(m_RenderDevice->GetDevice(), m_SwapChain, &imageCount, nullptr);
   m_SwapChainImages.resize(imageCount);
   vkGetSwapchainImagesKHR(m_RenderDevice->GetDevice(), m_SwapChain, &imageCount, m_SwapChainImages.data());
 
-  VK_CHECK_ERROR(vkCreateSwapchainKHR(m_RenderDevice->GetDevice(), &createInfo, nullptr, &m_SwapChain), "Failed to create vulkan swap chain!");
+  // Image views
+  m_SwapChainImageViews.resize(m_SwapChainImages.size());
+  for (size_t i = 0; i < m_SwapChainImages.size(); i++) {
+    VkImageViewCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    createInfo.image = m_SwapChainImages[i];
+    createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    createInfo.format = m_SwapChainImageFormat;
+    createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+    createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+    createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+    createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+    createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    createInfo.subresourceRange.baseMipLevel = 0;
+    createInfo.subresourceRange.levelCount = 1;
+    createInfo.subresourceRange.baseArrayLayer = 0;
+    createInfo.subresourceRange.layerCount = 1;
+
+    VK_CHECK_ERROR(vkCreateImageView(m_RenderDevice->GetDevice(), &createInfo, nullptr, &m_SwapChainImageViews[i]), "Failed to create vulkan image view!");
+  }
 }
 
 VulkanSwapChain::~VulkanSwapChain() {
   ZoneScoped;
+
+  for (auto imageView : m_SwapChainImageViews) {
+    vkDestroyImageView(m_RenderDevice->GetDevice(), imageView, nullptr);
+  }
+
   vkDestroySwapchainKHR(m_RenderDevice->GetDevice(), m_SwapChain, nullptr);
 }
 
