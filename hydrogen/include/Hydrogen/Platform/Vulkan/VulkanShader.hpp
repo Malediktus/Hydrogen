@@ -15,7 +15,7 @@ typedef unsigned int GLenum;
 namespace Hydrogen::Vulkan {
 class VulkanShader : public Shader {
  public:
-  VulkanShader(ReferencePointer<RenderDevice> renderDevice, const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<RenderPass>& renderPass, const String& name,
+  VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<RenderPass>& renderPass, const String& name,
                const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc, const DynamicArray<uint32_t>& geometrySrc);
   virtual ~VulkanShader();
 

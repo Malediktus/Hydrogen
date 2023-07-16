@@ -50,9 +50,8 @@ void Application::Run() {
 
   m_SwapChain = SwapChain::Create(m_RenderDevice, true);
   m_RenderPass = RenderPass::Create(m_RenderDevice, m_SwapChain);
-  auto shaderAsset = AssetManager::Get<ShaderAsset>("assets/Raw.glsl");
-  auto shader = Shader::Create(m_RenderDevice, m_SwapChain, m_RenderPass, shaderAsset->GetName(), shaderAsset->GetVertexShader(), shaderAsset->GetPixelShader(),
-                               shaderAsset->GetGeometryShader());
+  m_Shader = AssetManager::Get<ShaderAsset>("assets/Raw.glsl")->CreateShader(m_RenderDevice, m_SwapChain, m_RenderPass);
+  m_Framebuffer = Framebuffer::Create(m_RenderDevice, m_SwapChain, m_RenderPass);
 
   RenderCommand::Init();
   RenderCommand::ConfigureAntiAliasing(true);

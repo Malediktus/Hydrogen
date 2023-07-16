@@ -32,7 +32,7 @@ class ShaderAsset : public Asset {
           currentShader = &m_VertexShader;
           stage = ShaderStage::VertexShader;
         } else if (dirEntry.path().extension().string() == ".frag") {
-          currentShader = &m_PixelShader;
+          currentShader = &m_FragmentShader;
           stage = ShaderStage::PixelShader;
         } else if (dirEntry.path().extension().string() == ".geo") {
           currentShader = &m_GeometryShader;
@@ -99,8 +99,13 @@ class ShaderAsset : public Asset {
     HY_LOG_INFO("Finished loading shader asset '{}'!", filepath);
   }
 
+  ReferencePointer<Shader> CreateShader(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
+                                        const ReferencePointer<RenderPass>& renderPass) {
+    return Shader::Create(renderDevice, swapChain, renderPass, m_Name, m_VertexShader, m_FragmentShader, m_GeometryShader);
+  }
+
   const DynamicArray<uint32_t>& GetVertexShader() { return m_VertexShader; }
-  const DynamicArray<uint32_t>& GetPixelShader() { return m_PixelShader; }
+  const DynamicArray<uint32_t>& GetPixelShader() { return m_FragmentShader; }
   const DynamicArray<uint32_t>& GetGeometryShader() { return m_GeometryShader; }
   const String& GetName() { return m_Name; }
 
@@ -113,7 +118,7 @@ class ShaderAsset : public Asset {
 
  private:
   DynamicArray<uint32_t> m_VertexShader;
-  DynamicArray<uint32_t> m_PixelShader;
+  DynamicArray<uint32_t> m_FragmentShader;
   DynamicArray<uint32_t> m_GeometryShader;
   String m_Name;
 };

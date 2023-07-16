@@ -42,6 +42,8 @@ class Application {
   ReferencePointer<RenderDevice> m_RenderDevice;
   ReferencePointer<SwapChain> m_SwapChain;
   ReferencePointer<RenderPass> m_RenderPass;
+  ReferencePointer<Shader> m_Shader;
+  ReferencePointer<Framebuffer> m_Framebuffer;
 };
 
 extern ReferencePointer<Application> CreateApplication();

@@ -5,11 +5,12 @@
 
 using namespace Hydrogen;
 
-ReferencePointer<Framebuffer> Framebuffer::Create(const ReferencePointer<RenderWindow>& window) {
+ReferencePointer<Framebuffer> Framebuffer::Create(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
+                                                  const ReferencePointer<RenderPass>& renderPass) {
   ZoneScoped;
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
-      return NewReferencePointer<Vulkan::VulkanFramebuffer>(window);
+      return NewReferencePointer<Vulkan::VulkanFramebuffer>(renderDevice, swapChain, renderPass);
     default:
       HY_ASSERT_CHECK(false,
                       "Invalid renderer API value returned from "

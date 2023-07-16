@@ -21,6 +21,8 @@ class VulkanSwapChain : public SwapChain {
   VkSwapchainKHR GetSwapChain() { return m_SwapChain; }
   VkExtent2D GetExtent() { return m_Extent; }
   VkFormat GetSwapChainImageFormat() { return m_SwapChainImageFormat; }
+  const DynamicArray<VkImage>& GetImages() { return m_SwapChainImages; }
+  const DynamicArray<VkImageView>& GetImageViews() { return m_SwapChainImageViews; }
 
  private:
   VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const DynamicArray<VkSurfaceFormatKHR>& availableFormats);

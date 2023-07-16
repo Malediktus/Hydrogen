@@ -20,16 +20,16 @@ class Shader {
 
   virtual const String& GetName() const = 0;
 
-  static ReferencePointer<Shader> Create(ReferencePointer<RenderDevice> renderDevice, const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<RenderPass>& renderPass,
-                                         const String& name, const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc,
-                                         const DynamicArray<uint32_t>& geometrySrc);
+  static ReferencePointer<Shader> Create(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
+                                         const ReferencePointer<RenderPass>& renderPass, const String& name, const DynamicArray<uint32_t>& vertexSrc,
+                                         const DynamicArray<uint32_t>& fragmentSrc, const DynamicArray<uint32_t>& geometrySrc);
 };
 
 class ShaderLibrary {
  public:
   void Add(const String& name, const ReferencePointer<Shader>& shader);
   void Add(const ReferencePointer<Shader>& shader);
-  ReferencePointer<Shader> Load(ReferencePointer<RenderDevice> renderDevice, const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<RenderPass>& renderPass,
+  ReferencePointer<Shader> Load(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<RenderPass>& renderPass,
                                 const String& name, const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc, const DynamicArray<uint32_t>& geometrySrc);
 
   ReferencePointer<Shader> Get(const String& name);
