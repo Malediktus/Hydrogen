@@ -56,6 +56,6 @@ void VulkanRendererAPI::SetupImGui() {
 
 void VulkanRendererAPI::ImGuiNewFrame() {}
 
-void VulkanRendererAPI::ImGuiRenderDrawData(ImDrawData* drawData) {}
+void VulkanRendererAPI::ImGuiRenderDrawData(ImDrawData* drawData) { (void)drawData; }
 
 void VulkanRendererAPI::DestroyImGui() {}
