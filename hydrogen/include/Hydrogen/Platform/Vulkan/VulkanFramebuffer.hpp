@@ -11,6 +11,8 @@ class VulkanFramebuffer : public Framebuffer {
   VulkanFramebuffer(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<RenderPass>& renderPass);
   virtual ~VulkanFramebuffer();
 
+  const DynamicArray<VkFramebuffer>& GetFramebuffers() { return m_SwapChainFramebuffers; }
+
  private:
   ReferencePointer<VulkanRenderDevice> m_RenderDevice;
   ReferencePointer<VulkanSwapChain> m_SwapChain;

@@ -23,6 +23,7 @@ class VulkanShader : public Shader {
   virtual void Unbind() const override;
 
   virtual const String& GetName() const override { return m_Name; }
+  VkPipeline GetPipeline() { return m_Pipeline; }
 
  private:
   String m_Name;

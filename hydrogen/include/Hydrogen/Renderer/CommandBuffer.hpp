@@ -14,7 +14,8 @@ class CommandBuffer {
  public:
   virtual ~CommandBuffer() = default;
 
-  virtual void Begin(const ReferencePointer<RenderPass>& renderPass, const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<Framebuffer>& framebuffer) = 0;
+  virtual void Begin(const ReferencePointer<RenderPass>& renderPass, const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<Framebuffer>& framebuffer,
+                     Vector4 clearColor, uint32_t imageIndex) = 0;
   virtual void End() = 0;
 
   virtual void CmdDraw(const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<Shader>& shader) = 0;
