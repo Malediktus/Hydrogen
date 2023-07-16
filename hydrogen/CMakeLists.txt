@@ -35,6 +35,8 @@ set(HEADER_LIST
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/SwapChain.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/RenderPass.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/CommandBuffer.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/Semaphore.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/Fence.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanBuffer.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanContext.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanFramebuffer.hpp"
@@ -46,6 +48,8 @@ set(HEADER_LIST
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanVertexArray.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanRenderPass.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanSemaphore.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanFence.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/MacOS/MacOSWindow.hpp")
 
 set(SOURCE_LIST
@@ -73,6 +77,8 @@ set(SOURCE_LIST
     src/Renderer/SwapChain.cpp
     src/Renderer/RenderPass.cpp
     src/Renderer/CommandBuffer.cpp
+    src/Renderer/Semaphore.cpp
+    src/Renderer/Fence.cpp
     src/Platform/Vulkan/VulkanBuffer.cpp
     src/Platform/Vulkan/VulkanContext.cpp
     src/Platform/Vulkan/VulkanFramebuffer.cpp
@@ -84,6 +90,8 @@ set(SOURCE_LIST
     src/Platform/Vulkan/VulkanVertexArray.cpp
     src/Platform/Vulkan/VulkanRenderPass.cpp
     src/Platform/Vulkan/VulkanCommandBuffer.cpp
+    src/Platform/Vulkan/VulkanSemaphore.cpp
+    src/Platform/Vulkan/VulkanFence.cpp
     src/Platform/MacOS/MacOSWindow.cpp)
 
 add_library(Hydrogen ${SOURCE_LIST} ${HEADER_LIST})
