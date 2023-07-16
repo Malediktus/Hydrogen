@@ -25,11 +25,11 @@ void Application::Run() {
   engineProject.ProjectName = "Hydrogen Engine";
   engineProject.ProjectVersion = glm::vec3(1, 0, 0);
 
-  m_RenderContext = Context::Create(AppWindow);
-  Renderer::SetContext(m_RenderContext);
-  m_RenderContext->Init(clientProject, engineProject);
+  auto renderContext = Context::Create(AppWindow);
+  Renderer::SetContext(renderContext);
+  renderContext->Init(clientProject, engineProject);
 
-  m_RenderDevice = RenderDevice::Create([](const RenderDeviceProperties& deviceProperties) -> std::size_t {
+  auto renderDevice = RenderDevice::Create([](const RenderDeviceProperties& deviceProperties) -> std::size_t {
     size_t result = 0;
 
     switch (deviceProperties.DeviceType) {
@@ -47,10 +47,7 @@ void Application::Run() {
     return result;
   });
 
-  m_SwapChain = SwapChain::Create(m_RenderDevice, true);
-  m_RenderPass = RenderPass::Create(m_RenderDevice, m_SwapChain);
-  m_Shader = AssetManager::Get<ShaderAsset>("assets/Raw.glsl")->CreateShader(m_RenderDevice, m_SwapChain, m_RenderPass);
-  m_Framebuffer = Framebuffer::Create(m_RenderDevice, m_SwapChain, m_RenderPass);
+  auto renderer = NewReferencePointer<Renderer>(renderDevice);
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -94,6 +91,8 @@ void Application::Run() {
   while (!AppWindow->GetWindowClose()) {
     TaskManager::Update();
     OnUpdate();
+    renderer->Render();
+
     AppWindow->ImGuiNewFrame();
     // ImGui::NewFrame();
     OnImGuiDraw();
@@ -111,6 +110,8 @@ void Application::Run() {
   // RenderCommand::GetRendererAPI()->DestroyImGui();
   AppWindow->DestroyImGui();
   ImGui::DestroyContext();
+
+  renderDevice->WaitForIdle();
 
   TaskManager::Shutdown();
   Renderer::SetContext(nullptr);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../Renderer/CommandBuffer.hpp"
+#include "VulkanFence.hpp"
 #include "VulkanFramebuffer.hpp"
 #include "VulkanRenderDevice.hpp"
 #include "VulkanRenderPass.hpp"
@@ -13,11 +14,15 @@ class VulkanCommandBuffer : public CommandBuffer {
   VulkanCommandBuffer(const ReferencePointer<RenderDevice>& renderDevice);
   virtual ~VulkanCommandBuffer();
 
+  virtual void Reset() override;
   virtual void Begin(const ReferencePointer<RenderPass>& renderPass, const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<Framebuffer>& framebuffer,
                      Vector4 clearColor, uint32_t imageIndex) override;
   virtual void End() override;
 
   virtual void CmdDraw(const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<Shader>& shader) override;
+  virtual void SubmitGraphicsQueue(const ReferencePointer<Semaphore>& imageAvailableSemaphore, const ReferencePointer<Semaphore>& renderFinishedSemaphore,
+                                   const ReferencePointer<Fence>& inFlightFence) override;
+  virtual void PresentQueue(const ReferencePointer<Semaphore>& renderFinishedSemaphore, const ReferencePointer<SwapChain>& swapChain, uint32_t* imageIndex) override;
 
  private:
   ReferencePointer<VulkanRenderDevice> m_RenderDevice;

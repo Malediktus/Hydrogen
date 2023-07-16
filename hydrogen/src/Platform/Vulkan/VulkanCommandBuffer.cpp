@@ -18,6 +18,8 @@ VulkanCommandBuffer::VulkanCommandBuffer(const ReferencePointer<RenderDevice>& r
 
 VulkanCommandBuffer::~VulkanCommandBuffer() {}
 
+void VulkanCommandBuffer::Reset() { vkResetCommandBuffer(m_CommandBuffer, 0); }
+
 void VulkanCommandBuffer::Begin(const ReferencePointer<RenderPass>& renderPass, const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<Framebuffer>& framebuffer,
                                 Vector4 clearColor, uint32_t imageIndex) {
   VkCommandBufferBeginInfo beginInfo{};
@@ -66,4 +68,42 @@ void VulkanCommandBuffer::CmdDraw(const ReferencePointer<SwapChain>& swapChain, 
   vkCmdSetScissor(m_CommandBuffer, 0, 1, &scissor);
 
   vkCmdDraw(m_CommandBuffer, 3, 1, 0, 0);
+}
+
+void VulkanCommandBuffer::SubmitGraphicsQueue(const ReferencePointer<Semaphore>& imageAvailableSemaphore, const ReferencePointer<Semaphore>& renderFinishedSemaphore,
+                                              const ReferencePointer<Fence>& inFlightFence) {
+  VkSubmitInfo submitInfo{};
+  submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+  VkSemaphore waitSemaphores[] = {std::dynamic_pointer_cast<VulkanSemaphore>(imageAvailableSemaphore)->GetSemaphore()};
+  VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+  submitInfo.waitSemaphoreCount = 1;
+  submitInfo.pWaitSemaphores = waitSemaphores;
+  submitInfo.pWaitDstStageMask = waitStages;
+  submitInfo.commandBufferCount = 1;
+  submitInfo.pCommandBuffers = &m_CommandBuffer;
+
+  VkSemaphore signalSemaphores[] = {std::dynamic_pointer_cast<VulkanSemaphore>(renderFinishedSemaphore)->GetSemaphore()};
+  submitInfo.signalSemaphoreCount = 1;
+  submitInfo.pSignalSemaphores = signalSemaphores;
+
+  VK_CHECK_ERROR(vkQueueSubmit(m_RenderDevice->GetGraphicsQueue(), 1, &submitInfo, std::dynamic_pointer_cast<VulkanFence>(inFlightFence)->GetFence()),
+                 "Failed to submit vulkan graphics queue!");
+}
+
+void VulkanCommandBuffer::PresentQueue(const ReferencePointer<Semaphore>& renderFinishedSemaphore, const ReferencePointer<SwapChain>& swapChain, uint32_t* imageIndex) {
+  VkSemaphore waitSemaphores[] = {std::dynamic_pointer_cast<VulkanSemaphore>(renderFinishedSemaphore)->GetSemaphore()};
+
+  VkPresentInfoKHR presentInfo{};
+  presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+  presentInfo.waitSemaphoreCount = 1;
+  presentInfo.pWaitSemaphores = waitSemaphores;
+
+  VkSwapchainKHR swapChains[] = {std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)->GetSwapChain()};
+  presentInfo.swapchainCount = 1;
+  presentInfo.pSwapchains = swapChains;
+  presentInfo.pImageIndices = imageIndex;
+
+  vkQueuePresentKHR(m_RenderDevice->GetPresentQueue(), &presentInfo);
 }

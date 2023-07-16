@@ -26,6 +26,8 @@ class RenderDevice {
  public:
   virtual ~RenderDevice() = default;
 
+  virtual void WaitForIdle() = 0;
+
   static ReferencePointer<RenderDevice> Create(std::function<std::size_t(const RenderDeviceProperties&)> deviceRateFunction);
 };
 }  // namespace Hydrogen

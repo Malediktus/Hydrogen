@@ -10,6 +10,8 @@ class VulkanSemaphore : public Semaphore {
   VulkanSemaphore(const ReferencePointer<RenderDevice>& renderDevice);
   virtual ~VulkanSemaphore();
 
+  VkSemaphore GetSemaphore() { return m_Semaphore; }
+
  private:
   ReferencePointer<VulkanRenderDevice> m_RenderDevice;
   VkSemaphore m_Semaphore;

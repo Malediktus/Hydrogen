@@ -139,6 +139,8 @@ VulkanRenderDevice::~VulkanRenderDevice() {
   vkDestroyDevice(m_Device, nullptr);
 }
 
+void VulkanRenderDevice::WaitForIdle() { vkDeviceWaitIdle(m_Device); }
+
 VkQueueFamily VulkanRenderDevice::GetGraphicsQueueFamily(VkPhysicalDevice device) {
   uint32_t queueFamilyCount = 0;
   vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);

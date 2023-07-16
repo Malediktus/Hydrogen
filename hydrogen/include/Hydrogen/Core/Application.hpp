@@ -37,13 +37,6 @@ class Application {
  private:
   bool m_Initialized = false;
   void OnResize(const Event& event);
-
-  ReferencePointer<Context> m_RenderContext;
-  ReferencePointer<RenderDevice> m_RenderDevice;
-  ReferencePointer<SwapChain> m_SwapChain;
-  ReferencePointer<RenderPass> m_RenderPass;
-  ReferencePointer<Shader> m_Shader;
-  ReferencePointer<Framebuffer> m_Framebuffer;
 };
 
 extern ReferencePointer<Application> CreateApplication();

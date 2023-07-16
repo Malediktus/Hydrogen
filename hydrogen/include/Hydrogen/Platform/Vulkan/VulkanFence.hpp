@@ -10,6 +10,11 @@ class VulkanFence : public Fence {
   VulkanFence(const ReferencePointer<RenderDevice>& renderDevice);
   virtual ~VulkanFence();
 
+  virtual void Wait() override;
+  virtual void Reset() override;
+
+  VkFence GetFence() { return m_Fence; }
+
  private:
   ReferencePointer<VulkanRenderDevice> m_RenderDevice;
   VkFence m_Fence;

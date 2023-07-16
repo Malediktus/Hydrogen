@@ -11,6 +11,8 @@ class VulkanRenderDevice : public RenderDevice {
   VulkanRenderDevice(std::function<std::size_t(const RenderDeviceProperties&)> deviceRateFunction);
   virtual ~VulkanRenderDevice();
 
+  virtual void WaitForIdle() override;
+
   VkPhysicalDevice GetPhysicalDevice() { return m_PhysicalDevice; }
   VkDevice GetDevice() { return m_Device; }
   VkQueue GetGraphicsQueue() { return m_GraphicsQueue; }

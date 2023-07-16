@@ -20,3 +20,7 @@ VulkanFence::~VulkanFence() {
   ZoneScoped;
   vkDestroyFence(m_RenderDevice->GetDevice(), m_Fence, nullptr);
 }
+
+void VulkanFence::Wait() { vkWaitForFences(m_RenderDevice->GetDevice(), 1, &m_Fence, VK_TRUE, UINT64_MAX); }
+
+void VulkanFence::Reset() { vkResetFences(m_RenderDevice->GetDevice(), 1, &m_Fence); }
