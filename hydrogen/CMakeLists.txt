@@ -30,7 +30,6 @@ set(HEADER_LIST
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/Shader.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/Texture.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/VertexArray.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/RenderCommand.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/Renderer.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/ShaderCompiler.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/SwapChain.hpp"
@@ -67,7 +66,6 @@ set(SOURCE_LIST
     src/Renderer/Shader.cpp
     src/Renderer/Texture.cpp
     src/Renderer/VertexArray.cpp
-    src/Renderer/RenderCommand.cpp
     src/Renderer/Renderer.cpp
     src/Renderer/ShaderCompiler.cpp
     src/Renderer/SwapChain.cpp

@@ -14,7 +14,6 @@ Application::Application() {
 void Application::Run() {
   OnSetup();
   AppWindow = Window::Create(ApplicationInfo.Name, ApplicationInfo.WindowSize.x, ApplicationInfo.WindowSize.y);
-  auto testWindow = Window::Create("Test", 500, 500);
 
   AssetManager::Init();
 
@@ -53,9 +52,6 @@ void Application::Run() {
   m_Shader = AssetManager::Get<ShaderAsset>("assets/Raw.glsl")->CreateShader(m_RenderDevice, m_SwapChain, m_RenderPass);
   m_Framebuffer = Framebuffer::Create(m_RenderDevice, m_SwapChain, m_RenderPass);
 
-  RenderCommand::Init();
-  RenderCommand::ConfigureAntiAliasing(true);
-
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO();
@@ -75,7 +71,7 @@ void Application::Run() {
   }
 
   AppWindow->SetupImGui();
-  RenderCommand::GetRendererAPI()->SetupImGui();
+  // RenderCommand::GetRendererAPI()->SetupImGui();
 
   CurrentScene = NewReferencePointer<Scene>();
 
@@ -98,12 +94,11 @@ void Application::Run() {
   while (!AppWindow->GetWindowClose()) {
     TaskManager::Update();
     OnUpdate();
-    if (testWindow != nullptr && testWindow->GetWindowClose()) testWindow.reset();
     AppWindow->ImGuiNewFrame();
     // ImGui::NewFrame();
     OnImGuiDraw();
     // ImGui::Render();
-    RenderCommand::GetRendererAPI()->ImGuiRenderDrawData(ImGui::GetDrawData());
+    // RenderCommand::GetRendererAPI()->ImGuiRenderDrawData(ImGui::GetDrawData());
 
     AppWindow->UpdateImGuiPlatformWindows();
 
@@ -113,7 +108,7 @@ void Application::Run() {
 
   OnShutdown();
 
-  RenderCommand::GetRendererAPI()->DestroyImGui();
+  // RenderCommand::GetRendererAPI()->DestroyImGui();
   AppWindow->DestroyImGui();
   ImGui::DestroyContext();
 
