@@ -123,10 +123,19 @@ VulkanRenderDevice::VulkanRenderDevice(std::function<std::size_t(const RenderDev
 
   vkGetDeviceQueue(m_Device, m_GraphicsQueueFamily.value(), 0, &m_GraphicsQueue);
   vkGetDeviceQueue(m_Device, m_PresentQueueFamily.value(), 0, &m_PresentQueue);
+
+  // Command pool
+  VkCommandPoolCreateInfo poolInfo{};
+  poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+  poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+  poolInfo.queueFamilyIndex = m_GraphicsQueueFamily.value();
+
+  VK_CHECK_ERROR(vkCreateCommandPool(m_Device, &poolInfo, nullptr, &m_CommandPool), "Failed to create vulkan command pool!");
 }
 
 VulkanRenderDevice::~VulkanRenderDevice() {
   ZoneScoped;
+  vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
   vkDestroyDevice(m_Device, nullptr);
 }
 
