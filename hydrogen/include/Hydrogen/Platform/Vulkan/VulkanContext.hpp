@@ -23,9 +23,13 @@ class VulkanContext : public Context {
   VkSurfaceKHR GetWindowSurface() { return m_WindowSurface; }
 
  private:
+  void ConfigureExtensionsAndValidationLayers(const DynamicArray<const char*>& requiredExtensions);
+  void PopulateApplicationInfo(VkApplicationInfo& appInfo, const ProjectInformation& clientInfo, const ProjectInformation& engineInfo);
   void CreateInstance(VkApplicationInfo appInfo, VkInstanceCreateFlags flags, PFN_vkDebugUtilsMessengerCallbackEXT debugCallback);
+  void CheckExtensionSupport(const DynamicArray<const char*>& extensions);
+  void CheckValidationLayerSupport(const DynamicArray<const char*>& validationLayers);
   void CreateDebugMessenger(PFN_vkDebugUtilsMessengerCallbackEXT callback);
-  void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT* createInfo, PFN_vkDebugUtilsMessengerCallbackEXT callback);
+  void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo, PFN_vkDebugUtilsMessengerCallbackEXT callback);
 
   ReferencePointer<RenderWindow> m_Window;
   VkInstance m_Instance;

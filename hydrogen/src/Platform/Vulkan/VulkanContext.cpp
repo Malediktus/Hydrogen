@@ -71,34 +71,19 @@ VulkanContext::VulkanContext(const ReferencePointer<RenderWindow>& window) : m_W
 void VulkanContext::Init(ProjectInformation clientInfo, ProjectInformation engineInfo) {
   ZoneScoped;
 
-  // Configurations
-  m_ValidationLayers.push_back("VK_LAYER_KHRONOS_validation");
-
+  ConfigureExtensionsAndValidationLayers(m_Window->GetVulkanWindowExtensions());
+  VkApplicationInfo appInfo{};
+  PopulateApplicationInfo(appInfo, clientInfo, engineInfo);
+  VkInstanceCreateFlags instanceFlags = 0;
+  CheckExtensionSupport(m_InstanceExtensions);
 #ifdef HY_DEBUG
-  m_InstanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+  CheckValidationLayerSupport(m_ValidationLayers);
 #endif
 #ifdef HY_PLATFORM_APPLE
-  m_InstanceExtensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
-  m_InstanceExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
-  m_DeviceExtensions.push_back("VK_KHR_portability_subset");
+  instanceFlags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
 #endif
-  const auto requiredExtensions = m_Window->GetVulkanWindowExtensions();
-  m_InstanceExtensions.insert(m_InstanceExtensions.end(), requiredExtensions.begin(), requiredExtensions.end());
-
-  m_DeviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-
-  VkApplicationInfo appInfo{};
-  appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-  appInfo.pNext = nullptr;
-  appInfo.pApplicationName = clientInfo.ProjectName.c_str();
-  appInfo.applicationVersion = VK_MAKE_VERSION(clientInfo.ProjectVersion.x, clientInfo.ProjectVersion.y, clientInfo.ProjectVersion.z);
-  appInfo.pEngineName = engineInfo.ProjectName.c_str();
-  appInfo.engineVersion = VK_MAKE_VERSION(engineInfo.ProjectVersion.x, engineInfo.ProjectVersion.y, engineInfo.ProjectVersion.z);
-  appInfo.apiVersion = VK_API_VERSION_1_0;
-
-  CreateInstance(appInfo, VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR, Utils::VulkanDebugCallback);
+  CreateInstance(appInfo, instanceFlags, Utils::VulkanDebugCallback);
   CreateDebugMessenger(Utils::VulkanDebugCallback);
-
   m_WindowSurface = static_cast<VkSurfaceKHR>(m_Window->GetVulkanWindowSurface());
 
   HY_LOG_INFO("Created Vulkan context");
@@ -114,56 +99,33 @@ VulkanContext::~VulkanContext() {
   vkDestroyInstance(m_Instance, nullptr);
 }
 
-void VulkanContext::CreateInstance(VkApplicationInfo appInfo, VkInstanceCreateFlags flags, PFN_vkDebugUtilsMessengerCallbackEXT debugCallback) {
-  // Check for extensions
-  uint32_t availableExtensionCount = 0;
-  vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, nullptr);
-
-  DynamicArray<VkExtensionProperties> availableExtensions(availableExtensionCount);
-  vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, availableExtensions.data());
-
-  for (auto extension : m_InstanceExtensions) {
-    bool found = false;
-    for (const auto& availableExtension : availableExtensions) {
-      if (!strcmp(extension, availableExtension.extensionName)) {
-        found = true;
-        break;
-      }
-    }
-
-    if (found) continue;
-
-    HY_LOG_ERROR("Vulkan extension '{}' is not supported!", extension);
-    HY_INVOKE_ERROR("A vulkan extension is not supported");
-  }
-
-  // Check for validation layers
+void VulkanContext::ConfigureExtensionsAndValidationLayers(const DynamicArray<const char*>& requiredExtensions) {
+  m_ValidationLayers.push_back("VK_LAYER_KHRONOS_validation");
 #ifdef HY_DEBUG
-  uint32_t availableLayerCount;
-  vkEnumerateInstanceLayerProperties(&availableLayerCount, nullptr);
-
-  DynamicArray<VkLayerProperties> availableLayers(availableLayerCount);
-  vkEnumerateInstanceLayerProperties(&availableLayerCount, availableLayers.data());
-
-  for (auto validationLayer : m_ValidationLayers) {
-    bool found = false;
-    for (const auto& availableLayer : availableLayers) {
-      if (!strcmp(validationLayer, availableLayer.layerName)) {
-        found = true;
-        break;
-      }
-    }
-
-    if (found) continue;
-
-    HY_LOG_ERROR("Vulkan validation layer '{}' is not supported!", validationLayer);
-    HY_INVOKE_ERROR("A vulkan validation layer is not supported");
-  }
+  m_InstanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 #endif
+#ifdef HY_PLATFORM_APPLE
+  m_InstanceExtensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+  m_InstanceExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+  m_DeviceExtensions.push_back("VK_KHR_portability_subset");
+#endif
+  m_InstanceExtensions.insert(m_InstanceExtensions.end(), requiredExtensions.begin(), requiredExtensions.end());
+  m_DeviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+}
 
-  // Create instance
+void VulkanContext::PopulateApplicationInfo(VkApplicationInfo& appInfo, const ProjectInformation& clientInfo, const ProjectInformation& engineInfo) {
+  appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+  appInfo.pNext = nullptr;
+  appInfo.pApplicationName = clientInfo.ProjectName.c_str();
+  appInfo.applicationVersion = VK_MAKE_VERSION(clientInfo.ProjectVersion.x, clientInfo.ProjectVersion.y, clientInfo.ProjectVersion.z);
+  appInfo.pEngineName = engineInfo.ProjectName.c_str();
+  appInfo.engineVersion = VK_MAKE_VERSION(engineInfo.ProjectVersion.x, engineInfo.ProjectVersion.y, engineInfo.ProjectVersion.z);
+  appInfo.apiVersion = VK_API_VERSION_1_0;
+}
+
+void VulkanContext::CreateInstance(VkApplicationInfo appInfo, VkInstanceCreateFlags flags, PFN_vkDebugUtilsMessengerCallbackEXT debugCallback) {
   VkDebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo{};
-  PopulateDebugMessengerCreateInfo(&debugMessengerCreateInfo, debugCallback);
+  PopulateDebugMessengerCreateInfo(debugMessengerCreateInfo, debugCallback);
 
   VkInstanceCreateInfo createInfo{};
   createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -180,25 +142,70 @@ void VulkanContext::CreateInstance(VkApplicationInfo appInfo, VkInstanceCreateFl
   createInfo.enabledExtensionCount = static_cast<uint32_t>(m_InstanceExtensions.size());
   createInfo.ppEnabledExtensionNames = m_InstanceExtensions.data();
 
-  VK_CHECK_ERROR(vkCreateInstance(&createInfo, nullptr, &m_Instance), "Failed to create vulkan instance");
+  VK_CHECK_ERROR(vkCreateInstance(&createInfo, nullptr, &m_Instance), "Failed to create vulkan instance!");
+}
+
+void VulkanContext::CheckExtensionSupport(const DynamicArray<const char*>& extensions) {
+  uint32_t availableExtensionCount = 0;
+  vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, nullptr);
+
+  DynamicArray<VkExtensionProperties> availableExtensions(availableExtensionCount);
+  vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, availableExtensions.data());
+
+  for (auto extension : extensions) {
+    bool found = false;
+    for (const auto& availableExtension : availableExtensions) {
+      if (!strcmp(extension, availableExtension.extensionName)) {
+        found = true;
+        break;
+      }
+    }
+
+    if (found) continue;
+
+    HY_LOG_ERROR("Vulkan extension '{}' is not supported!", extension);
+    HY_INVOKE_ERROR("A vulkan extension is not supported");
+  }
+}
+
+void VulkanContext::CheckValidationLayerSupport(const DynamicArray<const char*>& validationLayers) {
+  uint32_t availableLayerCount;
+  vkEnumerateInstanceLayerProperties(&availableLayerCount, nullptr);
+
+  DynamicArray<VkLayerProperties> availableLayers(availableLayerCount);
+  vkEnumerateInstanceLayerProperties(&availableLayerCount, availableLayers.data());
+
+  for (auto validationLayer : validationLayers) {
+    bool found = false;
+    for (const auto& availableLayer : availableLayers) {
+      if (!strcmp(validationLayer, availableLayer.layerName)) {
+        found = true;
+        break;
+      }
+    }
+
+    if (found) continue;
+
+    HY_LOG_ERROR("Vulkan validation layer '{}' is not supported!", validationLayer);
+    HY_INVOKE_ERROR("A vulkan validation layer is not supported");
+  }
 }
 
 void VulkanContext::CreateDebugMessenger(PFN_vkDebugUtilsMessengerCallbackEXT callback) {
-#ifndef HY_DEBUG
-  return;
-#endif
+#ifdef HY_DEBUG
   VkDebugUtilsMessengerCreateInfoEXT createInfo{};
-  PopulateDebugMessengerCreateInfo(&createInfo, callback);
-  VK_CHECK_ERROR(Functions::CreateDebugUtilsMessengerEXT(m_Instance, &createInfo, nullptr, &m_DebugMessenger), "Failed to create vulkan debug messenger");
+  PopulateDebugMessengerCreateInfo(createInfo, callback);
+  VK_CHECK_ERROR(Functions::CreateDebugUtilsMessengerEXT(m_Instance, &createInfo, nullptr, &m_DebugMessenger), "Failed to create vulkan debug messenger!");
+#endif
 }
 
-void VulkanContext::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT* createInfo, PFN_vkDebugUtilsMessengerCallbackEXT callback) {
+void VulkanContext::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo, PFN_vkDebugUtilsMessengerCallbackEXT callback) {
 #ifndef HY_DEBUG
   return;
 #endif
-  createInfo->sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-  createInfo->messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-  createInfo->messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-  createInfo->pfnUserCallback = callback;
-  createInfo->pUserData = nullptr;
+  createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+  createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+  createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+  createInfo.pfnUserCallback = callback;
+  createInfo.pUserData = nullptr;
 }
