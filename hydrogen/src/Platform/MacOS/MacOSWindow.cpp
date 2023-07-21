@@ -31,6 +31,7 @@ MacOSWindow::MacOSWindow(const std::string& title, uint32_t width, uint32_t heig
   }
 
   m_Window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+  m_VulkanSurface = nullptr;
   HY_ASSERT(m_Window, "glfw window is null");
 }
 
@@ -144,8 +145,13 @@ const std::vector<const char*> MacOSWindow::GetVulkanWindowExtensions() {
 }
 
 void* MacOSWindow::GetVulkanWindowSurface() {
+  if (m_VulkanSurface != nullptr) {
+    return m_VulkanSurface;
+  }
+
   VkSurfaceKHR surface;
   VkInstance instance = Renderer::GetContext<Vulkan::VulkanContext>()->GetInstance();
   VK_CHECK_ERROR(glfwCreateWindowSurface(instance, m_Window, NULL, &surface), "Failed to create window surface");
-  return (void*)surface;
+  m_VulkanSurface = (void*)surface;
+  return m_VulkanSurface;
 }

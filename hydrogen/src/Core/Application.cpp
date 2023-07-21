@@ -14,6 +14,7 @@ Application::Application() {
 void Application::Run() {
   OnSetup();
   AppWindow = Window::Create(ApplicationInfo.Name, ApplicationInfo.WindowSize.x, ApplicationInfo.WindowSize.y);
+  auto popup = Window::Create("Popup", 500, 500);
 
   AssetManager::Init();
 
@@ -47,7 +48,11 @@ void Application::Run() {
     return result;
   });
 
-  auto renderer = NewReferencePointer<Renderer>(renderDevice);
+  HY_ASSERT(!renderDevice->ScreenSupported(AppWindow), "Screen is not supported!");  // TODO: Choose other graphics API
+  auto renderer = NewReferencePointer<Renderer>(AppWindow, renderDevice);
+
+  HY_ASSERT(!renderDevice->ScreenSupported(popup), "Screen is not supported!");
+  auto renderer2 = NewReferencePointer<Renderer>(popup, renderDevice);
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -89,6 +94,17 @@ void Application::Run() {
   OnInit();
 
   while (!AppWindow->GetWindowClose()) {
+    if (popup != nullptr) {
+      popup->Render();
+      popup->UpdateEvents();
+      renderer2->Render();
+
+      if (popup->GetWindowClose()) {
+        popup.reset();
+        renderer2.reset();
+      };
+    }
+
     TaskManager::Update();
     OnUpdate();
     renderer->Render();
@@ -114,6 +130,9 @@ void Application::Run() {
   renderDevice->WaitForIdle();
 
   TaskManager::Shutdown();
+  if (popup != nullptr) renderer2.reset();
+  renderer.reset();
+  renderDevice.reset();
   Renderer::SetContext(nullptr);
 }
 

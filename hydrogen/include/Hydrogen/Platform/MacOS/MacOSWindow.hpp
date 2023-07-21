@@ -43,5 +43,6 @@ class MacOSWindow : public Window {
  private:
   GLFWwindow* m_Window;
   static bool s_GlfwInitialized;
+  void* m_VulkanSurface;
 };
 }  // namespace Hydrogen

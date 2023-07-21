@@ -11,27 +11,23 @@ class VulkanRenderDevice : public RenderDevice {
   VulkanRenderDevice(std::function<std::size_t(const RenderDeviceProperties&)> deviceRateFunction);
   virtual ~VulkanRenderDevice();
 
+  virtual bool ScreenSupported(const ReferencePointer<RenderWindow>& window) override;
   virtual void WaitForIdle() override;
 
   VkPhysicalDevice GetPhysicalDevice() { return m_PhysicalDevice; }
   VkDevice GetDevice() { return m_Device; }
   VkQueue GetGraphicsQueue() { return m_GraphicsQueue; }
-  VkQueue GetPresentQueue() { return m_PresentQueue; }
   VkQueueFamily GetGraphicsQueueFamily() { return m_GraphicsQueueFamily; }
-  VkQueueFamily GetPresentQueueFamily() { return m_PresentQueueFamily; }
   VkCommandPool GetCommandPool() { return m_CommandPool; }
 
  private:
   VkQueueFamily GetGraphicsQueueFamily(VkPhysicalDevice device);
-  VkQueueFamily GetPresentQueueFamily(VkPhysicalDevice device);
   bool CheckDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char*>& deviceExtensions);
 
   VkPhysicalDevice m_PhysicalDevice;
   VkQueueFamily m_GraphicsQueueFamily;
-  VkQueueFamily m_PresentQueueFamily;
   VkDevice m_Device;
   VkQueue m_GraphicsQueue;
-  VkQueue m_PresentQueue;
   VkCommandPool m_CommandPool;
 };
 }  // namespace Hydrogen::Vulkan

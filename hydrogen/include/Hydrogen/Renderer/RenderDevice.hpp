@@ -26,6 +26,7 @@ class RenderDevice {
  public:
   virtual ~RenderDevice() = default;
 
+  virtual bool ScreenSupported(const ReferencePointer<RenderWindow>& window) = 0;
   virtual void WaitForIdle() = 0;
 
   static ReferencePointer<RenderDevice> Create(std::function<std::size_t(const RenderDeviceProperties&)> deviceRateFunction);

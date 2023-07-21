@@ -26,17 +26,10 @@ VulkanRenderDevice::VulkanRenderDevice(std::function<std::size_t(const RenderDev
 
   for (auto& device : devices) {
     auto graphicsQueueFamily = GetGraphicsQueueFamily(device);
-    auto presentQueueFamily = GetPresentQueueFamily(device);
 
-    if (!graphicsQueueFamily.has_value() || !presentQueueFamily.has_value()) continue;
+    if (!graphicsQueueFamily.has_value()) continue;
 
     if (!CheckDeviceExtensionSupport(device, deviceExtensions)) continue;
-
-    bool swapChainAdequate = false;
-    SwapChainSupportDetails swapChainSupport = VulkanSwapChain::QuerySwapChainSupportDetails(device);
-    swapChainAdequate = !swapChainSupport.Formats.empty() && !swapChainSupport.PresentModes.empty();
-
-    if (!swapChainAdequate) continue;
 
     VkPhysicalDeviceProperties deviceProperties;
     VkPhysicalDeviceFeatures deviceFeatures;
@@ -92,7 +85,6 @@ VulkanRenderDevice::VulkanRenderDevice(std::function<std::size_t(const RenderDev
 
   // Queue families
   m_GraphicsQueueFamily = GetGraphicsQueueFamily(m_PhysicalDevice);
-  m_PresentQueueFamily = GetPresentQueueFamily(m_PhysicalDevice);
 
   // Logical device
   float queuePriority = 1.0f;
@@ -122,7 +114,6 @@ VulkanRenderDevice::VulkanRenderDevice(std::function<std::size_t(const RenderDev
   VK_CHECK_ERROR(vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device), "Failed to create vulkan device!");
 
   vkGetDeviceQueue(m_Device, m_GraphicsQueueFamily.value(), 0, &m_GraphicsQueue);
-  vkGetDeviceQueue(m_Device, m_PresentQueueFamily.value(), 0, &m_PresentQueue);
 
   // Command pool
   VkCommandPoolCreateInfo poolInfo{};
@@ -137,6 +128,28 @@ VulkanRenderDevice::~VulkanRenderDevice() {
   ZoneScoped;
   vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
   vkDestroyDevice(m_Device, nullptr);
+}
+
+bool VulkanRenderDevice::ScreenSupported(const ReferencePointer<RenderWindow>& window) {
+  HY_ASSERT(m_PhysicalDevice, "Constructor must be called before VulkanRenderDevice::ScreenSupported!")
+
+  SwapChainSupportDetails swapChainSupport = VulkanSwapChain::QuerySwapChainSupportDetails(m_PhysicalDevice, window);
+  VkQueueFamily presentFamily = VkQueueFamily();
+
+  uint32_t queueFamilyCount = 0;
+  vkGetPhysicalDeviceQueueFamilyProperties(m_PhysicalDevice, &queueFamilyCount, nullptr);
+
+  for (uint32_t i = 0; i < queueFamilyCount; i++) {
+    VkBool32 presentSupport = false;
+    vkGetPhysicalDeviceSurfaceSupportKHR(m_PhysicalDevice, i, (VkSurfaceKHR)window->GetVulkanWindowSurface(), &presentSupport);
+
+    if (presentSupport) {
+      presentFamily = i;
+      break;
+    }
+  }
+
+  return swapChainSupport.Formats.empty() && !swapChainSupport.PresentModes.empty() && presentFamily;
 }
 
 void VulkanRenderDevice::WaitForIdle() { vkDeviceWaitIdle(m_Device); }
@@ -155,22 +168,6 @@ VkQueueFamily VulkanRenderDevice::GetGraphicsQueueFamily(VkPhysicalDevice device
     }
 
     i++;
-  }
-
-  return VkQueueFamily();
-}
-
-VkQueueFamily VulkanRenderDevice::GetPresentQueueFamily(VkPhysicalDevice device) {
-  uint32_t queueFamilyCount = 0;
-  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
-
-  for (uint32_t i = 0; i < queueFamilyCount; i++) {
-    VkBool32 presentSupport = false;
-    vkGetPhysicalDeviceSurfaceSupportKHR(device, i, Renderer::GetContext<VulkanContext>()->GetWindowSurface(), &presentSupport);
-
-    if (presentSupport) {
-      return i;
-    }
   }
 
   return VkQueueFamily();

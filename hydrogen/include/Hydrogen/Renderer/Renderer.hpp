@@ -67,8 +67,8 @@ struct SpotLight : public Light {
 
 class Renderer {
  public:
-  Renderer(const ReferencePointer<RenderDevice>& device);
-  ~Renderer() = default;
+  Renderer(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& device);
+  ~Renderer();
 
   void Render();
 

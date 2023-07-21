@@ -7,10 +7,10 @@ using namespace Hydrogen;
 
 ReferencePointer<Context> Renderer::s_Context;
 
-Renderer::Renderer(const ReferencePointer<RenderDevice>& device) {
+Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& device) {
   ZoneScoped;
 
-  m_SwapChain = SwapChain::Create(device, true);
+  m_SwapChain = SwapChain::Create(window, device, true);
   m_RenderPass = RenderPass::Create(device, m_SwapChain);
   m_Shader = AssetManager::Get<ShaderAsset>("assets/Raw.glsl")->CreateShader(device, m_SwapChain, m_RenderPass);
   m_Framebuffer = Framebuffer::Create(device, m_SwapChain, m_RenderPass);
@@ -21,6 +21,13 @@ Renderer::Renderer(const ReferencePointer<RenderDevice>& device) {
   m_FirstFrame = true;
 
   HY_LOG_INFO("Initialized renderer");
+}
+
+Renderer::~Renderer() {
+  if (!m_FirstFrame) {
+    m_InFlightFence->Wait();
+    m_InFlightFence->Reset();
+  }
 }
 
 void Renderer::Render() {

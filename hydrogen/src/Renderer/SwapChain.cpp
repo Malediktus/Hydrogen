@@ -5,11 +5,11 @@
 
 using namespace Hydrogen;
 
-ReferencePointer<SwapChain> SwapChain::Create(const ReferencePointer<RenderDevice>& renderDevice, bool verticalSync) {
+ReferencePointer<SwapChain> SwapChain::Create(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& renderDevice, bool verticalSync) {
   ZoneScoped;
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
-      return NewReferencePointer<Vulkan::VulkanSwapChain>(renderDevice, verticalSync);
+      return NewReferencePointer<Vulkan::VulkanSwapChain>(window, renderDevice, verticalSync);
     default:
       HY_ASSERT_CHECK(false,
                       "Invalid renderer API value returned from "

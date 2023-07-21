@@ -7,12 +7,31 @@
 
 using namespace Hydrogen::Vulkan;
 
-VulkanSwapChain::VulkanSwapChain(const ReferencePointer<RenderDevice>& renderDevice, bool verticalSync)
-    : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)) {
+VulkanSwapChain::VulkanSwapChain(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& renderDevice, bool verticalSync)
+    : m_RenderWindow(window), m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)) {
   ZoneScoped;
 
+  m_WindowSurface = static_cast<VkSurfaceKHR>(window->GetVulkanWindowSurface());
+
+  m_PresentQueueFamily = VkQueueFamily();
+
+  uint32_t queueFamilyCount = 0;
+  vkGetPhysicalDeviceQueueFamilyProperties(m_RenderDevice->GetPhysicalDevice(), &queueFamilyCount, nullptr);
+
+  for (uint32_t i = 0; i < queueFamilyCount; i++) {
+    VkBool32 presentSupport = false;
+    vkGetPhysicalDeviceSurfaceSupportKHR(m_RenderDevice->GetPhysicalDevice(), i, m_WindowSurface, &presentSupport);
+
+    if (presentSupport) {
+      m_PresentQueueFamily = i;
+      break;
+    }
+  }
+
+  vkGetDeviceQueue(m_RenderDevice->GetDevice(), m_PresentQueueFamily.value(), 0, &m_PresentQueue);
+
   // Swap chain
-  SwapChainSupportDetails swapChainSupport = QuerySwapChainSupportDetails(m_RenderDevice->GetPhysicalDevice());
+  SwapChainSupportDetails swapChainSupport = QuerySwapChainSupportDetails(m_RenderDevice->GetPhysicalDevice(), m_WindowSurface);
 
   VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.Formats);
   VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.PresentModes, verticalSync);
@@ -26,7 +45,7 @@ VulkanSwapChain::VulkanSwapChain(const ReferencePointer<RenderDevice>& renderDev
 
   VkSwapchainCreateInfoKHR createInfo{};
   createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-  createInfo.surface = Renderer::GetContext<VulkanContext>()->GetWindowSurface();
+  createInfo.surface = m_WindowSurface;
   createInfo.minImageCount = imageCount;
   createInfo.imageFormat = surfaceFormat.format;
   createInfo.imageColorSpace = surfaceFormat.colorSpace;
@@ -40,10 +59,9 @@ VulkanSwapChain::VulkanSwapChain(const ReferencePointer<RenderDevice>& renderDev
   createInfo.oldSwapchain = VK_NULL_HANDLE;
 
   VkQueueFamily graphicsFamily = m_RenderDevice->GetGraphicsQueueFamily();
-  VkQueueFamily presentFamily = m_RenderDevice->GetPresentQueueFamily();
-  uint32_t queueFamilyIndices[] = {graphicsFamily.value(), presentFamily.value()};
+  uint32_t queueFamilyIndices[] = {graphicsFamily.value(), m_PresentQueueFamily.value()};
 
-  if (graphicsFamily != presentFamily) {
+  if (graphicsFamily != m_PresentQueueFamily) {
     createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
     createInfo.queueFamilyIndexCount = 2;
     createInfo.pQueueFamilyIndices = queueFamilyIndices;
@@ -89,15 +107,40 @@ VulkanSwapChain::~VulkanSwapChain() {
   }
 
   vkDestroySwapchainKHR(m_RenderDevice->GetDevice(), m_SwapChain, nullptr);
+  vkDestroySurfaceKHR(Renderer::GetContext<VulkanContext>()->GetInstance(), m_WindowSurface, nullptr);
 }
 
 void VulkanSwapChain::AcquireNextImage(const ReferencePointer<Semaphore>& semaphore, uint32_t* imageIndex) {
   vkAcquireNextImageKHR(m_RenderDevice->GetDevice(), m_SwapChain, UINT64_MAX, std::dynamic_pointer_cast<VulkanSemaphore>(semaphore)->GetSemaphore(), VK_NULL_HANDLE, imageIndex);
 }
 
-SwapChainSupportDetails VulkanSwapChain::QuerySwapChainSupportDetails(VkPhysicalDevice device) {
+SwapChainSupportDetails VulkanSwapChain::QuerySwapChainSupportDetails(VkPhysicalDevice device, const ReferencePointer<RenderWindow>& window) {
   SwapChainSupportDetails details;
-  auto surface = Renderer::GetContext<VulkanContext>()->GetWindowSurface();
+  VkSurfaceKHR surface = (VkSurfaceKHR)window->GetVulkanWindowSurface();
+
+  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.Capabilities);
+
+  uint32_t formatCount;
+  vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
+
+  if (formatCount != 0) {
+    details.Formats.resize(formatCount);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.Formats.data());
+  }
+
+  uint32_t presentModeCount;
+  vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
+
+  if (presentModeCount != 0) {
+    details.PresentModes.resize(presentModeCount);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.PresentModes.data());
+  }
+
+  return details;
+}
+
+SwapChainSupportDetails VulkanSwapChain::QuerySwapChainSupportDetails(VkPhysicalDevice device, VkSurfaceKHR surface) {
+  SwapChainSupportDetails details;
 
   vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.Capabilities);
 
@@ -144,7 +187,7 @@ VkExtent2D VulkanSwapChain::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& cap
   if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
     return capabilities.currentExtent;
   } else {
-    Vector2 viewportSize = Renderer::GetContext<VulkanContext>()->GetWindow()->GetViewportSize();
+    Vector2 viewportSize = m_RenderWindow->GetViewportSize();
 
     VkExtent2D actualExtent = {static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y)};
 

@@ -5,12 +5,12 @@
 
 using namespace Hydrogen;
 
-ReferencePointer<Context> Context::Create(const ReferencePointer<Hydrogen::RenderWindow>& window) {
+ReferencePointer<Context> Context::Create(const ReferencePointer<Hydrogen::RenderWindow>& mainWindow) {
   ZoneScoped;
 
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
-      return NewReferencePointer<Vulkan::VulkanContext>(window);
+      return NewReferencePointer<Vulkan::VulkanContext>(mainWindow);
     default:
       HY_ASSERT_CHECK(false,
                       "Invalid renderer API value returned from "

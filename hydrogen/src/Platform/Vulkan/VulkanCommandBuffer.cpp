@@ -105,5 +105,5 @@ void VulkanCommandBuffer::PresentQueue(const ReferencePointer<Semaphore>& render
   presentInfo.pSwapchains = swapChains;
   presentInfo.pImageIndices = imageIndex;
 
-  vkQueuePresentKHR(m_RenderDevice->GetPresentQueue(), &presentInfo);
+  vkQueuePresentKHR(std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)->GetPresentQueue(), &presentInfo);
 }
