@@ -1,4 +1,5 @@
 #include <Hydrogen/Core/Logger.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
 #include <tracy/Tracy.hpp>
@@ -67,7 +68,11 @@ void VulkanCommandBuffer::CmdDraw(const ReferencePointer<SwapChain>& swapChain, 
   scissor.extent = swapChainExtent;
   vkCmdSetScissor(m_CommandBuffer, 0, 1, &scissor);
 
-  vkCmdDraw(m_CommandBuffer, 3, 1, 0, 0);
+  VkBuffer vertexBuffers[] = {std::dynamic_pointer_cast<VulkanVertexBuffer>(Renderer::m_VertexBuffer)->GetVertexBuffer()};
+  VkDeviceSize offsets[] = {0};
+  vkCmdBindVertexBuffers(m_CommandBuffer, 0, 1, vertexBuffers, offsets);
+
+  vkCmdDraw(m_CommandBuffer, static_cast<uint32_t>(std::dynamic_pointer_cast<VulkanVertexBuffer>(Renderer::m_VertexBuffer)->GetSize()), 1, 0, 0);
 }
 
 void VulkanCommandBuffer::SubmitGraphicsQueue(const ReferencePointer<Semaphore>& imageAvailableSemaphore, const ReferencePointer<Semaphore>& renderFinishedSemaphore,

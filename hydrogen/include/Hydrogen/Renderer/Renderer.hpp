@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+#include "Buffer.hpp"
 #include "Camera.hpp"
 #include "CommandBuffer.hpp"
 #include "Context.hpp"
@@ -81,6 +82,7 @@ class Renderer {
     static_assert(std::is_base_of<Context, T>::value, "T must be derived from Context");
     return std::dynamic_pointer_cast<T>(s_Context);
   }
+  static ReferencePointer<VertexBuffer> m_VertexBuffer;
 
  private:
   bool m_FirstFrame;

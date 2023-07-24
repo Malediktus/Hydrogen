@@ -6,18 +6,24 @@
 using namespace Hydrogen;
 
 ReferencePointer<Context> Renderer::s_Context;
+ReferencePointer<VertexBuffer> Renderer::m_VertexBuffer;
 
 Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& device) {
   ZoneScoped;
 
+  const float vertices[] = {0.0f, -0.5f, 1.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f};
+
   m_SwapChain = SwapChain::Create(window, device, true);
   m_RenderPass = RenderPass::Create(device, m_SwapChain);
-  m_Shader = AssetManager::Get<ShaderAsset>("assets/Raw.glsl")->CreateShader(device, m_SwapChain, m_RenderPass);
+  m_Shader = AssetManager::Get<ShaderAsset>("assets/Raw.glsl")
+                 ->CreateShader({{ShaderDataType::Float2, "Position", false}, {ShaderDataType::Float3, "Color", false}}, device, m_SwapChain, m_RenderPass);
   m_Framebuffer = Framebuffer::Create(device, m_SwapChain, m_RenderPass);
   m_CommandBuffer = CommandBuffer::Create(device);
   m_ImageAvailableSemaphore = Semaphore::Create(device);
   m_RenderFinishedSemaphore = Semaphore::Create(device);
   m_InFlightFence = Fence::Create(device);
+  m_VertexBuffer = VertexBuffer::Create(device, (float*)vertices, sizeof(vertices));
+  m_VertexBuffer->SetLayout({{ShaderDataType::Float2, "Position", false}, {ShaderDataType::Float3, "Color", false}});
   m_FirstFrame = true;
 
   HY_LOG_INFO("Initialized renderer");

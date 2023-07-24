@@ -57,7 +57,7 @@ class ShaderAsset : public Asset {
         if (!cache.CacheValid()) {
           HY_LOG_INFO("Shader cache {} is invalid. Recompiling!", shaderFilepath)
 
-          ShaderCompiler compiler(ShaderLanguage::GLSL, ShaderClient::Vulkan_1_0, SpriVVersion::SpriV_1_0, stage, 330);
+          ShaderCompiler compiler(ShaderLanguage::GLSL, ShaderClient::Vulkan_1_0, SpriVVersion::SpriV_1_0, stage, 450);
           compiler.AddShader(inbuf);
           compiler.Link();
           auto spirv = compiler.GetSpriv();
@@ -99,9 +99,9 @@ class ShaderAsset : public Asset {
     HY_LOG_INFO("Finished loading shader asset '{}'!", filepath);
   }
 
-  ReferencePointer<Shader> CreateShader(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
+  ReferencePointer<Shader> CreateShader(const BufferLayout& vertexLayout, const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
                                         const ReferencePointer<RenderPass>& renderPass) {
-    return Shader::Create(renderDevice, swapChain, renderPass, m_Name, m_VertexShader, m_FragmentShader, m_GeometryShader);
+    return Shader::Create(vertexLayout, renderDevice, swapChain, renderPass, m_Name, m_VertexShader, m_FragmentShader, m_GeometryShader);
   }
 
   const DynamicArray<uint32_t>& GetVertexShader() { return m_VertexShader; }

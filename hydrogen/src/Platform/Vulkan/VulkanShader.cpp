@@ -13,13 +13,73 @@
 using namespace Hydrogen::Vulkan;
 using namespace Hydrogen;
 
-VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<RenderPass>& renderPass,
-                           const String& name, const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc, const DynamicArray<uint32_t>& geometrySrc)
+namespace Hydrogen::Vulkan::Utils {
+static VkFormat ShaderDataTypeToVkFormat(ShaderDataType type) {
+  switch (type) {
+    case ShaderDataType::None:
+      HY_INVOKE_ERROR("Invalid ShaderDataType value (ShaderDataType::None)!");
+    case ShaderDataType::Float:
+      return VK_FORMAT_R32_SFLOAT;
+      break;
+    case ShaderDataType::Float2:
+      return VK_FORMAT_R32G32_SFLOAT;
+      break;
+    case ShaderDataType::Float3:
+      return VK_FORMAT_R32G32B32_SFLOAT;
+      break;
+    case ShaderDataType::Float4:
+      return VK_FORMAT_R32G32B32A32_SFLOAT;
+      break;
+    case ShaderDataType::Mat3:
+      HY_INVOKE_ERROR("ShaderDataType::Mat3 is not supported for vulkan shader input!");
+      break;
+    case ShaderDataType::Mat4:
+      HY_INVOKE_ERROR("ShaderDataType::Mat4 is not supported for vulkan shader input!");
+      break;
+    case ShaderDataType::Int:
+      return VK_FORMAT_R32_SINT;
+      break;
+    case ShaderDataType::Int2:
+      return VK_FORMAT_R32G32_SINT;
+      break;
+    case ShaderDataType::Int3:
+      return VK_FORMAT_R32G32B32_SINT;
+      break;
+    case ShaderDataType::Int4:
+      return VK_FORMAT_R32G32B32A32_SINT;
+      break;
+    case ShaderDataType::Bool:
+      HY_INVOKE_ERROR("ShaderDataType::Bool is not supported for vulkan shader input!");
+      break;
+    default:
+      HY_INVOKE_ERROR("Invalid ShaderDataType value!");
+  }
+}
+}  // namespace Hydrogen::Vulkan::Utils
+
+VulkanShader::VulkanShader(const BufferLayout& vertexLayout, const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
+                           const ReferencePointer<RenderPass>& renderPass, const String& name, const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc,
+                           const DynamicArray<uint32_t>& geometrySrc)
     : m_Name(name),
       m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)),
       m_SwapChain(std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)),
       m_RenderPass(std::dynamic_pointer_cast<VulkanRenderPass>(renderPass)) {
   ZoneScoped;
+
+  VkVertexInputBindingDescription bindingDescription{};
+  bindingDescription.binding = 0;
+  bindingDescription.stride = vertexLayout.GetStride();
+  bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+  const auto& elements = vertexLayout.GetElements();
+  DynamicArray<VkVertexInputAttributeDescription> attributeDescriptions(elements.size());
+  for (size_t i = 0; i < elements.size(); i++) {
+    HY_ASSERT(!elements[i].Normalized, "Normalization of vertex input is not supported in vulkan!");
+    attributeDescriptions[i].binding = 0;
+    attributeDescriptions[i].location = i;
+    attributeDescriptions[i].format = Utils::ShaderDataTypeToVkFormat(elements[i].Type);
+    attributeDescriptions[i].offset = elements[i].Offset;
+  }
 
   DynamicArray<VkPipelineShaderStageCreateInfo> shaderStageCreateInfos;
   shaderStageCreateInfos.reserve(3);
@@ -84,10 +144,10 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
 
   VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
   vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-  vertexInputInfo.vertexBindingDescriptionCount = 0;
-  vertexInputInfo.pVertexBindingDescriptions = nullptr;  // Optional
-  vertexInputInfo.vertexAttributeDescriptionCount = 0;
-  vertexInputInfo.pVertexAttributeDescriptions = nullptr;  // Optional
+  vertexInputInfo.vertexBindingDescriptionCount = 1;
+  vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+  vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+  vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
   VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
   inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;

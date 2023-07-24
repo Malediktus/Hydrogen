@@ -22,7 +22,7 @@ void Application::Run() {
   clientProject.ProjectName = ApplicationInfo.Name;
   clientProject.ProjectVersion = ApplicationInfo.Version;
 
-  Hydrogen::ProjectInformation engineProject;
+  ProjectInformation engineProject;
   engineProject.ProjectName = "Hydrogen Engine";
   engineProject.ProjectVersion = glm::vec3(1, 0, 0);
 
@@ -48,7 +48,7 @@ void Application::Run() {
     return result;
   });
 
-  HY_ASSERT(!renderDevice->ScreenSupported(AppWindow), "Screen is not supported!");  // TODO: Choose other graphics API
+  HY_ASSERT(!renderDevice->ScreenSupported(AppWindow), "Screen is not supported!");  // TODO: Choose other graphics API or device
   auto renderer = NewReferencePointer<Renderer>(AppWindow, renderDevice);
 
   HY_ASSERT(!renderDevice->ScreenSupported(popup), "Screen is not supported!");

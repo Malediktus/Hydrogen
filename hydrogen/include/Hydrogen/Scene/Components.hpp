@@ -3,10 +3,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include <string>
 
 #include "../Core/UUID.hpp"
 #include "../Renderer/Renderer.hpp"
+#include "../Renderer/VertexArray.hpp"
 
 namespace Hydrogen {
 struct IDComponent {
@@ -42,7 +42,7 @@ struct TransformComponent {
 };
 
 struct MeshRendererComponent {
-  std::vector<ReferencePointer<VertexArray>> VertexArrays = {};
+  DynamicArray<ReferencePointer<VertexArray>> VertexArrays = {};
   ReferencePointer<Shader> MeshShader = {};
 
   MeshRendererComponent() = default;

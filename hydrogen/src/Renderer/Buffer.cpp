@@ -5,11 +5,11 @@
 
 using namespace Hydrogen;
 
-ReferencePointer<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size) {
+ReferencePointer<VertexBuffer> VertexBuffer::Create(const ReferencePointer<RenderDevice>& device, float* vertices, size_t size) {
   ZoneScoped;
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
-      return NewReferencePointer<Vulkan::VulkanVertexBuffer>(vertices, size);
+      return NewReferencePointer<Vulkan::VulkanVertexBuffer>(device, vertices, size);
     default:
       HY_ASSERT_CHECK(false,
                       "Invalid renderer API value returned from "
@@ -18,11 +18,11 @@ ReferencePointer<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t si
   return nullptr;
 }
 
-ReferencePointer<VertexBuffer> VertexBuffer::Create(uint32_t size) {
+ReferencePointer<VertexBuffer> VertexBuffer::Create(const ReferencePointer<RenderDevice>& device, size_t size) {
   ZoneScoped;
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
-      return NewReferencePointer<Vulkan::VulkanVertexBuffer>(size);
+      return NewReferencePointer<Vulkan::VulkanVertexBuffer>(device, size);
     default:
       HY_ASSERT_CHECK(false,
                       "Invalid renderer API value returned from "
@@ -31,11 +31,11 @@ ReferencePointer<VertexBuffer> VertexBuffer::Create(uint32_t size) {
   return nullptr;
 }
 
-ReferencePointer<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t size) {
+ReferencePointer<IndexBuffer> IndexBuffer::Create(const ReferencePointer<RenderDevice>& device, uint32_t* indices, size_t size) {
   ZoneScoped;
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
-      return NewReferencePointer<Vulkan::VulkanIndexBuffer>(indices, size);
+      return NewReferencePointer<Vulkan::VulkanIndexBuffer>(device, indices, size);
     default:
       HY_ASSERT_CHECK(false,
                       "Invalid renderer API value returned from "

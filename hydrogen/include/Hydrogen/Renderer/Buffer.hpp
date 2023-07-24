@@ -1,11 +1,9 @@
 #pragma once
 
-#include <cstdint>
-#include <memory>
-
 #include "../Core/Assert.hpp"
 #include "../Core/Base.hpp"
 #include "../Core/Memory.hpp"
+#include "RenderDevice.hpp"
 
 namespace Hydrogen {
 enum class ShaderDataType { None = 0, Float = 1, Float2 = 2, Float3 = 3, Float4 = 4, Mat3 = 5, Mat4 = 6, Int = 7, Int2 = 8, Int3 = 9, Int4 = 10, Bool = 11 };
@@ -122,13 +120,13 @@ class VertexBuffer {
   virtual void Bind() const = 0;
   virtual void Unbind() const = 0;
 
-  virtual void SetData(const void* data, uint32_t size) = 0;
+  virtual void SetData(const void* data, size_t size) = 0;
 
   virtual const BufferLayout& GetLayout() const = 0;
   virtual void SetLayout(const BufferLayout& layout) = 0;
 
-  static ReferencePointer<VertexBuffer> Create(float* vertices, uint32_t size);
-  static ReferencePointer<VertexBuffer> Create(uint32_t size);
+  static ReferencePointer<VertexBuffer> Create(const ReferencePointer<RenderDevice>& device, float* vertices, size_t size);
+  static ReferencePointer<VertexBuffer> Create(const ReferencePointer<RenderDevice>& device, size_t size);
 };
 
 class IndexBuffer {
@@ -140,6 +138,6 @@ class IndexBuffer {
 
   virtual uint32_t GetCount() const = 0;
 
-  static ReferencePointer<IndexBuffer> Create(uint32_t* indices, uint32_t size);
+  static ReferencePointer<IndexBuffer> Create(const ReferencePointer<RenderDevice>& device, uint32_t* indices, size_t size);
 };
 }  // namespace Hydrogen

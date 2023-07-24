@@ -2,14 +2,10 @@
 
 #include <imgui.h>
 
-#include <cstdint>
-#include <glm/glm.hpp>
-
 #include "../Core/Assert.hpp"
 #include "../Core/Base.hpp"
 #include "../Core/Memory.hpp"
 #include "../Math/Math.hpp"
-#include "VertexArray.hpp"
 
 namespace Hydrogen {
 class RendererAPI {

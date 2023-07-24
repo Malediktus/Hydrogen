@@ -21,7 +21,12 @@ class VulkanRenderDevice : public RenderDevice {
   VkCommandPool GetCommandPool() { return m_CommandPool; }
 
  private:
-  VkQueueFamily GetGraphicsQueueFamily(VkPhysicalDevice device);
+  void PickPhysicalDevice(const DynamicArray<const char*>& requiredExtensions, const std::function<std::size_t(const RenderDeviceProperties&)>& deviceRateFunction);
+  void PopulateRenderDeviceProperties(RenderDeviceProperties& renderDeviceProperties, VkPhysicalDevice device);
+  void CreateLogicalDevice(const DynamicArray<const char*>& requiredExtensions, const DynamicArray<const char*>& validationLayers);
+  void CreateCommandPool();
+
+  VkQueueFamily FindGraphicsQueueFamily(VkPhysicalDevice device);
   bool CheckDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char*>& deviceExtensions);
 
   VkPhysicalDevice m_PhysicalDevice;
