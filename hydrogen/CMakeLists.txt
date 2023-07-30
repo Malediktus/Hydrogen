@@ -115,5 +115,5 @@ set(GLSLANGLIBS
     OGLCompiler
     SPIRV)
 
-target_link_libraries(Hydrogen PRIVATE glfw assimp Vulkan::Vulkan)
+target_link_libraries(Hydrogen PRIVATE glfw Vulkan::Vulkan)
 target_link_libraries(Hydrogen PUBLIC spdlog::spdlog stb_image imgui glm EnTT::EnTT TracyClient ${GLSLANGLIBS})
