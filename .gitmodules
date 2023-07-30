@@ -1,9 +1,6 @@
 [submodule "extern/glfw"]
 	path = extern/glfw
 	url = https://github.com/glfw/glfw
-[submodule "extern/assimp"]
-	path = extern/assimp
-	url = https://github.com/assimp/assimp
 [submodule "extern/entt"]
 	path = extern/entt
 	url = https://github.com/skypjack/entt
@@ -16,3 +13,6 @@
 [submodule "extern/tracy"]
 	path = extern/tracy
 	url = https://github.com/wolfpld/tracy
+[submodule "extern/glslang"]
+	path = extern/glslang
+	url = https://github.com/KhronosGroup/glslang
