@@ -7,6 +7,7 @@
 #include "../Core/Memory.hpp"
 #include "../Math/Math.hpp"
 #include "Buffer.hpp"
+#include "CommandBuffer.hpp"
 #include "RenderDevice.hpp"
 #include "RenderPass.hpp"
 #include "SwapChain.hpp"
@@ -16,8 +17,7 @@ class Shader {
  public:
   virtual ~Shader() = default;
 
-  virtual void Bind() const = 0;
-  virtual void Unbind() const = 0;
+  virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const = 0;
 
   virtual const String& GetName() const = 0;
 

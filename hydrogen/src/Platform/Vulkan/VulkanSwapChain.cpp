@@ -110,10 +110,6 @@ VulkanSwapChain::~VulkanSwapChain() {
   vkDestroySurfaceKHR(Renderer::GetContext<VulkanContext>()->GetInstance(), m_WindowSurface, nullptr);
 }
 
-void VulkanSwapChain::AcquireNextImage(const ReferencePointer<Semaphore>& semaphore, uint32_t* imageIndex) {
-  vkAcquireNextImageKHR(m_RenderDevice->GetDevice(), m_SwapChain, UINT64_MAX, std::dynamic_pointer_cast<VulkanSemaphore>(semaphore)->GetSemaphore(), VK_NULL_HANDLE, imageIndex);
-}
-
 SwapChainSupportDetails VulkanSwapChain::QuerySwapChainSupportDetails(VkPhysicalDevice device, const ReferencePointer<RenderWindow>& window) {
   SwapChainSupportDetails details;
   VkSurfaceKHR surface = (VkSurfaceKHR)window->GetVulkanWindowSurface();

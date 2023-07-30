@@ -11,8 +11,6 @@ class SwapChain {
  public:
   virtual ~SwapChain() = default;
 
-  virtual void AcquireNextImage(const ReferencePointer<Semaphore>& semaphore, uint32_t* imageIndex) = 0;
-
   static ReferencePointer<SwapChain> Create(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& renderDevice, bool verticalSync);
 };
 }  // namespace Hydrogen

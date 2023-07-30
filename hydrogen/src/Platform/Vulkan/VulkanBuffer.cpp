@@ -1,5 +1,6 @@
 #include <Hydrogen/Core/Logger.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
 #include <tracy/Tracy.hpp>
 
@@ -62,9 +63,12 @@ VulkanVertexBuffer::~VulkanVertexBuffer() {
   vkFreeMemory(m_RenderDevice->GetDevice(), m_VertexBufferMemory, nullptr);
 }
 
-void VulkanVertexBuffer::Bind() const { ZoneScoped; }
-
-void VulkanVertexBuffer::Unbind() const { ZoneScoped; }
+void VulkanVertexBuffer::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const {
+  ZoneScoped;
+  VkBuffer vertexBuffers[] = {m_VertexBuffer};
+  VkDeviceSize offsets[] = {0};
+  vkCmdBindVertexBuffers(std::dynamic_pointer_cast<VulkanCommandBuffer>(commandBuffer)->GetCommandBuffer(), 0, 1, vertexBuffers, offsets);
+}
 
 void VulkanVertexBuffer::SetData(const void* data, size_t size) {
   ZoneScoped;
@@ -95,6 +99,4 @@ VulkanIndexBuffer::VulkanIndexBuffer(const ReferencePointer<RenderDevice>& devic
 
 VulkanIndexBuffer::~VulkanIndexBuffer() { ZoneScoped; }
 
-void VulkanIndexBuffer::Bind() const { ZoneScoped; }
-
-void VulkanIndexBuffer::Unbind() const { ZoneScoped; }
+void VulkanIndexBuffer::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const { ZoneScoped; }

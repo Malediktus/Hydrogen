@@ -10,8 +10,7 @@ class VulkanVertexBuffer : public VertexBuffer {
   VulkanVertexBuffer(const ReferencePointer<RenderDevice>& device, float* vertices, size_t size);
   virtual ~VulkanVertexBuffer();
 
-  virtual void Bind() const override;
-  virtual void Unbind() const override;
+  virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const override;
 
   virtual void SetData(const void* data, size_t size) override;
 
@@ -36,8 +35,7 @@ class VulkanIndexBuffer : public IndexBuffer {
   VulkanIndexBuffer(const ReferencePointer<RenderDevice>& device, uint32_t* indices, size_t count);
   virtual ~VulkanIndexBuffer();
 
-  virtual void Bind() const override;
-  virtual void Unbind() const override;
+  virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const override;
 
   virtual uint32_t GetCount() const override { return m_Count; }
 

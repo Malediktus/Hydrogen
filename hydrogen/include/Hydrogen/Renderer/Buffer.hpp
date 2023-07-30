@@ -3,6 +3,7 @@
 #include "../Core/Assert.hpp"
 #include "../Core/Base.hpp"
 #include "../Core/Memory.hpp"
+#include "CommandBuffer.hpp"
 #include "RenderDevice.hpp"
 
 namespace Hydrogen {
@@ -117,8 +118,7 @@ class VertexBuffer {
  public:
   virtual ~VertexBuffer() {}
 
-  virtual void Bind() const = 0;
-  virtual void Unbind() const = 0;
+  virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const = 0;
 
   virtual void SetData(const void* data, size_t size) = 0;
 
@@ -133,8 +133,7 @@ class IndexBuffer {
  public:
   virtual ~IndexBuffer() {}
 
-  virtual void Bind() const = 0;
-  virtual void Unbind() const = 0;
+  virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const = 0;
 
   virtual uint32_t GetCount() const = 0;
 

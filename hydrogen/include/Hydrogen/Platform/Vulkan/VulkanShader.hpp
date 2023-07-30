@@ -20,8 +20,7 @@ class VulkanShader : public Shader {
                const DynamicArray<uint32_t>& geometrySrc);
   virtual ~VulkanShader();
 
-  virtual void Bind() const override;
-  virtual void Unbind() const override;
+  virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const override;
 
   virtual const String& GetName() const override { return m_Name; }
   VkPipeline GetPipeline() { return m_Pipeline; }

@@ -17,8 +17,6 @@ class VulkanSwapChain : public SwapChain {
   VulkanSwapChain(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& renderDevice, bool verticalSync);
   virtual ~VulkanSwapChain();
 
-  virtual void AcquireNextImage(const ReferencePointer<Semaphore>& semaphore, uint32_t* imageIndex) override;
-
   static SwapChainSupportDetails QuerySwapChainSupportDetails(VkPhysicalDevice device, const ReferencePointer<RenderWindow>& window);
   static SwapChainSupportDetails QuerySwapChainSupportDetails(VkPhysicalDevice device, VkSurfaceKHR surface);
 

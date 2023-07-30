@@ -1,14 +1,12 @@
 #include <Hydrogen/Core/Logger.hpp>
 #include <Hydrogen/Core/Memory.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanShader.hpp>
 #include <array>
-#include <fstream>
 #include <glm/gtc/type_ptr.hpp>
-#include <iostream>
 #include <tracy/Tracy.hpp>
-#include <vector>
 
 using namespace Hydrogen::Vulkan;
 using namespace Hydrogen;
@@ -263,6 +261,7 @@ VulkanShader::~VulkanShader() {
   if (m_GeometryShaderModule != VK_NULL_HANDLE) vkDestroyShaderModule(m_RenderDevice->GetDevice(), m_GeometryShaderModule, nullptr);
 }
 
-void VulkanShader::Bind() const { ZoneScoped; }
-
-void VulkanShader::Unbind() const { ZoneScoped; }
+void VulkanShader::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const {
+  ZoneScoped;
+  vkCmdBindPipeline(std::dynamic_pointer_cast<VulkanCommandBuffer>(commandBuffer)->GetCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline);
+}

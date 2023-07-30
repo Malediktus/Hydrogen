@@ -82,7 +82,6 @@ class Renderer {
     static_assert(std::is_base_of<Context, T>::value, "T must be derived from Context");
     return std::dynamic_pointer_cast<T>(s_Context);
   }
-  static ReferencePointer<VertexBuffer> m_VertexBuffer;
 
  private:
   bool m_FirstFrame;
@@ -95,5 +94,6 @@ class Renderer {
   ReferencePointer<Semaphore> m_ImageAvailableSemaphore;
   ReferencePointer<Semaphore> m_RenderFinishedSemaphore;
   ReferencePointer<Fence> m_InFlightFence;
+  ReferencePointer<VertexBuffer> m_VertexBuffer;
 };
 }  // namespace Hydrogen

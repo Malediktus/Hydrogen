@@ -6,7 +6,6 @@
 using namespace Hydrogen;
 
 ReferencePointer<Context> Renderer::s_Context;
-ReferencePointer<VertexBuffer> Renderer::m_VertexBuffer;
 
 Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& device) {
   ZoneScoped;
@@ -37,20 +36,14 @@ Renderer::~Renderer() {
 }
 
 void Renderer::Render() {
-  if (!m_FirstFrame) {
-    m_InFlightFence->Wait();
-    m_InFlightFence->Reset();
-  }
-  m_FirstFrame = false;
-
-  uint32_t imageIndex;
-  m_SwapChain->AcquireNextImage(m_ImageAvailableSemaphore, &imageIndex);
-
   m_CommandBuffer->Reset();
-  m_CommandBuffer->Begin(m_RenderPass, m_SwapChain, m_Framebuffer, {1.0f, 0.0f, 1.0f, 1.0f}, imageIndex);
-  m_CommandBuffer->CmdDraw(m_SwapChain, m_Shader);
-  m_CommandBuffer->End();
+  m_CommandBuffer->Begin(m_RenderPass, m_SwapChain, m_Framebuffer, {1.0f, 0.0f, 1.0f, 1.0f});
+  m_Shader->Bind(m_CommandBuffer);
+  m_VertexBuffer->Bind(m_CommandBuffer);
+  m_CommandBuffer->CmdSetViewport(m_SwapChain);
+  m_CommandBuffer->CmdDraw(m_VertexBuffer);
+  m_CommandBuffer->End(m_SwapChain);
 
-  m_CommandBuffer->SubmitGraphicsQueue(m_ImageAvailableSemaphore, m_RenderFinishedSemaphore, m_InFlightFence);
-  m_CommandBuffer->PresentQueue(m_RenderFinishedSemaphore, m_SwapChain, &imageIndex);
+  // m_CommandBuffer->SubmitGraphicsQueue(m_ImageAvailableSemaphore, m_RenderFinishedSemaphore, m_InFlightFence);
+  // m_CommandBuffer->PresentQueue(m_RenderFinishedSemaphore, m_SwapChain, &imageIndex);
 }
