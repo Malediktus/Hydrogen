@@ -74,9 +74,9 @@ VulkanShader::VulkanShader(const BufferLayout& vertexLayout, const ReferencePoin
   for (size_t i = 0; i < elements.size(); i++) {
     HY_ASSERT(!elements[i].Normalized, "Normalization of vertex input is not supported in vulkan!");
     attributeDescriptions[i].binding = 0;
-    attributeDescriptions[i].location = i;
+    attributeDescriptions[i].location = static_cast<uint32_t>(i);
     attributeDescriptions[i].format = Utils::ShaderDataTypeToVkFormat(elements[i].Type);
-    attributeDescriptions[i].offset = elements[i].Offset;
+    attributeDescriptions[i].offset = static_cast<uint32_t>(elements[i].Offset);
   }
 
   DynamicArray<VkPipelineShaderStageCreateInfo> shaderStageCreateInfos;

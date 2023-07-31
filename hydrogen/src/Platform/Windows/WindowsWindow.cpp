@@ -2,15 +2,15 @@
 #include <imgui.h>
 
 #include <Hydrogen/Core/Logger.hpp>
-#include <Hydrogen/Platform/MacOS/MacOSWindow.hpp>
+#include <Hydrogen/Platform/Windows/WindowsWindow.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 
 using namespace Hydrogen;
 
-bool MacOSWindow::s_GlfwInitialized;
+bool WindowsWindow::s_GlfwInitialized;
 
-MacOSWindow::MacOSWindow(const std::string& title, uint32_t width, uint32_t height) {
+WindowsWindow::WindowsWindow(const std::string& title, uint32_t width, uint32_t height) {
   if (!s_GlfwInitialized) {
     HY_ASSERT(glfwInit(), "Init glfw");
     s_GlfwInitialized = true;
@@ -35,93 +35,83 @@ MacOSWindow::MacOSWindow(const std::string& title, uint32_t width, uint32_t heig
   HY_ASSERT(m_Window, "glfw window is null");
 }
 
-MacOSWindow::~MacOSWindow() { glfwDestroyWindow(m_Window); }
+WindowsWindow::~WindowsWindow() { glfwDestroyWindow(m_Window); }
 
-void MacOSWindow::SetTitle(const std::string& title) { glfwSetWindowTitle(m_Window, title.c_str()); }
+void WindowsWindow::SetTitle(const std::string& title) { glfwSetWindowTitle(m_Window, title.c_str()); }
 
-uint32_t MacOSWindow::GetWidth() const {
+uint32_t WindowsWindow::GetWidth() const {
   int width, height;
   glfwGetWindowSize(m_Window, &width, &height);
   return (uint32_t)width;
 }
 
-uint32_t MacOSWindow::GetHeight() const {
+uint32_t WindowsWindow::GetHeight() const {
   int width, height;
   glfwGetWindowSize(m_Window, &width, &height);
   return (uint32_t)height;
 }
 
-Vector2 MacOSWindow::GetViewportSize() const {
+Vector2 WindowsWindow::GetViewportSize() const {
   int width, height;
   glfwGetWindowSize(m_Window, &width, &height);
   return Vector2(width, height);
 }
 
-bool MacOSWindow::GetWindowClose() const { return glfwWindowShouldClose(m_Window); }
+bool WindowsWindow::GetWindowClose() const { return glfwWindowShouldClose(m_Window); }
 
-bool MacOSWindow::GetKeyDown(KeyCode key) const { return glfwGetKey(m_Window, (int)key) == GLFW_PRESS; }
+bool WindowsWindow::GetKeyDown(KeyCode key) const { return glfwGetKey(m_Window, (int)key) == GLFW_PRESS; }
 
-bool MacOSWindow::GetKey(KeyCode key) const { return glfwGetKey(m_Window, (int)key) == GLFW_PRESS; }
+bool WindowsWindow::GetKey(KeyCode key) const { return glfwGetKey(m_Window, (int)key) == GLFW_PRESS; }
 
-bool MacOSWindow::GetKeyUp(KeyCode key) const { return glfwGetKey(m_Window, (int)key) == GLFW_RELEASE; }
+bool WindowsWindow::GetKeyUp(KeyCode key) const { return glfwGetKey(m_Window, (int)key) == GLFW_RELEASE; }
 
-bool MacOSWindow::GetMouseKeyDown(KeyCode key) const { return glfwGetMouseButton(m_Window, (int)key) == GLFW_PRESS; }
+bool WindowsWindow::GetMouseKeyDown(KeyCode key) const { return glfwGetMouseButton(m_Window, (int)key) == GLFW_PRESS; }
 
-bool MacOSWindow::GetMouseKey(KeyCode key) const { return glfwGetMouseButton(m_Window, (int)key) == GLFW_PRESS; }
+bool WindowsWindow::GetMouseKey(KeyCode key) const { return glfwGetMouseButton(m_Window, (int)key) == GLFW_PRESS; }
 
-bool MacOSWindow::GetMouseKeyUp(KeyCode key) const { return glfwGetMouseButton(m_Window, (int)key) == GLFW_RELEASE; }
+bool WindowsWindow::GetMouseKeyUp(KeyCode key) const { return glfwGetMouseButton(m_Window, (int)key) == GLFW_RELEASE; }
 
-uint32_t MacOSWindow::GetMouseX() const {
+uint32_t WindowsWindow::GetMouseX() const {
   double x, y;
   glfwGetCursorPos(m_Window, &x, &y);
   return static_cast<uint32_t>(x);
 }
 
-uint32_t MacOSWindow::GetMouseY() const {
+uint32_t WindowsWindow::GetMouseY() const {
   double x, y;
   glfwGetCursorPos(m_Window, &x, &y);
   return static_cast<uint32_t>(y);
 }
 
-Vector2 MacOSWindow::GetMousePos() const {
+Vector2 WindowsWindow::GetMousePos() const {
   double x, y;
   glfwGetCursorPos(m_Window, &x, &y);
   return Vector2(x, y);
 }
 
-void MacOSWindow::UpdateEvents() { glfwPollEvents(); }
+void WindowsWindow::UpdateEvents() { glfwPollEvents(); }
 
-void MacOSWindow::Render() {
+void WindowsWindow::Render() {
   glfwSwapBuffers(m_Window);
-
-  // Only for MacOS (Because of some strange glfw bug)
-  static bool moved = false;
-  if (!moved) {
-    int x, y;
-    glfwGetWindowPos(m_Window, &x, &y);
-    glfwSetWindowPos(m_Window, x + 1, y);
-    glfwSetWindowPos(m_Window, x, y);
-    moved = true;
-  }
 }
 
-void MacOSWindow::SetupImGui() {
+void WindowsWindow::SetupImGui() {
   // ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
 }
 
-void MacOSWindow::ImGuiNewFrame() {
+void WindowsWindow::ImGuiNewFrame() {
   // ImGui_ImplGlfw_NewFrame();
 }
 
-void MacOSWindow::DestroyImGui() {
+void WindowsWindow::DestroyImGui() {
   // ImGui_ImplGlfw_Shutdown();
 }
 
-void MacOSWindow::SetupOpenglContext(int, int) { glfwMakeContextCurrent(m_Window); }
+void WindowsWindow::SetupOpenglContext(int, int) { glfwMakeContextCurrent(m_Window); }
 
-void* MacOSWindow::GetWindowOpenGLProcAddress() { return (void*)glfwGetProcAddress; }
+void* WindowsWindow::GetWindowOpenGLProcAddress() { return (void*)glfwGetProcAddress; }
 
-void MacOSWindow::UpdateImGuiPlatformWindows() {
+void WindowsWindow::UpdateImGuiPlatformWindows() {
   // if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
   //   GLFWwindow* backup_current_context = glfwGetCurrentContext();
   //   ImGui::UpdatePlatformWindows();
@@ -130,7 +120,7 @@ void MacOSWindow::UpdateImGuiPlatformWindows() {
   // }
 }
 
-const DynamicArray<char*> MacOSWindow::GetVulkanWindowExtensions() {
+const DynamicArray<char*> WindowsWindow::GetVulkanWindowExtensions() {
   uint32_t glfwExtensionCount = 0;
   const char** glfwExtensions;
   glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -144,7 +134,7 @@ const DynamicArray<char*> MacOSWindow::GetVulkanWindowExtensions() {
   return result;
 }
 
-void* MacOSWindow::GetVulkanWindowSurface() {
+void* WindowsWindow::GetVulkanWindowSurface() {
   if (m_VulkanSurface != nullptr) {
     return m_VulkanSurface;
   }

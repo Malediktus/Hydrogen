@@ -50,7 +50,8 @@ set(HEADER_LIST
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanSemaphore.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanFence.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/MacOS/MacOSWindow.hpp")
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/MacOS/MacOSWindow.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Windows/WindowsWindow.hpp")
 
 set(SOURCE_LIST
     src/Core/Platform.cpp
@@ -92,7 +93,8 @@ set(SOURCE_LIST
     src/Platform/Vulkan/VulkanCommandBuffer.cpp
     src/Platform/Vulkan/VulkanSemaphore.cpp
     src/Platform/Vulkan/VulkanFence.cpp
-    src/Platform/MacOS/MacOSWindow.cpp)
+    src/Platform/MacOS/MacOSWindow.cpp
+    src/Platform/Windows/WindowsWindow.cpp)
 
 add_library(Hydrogen ${SOURCE_LIST} ${HEADER_LIST})
 
@@ -103,9 +105,9 @@ target_compile_definitions(Hydrogen PRIVATE $<$<CONFIG:Release>:HY_RELEASE>)
 target_compile_features(Hydrogen PUBLIC cxx_std_20)
 
 if(MSVC)
-    target_compile_options(Hydrogen PRIVATE /W4 /WX)
+    target_compile_options(Hydrogen PRIVATE /W4 /Qpar)
 else()
-    target_compile_options(Hydrogen PRIVATE -Wall -Wextra -Wpedantic -Werror)
+    target_compile_options(Hydrogen PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
 set(GLSLANGLIBS

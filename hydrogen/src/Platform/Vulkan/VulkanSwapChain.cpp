@@ -44,35 +44,35 @@ VulkanSwapChain::VulkanSwapChain(const ReferencePointer<RenderWindow>& window, c
     imageCount = swapChainSupport.Capabilities.maxImageCount;
   }
 
-  VkSwapchainCreateInfoKHR createInfo{};
-  createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-  createInfo.surface = m_WindowSurface;
-  createInfo.minImageCount = imageCount;
-  createInfo.imageFormat = surfaceFormat.format;
-  createInfo.imageColorSpace = surfaceFormat.colorSpace;
-  createInfo.imageExtent = m_Extent;
-  createInfo.imageArrayLayers = 1;
-  createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-  createInfo.preTransform = swapChainSupport.Capabilities.currentTransform;
-  createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-  createInfo.presentMode = presentMode;
-  createInfo.clipped = VK_TRUE;
-  createInfo.oldSwapchain = VK_NULL_HANDLE;
+  VkSwapchainCreateInfoKHR swapChainCreateInfo{};
+  swapChainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+  swapChainCreateInfo.surface = m_WindowSurface;
+  swapChainCreateInfo.minImageCount = imageCount;
+  swapChainCreateInfo.imageFormat = surfaceFormat.format;
+  swapChainCreateInfo.imageColorSpace = surfaceFormat.colorSpace;
+  swapChainCreateInfo.imageExtent = m_Extent;
+  swapChainCreateInfo.imageArrayLayers = 1;
+  swapChainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+  swapChainCreateInfo.preTransform = swapChainSupport.Capabilities.currentTransform;
+  swapChainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+  swapChainCreateInfo.presentMode = presentMode;
+  swapChainCreateInfo.clipped = VK_TRUE;
+  swapChainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
   VkQueueFamily graphicsFamily = m_RenderDevice->GetGraphicsQueueFamily();
   uint32_t queueFamilyIndices[] = {graphicsFamily.value(), m_PresentQueueFamily.value()};
 
   if (graphicsFamily != m_PresentQueueFamily) {
-    createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-    createInfo.queueFamilyIndexCount = 2;
-    createInfo.pQueueFamilyIndices = queueFamilyIndices;
+    swapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+    swapChainCreateInfo.queueFamilyIndexCount = 2;
+    swapChainCreateInfo.pQueueFamilyIndices = queueFamilyIndices;
   } else {
-    createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    createInfo.queueFamilyIndexCount = 0;      // Optional
-    createInfo.pQueueFamilyIndices = nullptr;  // Optional
+    swapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    swapChainCreateInfo.queueFamilyIndexCount = 0;      // Optional
+    swapChainCreateInfo.pQueueFamilyIndices = nullptr;  // Optional
   }
 
-  VK_CHECK_ERROR(vkCreateSwapchainKHR(m_RenderDevice->GetDevice(), &createInfo, nullptr, &m_SwapChain), "Failed to create vulkan swap chain!");
+  VK_CHECK_ERROR(vkCreateSwapchainKHR(m_RenderDevice->GetDevice(), &swapChainCreateInfo, nullptr, &m_SwapChain), "Failed to create vulkan swap chain!");
 
   vkGetSwapchainImagesKHR(m_RenderDevice->GetDevice(), m_SwapChain, &imageCount, nullptr);
   m_SwapChainImages.resize(imageCount);

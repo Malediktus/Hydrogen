@@ -37,7 +37,6 @@ class AssetManager {
     }
 
     return std::dynamic_pointer_cast<T>(s_Assets[filenameString]);
-    return nullptr;
   }
 
  private:

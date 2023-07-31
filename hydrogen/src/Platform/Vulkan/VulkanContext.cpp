@@ -71,7 +71,8 @@ VulkanContext::VulkanContext(const ReferencePointer<RenderWindow>& mainWindow) :
 void VulkanContext::Init(ProjectInformation clientInfo, ProjectInformation engineInfo) {
   ZoneScoped;
 
-  ConfigureExtensionsAndValidationLayers(m_MainWindow->GetVulkanWindowExtensions());
+  auto windowExtensions = m_MainWindow->GetVulkanWindowExtensions();
+  ConfigureExtensionsAndValidationLayers(windowExtensions);
   VkApplicationInfo appInfo{};
   PopulateApplicationInfo(appInfo, clientInfo, engineInfo);
   VkInstanceCreateFlags instanceFlags = 0;
@@ -98,9 +99,9 @@ VulkanContext::~VulkanContext() {
 }
 
 void VulkanContext::ConfigureExtensionsAndValidationLayers(const DynamicArray<char*>& requiredExtensions) {
-  m_ValidationLayers.push_back("VK_LAYER_KHRONOS_validation");
+  m_ValidationLayers.push_back((char*)"VK_LAYER_KHRONOS_validation");
 #ifdef HY_DEBUG
-  m_InstanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+  m_InstanceExtensions.push_back((char*)VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 #endif
 #ifdef HY_PLATFORM_APPLE
   m_InstanceExtensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
@@ -108,7 +109,7 @@ void VulkanContext::ConfigureExtensionsAndValidationLayers(const DynamicArray<ch
   m_DeviceExtensions.push_back("VK_KHR_portability_subset");
 #endif
   m_InstanceExtensions.insert(m_InstanceExtensions.end(), requiredExtensions.begin(), requiredExtensions.end());
-  m_DeviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+  m_DeviceExtensions.push_back((char*)VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 }
 
 void VulkanContext::PopulateApplicationInfo(VkApplicationInfo& appInfo, const ProjectInformation& clientInfo, const ProjectInformation& engineInfo) {

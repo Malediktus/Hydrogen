@@ -21,11 +21,11 @@ class VulkanContext : public Context {
   VkInstance GetInstance() { return m_Instance; }
 
  private:
-  void ConfigureExtensionsAndValidationLayers(DynamicArray<char*>& requiredExtensions);
+  void ConfigureExtensionsAndValidationLayers(const DynamicArray<char*>& requiredExtensions);
   void PopulateApplicationInfo(VkApplicationInfo& appInfo, const ProjectInformation& clientInfo, const ProjectInformation& engineInfo);
   void CreateInstance(VkApplicationInfo appInfo, VkInstanceCreateFlags flags, PFN_vkDebugUtilsMessengerCallbackEXT debugCallback);
-  void CheckExtensionSupport(DynamicArray<char*>& extensions);
-  void CheckValidationLayerSupport(DynamicArray<char*>& validationLayers);
+  void CheckExtensionSupport(const DynamicArray<char*>& extensions);
+  void CheckValidationLayerSupport(const DynamicArray<char*>& validationLayers);
   void CreateDebugMessenger(PFN_vkDebugUtilsMessengerCallbackEXT callback);
   void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo, PFN_vkDebugUtilsMessengerCallbackEXT callback);
 

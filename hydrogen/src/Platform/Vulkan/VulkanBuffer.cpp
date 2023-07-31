@@ -95,8 +95,13 @@ uint32_t VulkanVertexBuffer::FindMemoryType(uint32_t typeFilter, VkMemoryPropert
 VulkanIndexBuffer::VulkanIndexBuffer(const ReferencePointer<RenderDevice>& device, uint32_t* indices, size_t count)
     : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(device)) {
   ZoneScoped;
+  (void)indices;
+  (void)count;
 }
 
 VulkanIndexBuffer::~VulkanIndexBuffer() { ZoneScoped; }
 
-void VulkanIndexBuffer::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const { ZoneScoped; }
+void VulkanIndexBuffer::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const {
+  ZoneScoped;
+  (void)commandBuffer;
+}
