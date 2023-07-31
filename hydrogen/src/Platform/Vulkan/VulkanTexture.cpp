@@ -30,4 +30,4 @@ void VulkanTexture2D::Resize(uint32_t width, uint32_t height) {
   HY_LOG_TRACE("Resized Vulkan texture2D (ID: {})", m_RendererID);
 }
 
-void* VulkanTexture2D::GetNative() const {}
+void* VulkanTexture2D::GetNative() const { return nullptr; }

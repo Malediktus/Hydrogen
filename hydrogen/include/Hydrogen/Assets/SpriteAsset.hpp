@@ -25,7 +25,7 @@ class SpriteAsset : public Asset {
     return m_Texture;
   }
 
-  static const DynamicArray<const String> GetFileExtensions() { return DynamicArray<const String>{".png", ".jpg", ".bmp", ".tga", ".hdr"}; }
+  static const DynamicArray<String> GetFileExtensions() { return DynamicArray<String>{".png", ".jpg", ".bmp", ".tga", ".hdr"}; }
 
   static bool CheckFileExtensions(const String& ext) {
     auto exts = GetFileExtensions();

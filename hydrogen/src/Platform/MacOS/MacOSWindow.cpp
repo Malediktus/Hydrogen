@@ -130,12 +130,12 @@ void MacOSWindow::UpdateImGuiPlatformWindows() {
   // }
 }
 
-const std::vector<const char*> MacOSWindow::GetVulkanWindowExtensions() {
+const DynamicArray<char*> MacOSWindow::GetVulkanWindowExtensions() {
   uint32_t glfwExtensionCount = 0;
   const char** glfwExtensions;
   glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
-  std::vector<const char*> result;
+  DynamicArray<char*> result;
   result.reserve(glfwExtensionCount);
   for (uint32_t i = 0; i < glfwExtensionCount; i++) {
     result.push_back(glfwExtensions[i]);

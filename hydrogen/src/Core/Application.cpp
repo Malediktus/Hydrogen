@@ -13,7 +13,7 @@ Application::Application() {
 
 void Application::Run() {
   OnSetup();
-  AppWindow = Window::Create(ApplicationInfo.Name, ApplicationInfo.WindowSize.x, ApplicationInfo.WindowSize.y);
+  AppWindow = Window::Create(ApplicationInfo.Name, static_cast<uint32_t>(ApplicationInfo.WindowSize.x), static_cast<uint32_t>(ApplicationInfo.WindowSize.y));
   auto popup = Window::Create("Popup", 500, 500);
 
   AssetManager::Init();

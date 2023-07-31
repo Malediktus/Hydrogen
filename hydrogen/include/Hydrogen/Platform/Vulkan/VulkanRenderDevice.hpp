@@ -2,6 +2,7 @@
 
 #include "../../Renderer/RenderDevice.hpp"
 #include "VulkanContext.hpp"
+#include <optional>
 
 namespace Hydrogen::Vulkan {
 using VkQueueFamily = std::optional<uint32_t>;
@@ -21,13 +22,13 @@ class VulkanRenderDevice : public RenderDevice {
   VkCommandPool GetCommandPool() { return m_CommandPool; }
 
  private:
-  void PickPhysicalDevice(const DynamicArray<const char*>& requiredExtensions, const std::function<std::size_t(const RenderDeviceProperties&)>& deviceRateFunction);
+  void PickPhysicalDevice(const DynamicArray<char*>& requiredExtensions, const std::function<std::size_t(const RenderDeviceProperties&)>& deviceRateFunction);
   void PopulateRenderDeviceProperties(RenderDeviceProperties& renderDeviceProperties, VkPhysicalDevice device);
-  void CreateLogicalDevice(const DynamicArray<const char*>& requiredExtensions, const DynamicArray<const char*>& validationLayers);
+  void CreateLogicalDevice(const DynamicArray<char*>& requiredExtensions, const DynamicArray<char*>& validationLayers);
   void CreateCommandPool();
 
   VkQueueFamily FindGraphicsQueueFamily(VkPhysicalDevice device);
-  bool CheckDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char*>& deviceExtensions);
+  bool CheckDeviceExtensionSupport(VkPhysicalDevice device, const DynamicArray<char*>& deviceExtensions);
 
   VkPhysicalDevice m_PhysicalDevice;
   VkQueueFamily m_GraphicsQueueFamily;

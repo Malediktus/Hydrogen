@@ -50,7 +50,7 @@ bool VulkanRenderDevice::ScreenSupported(const ReferencePointer<RenderWindow>& w
 
 void VulkanRenderDevice::WaitForIdle() { vkDeviceWaitIdle(m_Device); }
 
-void VulkanRenderDevice::PickPhysicalDevice(const DynamicArray<const char*>& requiredExtensions,
+void VulkanRenderDevice::PickPhysicalDevice(const DynamicArray<char*>& requiredExtensions,
                                             const std::function<std::size_t(const RenderDeviceProperties&)>& deviceRateFunction) {
   auto instance = Renderer::GetContext<VulkanContext>()->GetInstance();
 
@@ -124,7 +124,7 @@ void VulkanRenderDevice::PopulateRenderDeviceProperties(RenderDeviceProperties& 
   }
 }
 
-void VulkanRenderDevice::CreateLogicalDevice(const DynamicArray<const char*>& requiredExtensions, const DynamicArray<const char*>& validationLayers) {
+void VulkanRenderDevice::CreateLogicalDevice(const DynamicArray<char*>& requiredExtensions, const DynamicArray<char*>& validationLayers) {
   float queuePriority = 1.0f;
 
   VkDeviceQueueCreateInfo graphicsQueueCreateInfo{};
@@ -180,7 +180,7 @@ VkQueueFamily VulkanRenderDevice::FindGraphicsQueueFamily(VkPhysicalDevice devic
   return VkQueueFamily();
 }
 
-bool VulkanRenderDevice::CheckDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char*>& deviceExtensions) {
+bool VulkanRenderDevice::CheckDeviceExtensionSupport(VkPhysicalDevice device, const DynamicArray<char*>& deviceExtensions) {
   uint32_t extensionCount;
   vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
 

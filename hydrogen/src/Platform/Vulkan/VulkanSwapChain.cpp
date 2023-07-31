@@ -4,6 +4,7 @@
 #include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <tracy/Tracy.hpp>
+#include <algorithm>
 
 using namespace Hydrogen::Vulkan;
 

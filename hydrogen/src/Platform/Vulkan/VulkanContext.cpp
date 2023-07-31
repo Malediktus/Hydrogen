@@ -97,7 +97,7 @@ VulkanContext::~VulkanContext() {
   vkDestroyInstance(m_Instance, nullptr);
 }
 
-void VulkanContext::ConfigureExtensionsAndValidationLayers(const DynamicArray<const char*>& requiredExtensions) {
+void VulkanContext::ConfigureExtensionsAndValidationLayers(const DynamicArray<char*>& requiredExtensions) {
   m_ValidationLayers.push_back("VK_LAYER_KHRONOS_validation");
 #ifdef HY_DEBUG
   m_InstanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
@@ -143,7 +143,7 @@ void VulkanContext::CreateInstance(VkApplicationInfo appInfo, VkInstanceCreateFl
   VK_CHECK_ERROR(vkCreateInstance(&createInfo, nullptr, &m_Instance), "Failed to create vulkan instance!");
 }
 
-void VulkanContext::CheckExtensionSupport(const DynamicArray<const char*>& extensions) {
+void VulkanContext::CheckExtensionSupport(const DynamicArray<char*>& extensions) {
   uint32_t availableExtensionCount = 0;
   vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, nullptr);
 
@@ -166,7 +166,7 @@ void VulkanContext::CheckExtensionSupport(const DynamicArray<const char*>& exten
   }
 }
 
-void VulkanContext::CheckValidationLayerSupport(const DynamicArray<const char*>& validationLayers) {
+void VulkanContext::CheckValidationLayerSupport(const DynamicArray<char*>& validationLayers) {
   uint32_t availableLayerCount;
   vkEnumerateInstanceLayerProperties(&availableLayerCount, nullptr);
 

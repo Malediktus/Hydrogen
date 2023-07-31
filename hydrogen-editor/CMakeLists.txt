@@ -9,7 +9,7 @@ target_compile_features(HydrogenEditor PRIVATE cxx_std_17)
 if(MSVC)
     target_compile_options(HydrogenEditor PRIVATE /W4 /WX)
 else()
-    target_compile_options(HydrogenEditor PRIVATE -Wall -Wextra -Wpedantic)
+    target_compile_options(HydrogenEditor PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
 target_link_libraries(HydrogenEditor PRIVATE Hydrogen glfw)

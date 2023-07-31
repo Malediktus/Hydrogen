@@ -75,19 +75,19 @@ class ShaderAsset : public Asset {
           outfile.close();
         } else {
           std::uintmax_t fileSize = std::filesystem::file_size(outfilepath);
-          std::ifstream infile;
+          std::ifstream infile2;
 
-          infile.open(outfilepath, std::ios::in | std::ios::binary);
-          HY_ASSERT(infile.is_open(), "Failed to open file {}!", outfilepath);
-          infile.unsetf(std::ios::skipws);
+          infile2.open(outfilepath, std::ios::in | std::ios::binary);
+          HY_ASSERT(infile2.is_open(), "Failed to open file {}!", outfilepath);
+          infile2.unsetf(std::ios::skipws);
 
           DynamicArray<char> fileData(fileSize);
-          infile.read(fileData.data(), fileSize);
+          infile2.read(fileData.data(), fileSize);
 
           currentShader->resize(fileSize / sizeof(uint32_t));
           std::memcpy(currentShader->data(), fileData.data(), fileSize);
 
-          infile.close();
+          infile2.close();
         }
 
         cache.UpdateCacheChecksum();
@@ -109,7 +109,7 @@ class ShaderAsset : public Asset {
   const DynamicArray<uint32_t>& GetGeometryShader() { return m_GeometryShader; }
   const String& GetName() { return m_Name; }
 
-  static const DynamicArray<const String> GetFileExtensions() { return DynamicArray<const String>{".glsl"}; }
+  static const DynamicArray<String> GetFileExtensions() { return DynamicArray<String>{".glsl"}; }
 
   static bool CheckFileExtensions(const String& ext) {
     auto exts = GetFileExtensions();

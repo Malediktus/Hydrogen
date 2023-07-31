@@ -100,12 +100,12 @@ target_include_directories(Hydrogen PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_compile_definitions(Hydrogen PRIVATE HY_EXPORT_API)
 target_compile_definitions(Hydrogen PRIVATE $<$<CONFIG:Debug>:HY_DEBUG>)
 target_compile_definitions(Hydrogen PRIVATE $<$<CONFIG:Release>:HY_RELEASE>)
-target_compile_features(Hydrogen PUBLIC cxx_std_17)
+target_compile_features(Hydrogen PUBLIC cxx_std_20)
 
 if(MSVC)
     target_compile_options(Hydrogen PRIVATE /W4 /WX)
 else()
-    target_compile_options(Hydrogen PRIVATE -Wall -Wextra -Wpedantic)
+    target_compile_options(Hydrogen PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
 set(GLSLANGLIBS
