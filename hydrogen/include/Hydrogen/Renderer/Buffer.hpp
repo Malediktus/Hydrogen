@@ -1,12 +1,12 @@
 #pragma once
 
 #include "../Core/Assert.hpp"
-#include "../Core/Base.hpp"
 #include "../Core/Memory.hpp"
-#include "CommandBuffer.hpp"
-#include "RenderDevice.hpp"
 
 namespace Hydrogen {
+class CommandBuffer;
+class RenderDevice;
+
 enum class ShaderDataType { None = 0, Float = 1, Float2 = 2, Float3 = 3, Float4 = 4, Mat3 = 5, Mat4 = 6, Int = 7, Int2 = 8, Int3 = 9, Int4 = 10, Bool = 11 };
 
 namespace Utils {

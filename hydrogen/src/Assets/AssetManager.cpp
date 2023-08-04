@@ -1,6 +1,4 @@
 #include <Hydrogen/Assets/AssetManager.hpp>
-#include <Hydrogen/Assets/ShaderAsset.hpp>
-#include <Hydrogen/Assets/SpriteAsset.hpp>
 
 using namespace Hydrogen;
 

@@ -1,8 +1,6 @@
 #pragma once
 
 #include <filesystem>
-
-#include "../Core/Logger.hpp"
 #include "../Core/Memory.hpp"
 #include "Asset.hpp"
 #include "ShaderAsset.hpp"

@@ -1,11 +1,9 @@
 #pragma once
 
 #include <glm/ext/matrix_transform.hpp>
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <tracy/Tracy.hpp>
-
 #include "../Math/Math.hpp"
+#include <tracy/Tracy.hpp>
 
 namespace Hydrogen {
 class Camera {

@@ -1,6 +1,6 @@
-#include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
 #include <Hydrogen/Renderer/Buffer.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen;
