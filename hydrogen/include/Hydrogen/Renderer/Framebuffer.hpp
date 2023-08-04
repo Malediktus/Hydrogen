@@ -3,11 +3,12 @@
 #include "../Core/Assert.hpp"
 #include "../Core/Base.hpp"
 #include "../Core/Memory.hpp"
-#include "RenderDevice.hpp"
-#include "RenderPass.hpp"
-#include "SwapChain.hpp"
 
 namespace Hydrogen {
+class RenderDevice;
+class RenderPass;
+class SwapChain;
+
 class Framebuffer {
  public:
   virtual ~Framebuffer() = default;

@@ -2,6 +2,8 @@
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRenderPass.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanFramebuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <tracy/Tracy.hpp>
 
@@ -53,4 +55,21 @@ VulkanRenderPass::VulkanRenderPass(const ReferencePointer<RenderDevice>& renderD
 VulkanRenderPass::~VulkanRenderPass() {
   ZoneScoped;
   vkDestroyRenderPass(m_RenderDevice->GetDevice(), m_RenderPass, nullptr);
+}
+
+void VulkanRenderPass::Begin(const ReferencePointer<CommandBuffer>& commandBuffer, const ReferencePointer<Framebuffer>& framebuffer, Vector4 clearColor) {
+  auto vulkanCommandBuffer = std::dynamic_pointer_cast<VulkanCommandBuffer>(commandBuffer);
+
+  VkRenderPassBeginInfo renderPassInfo{};
+  renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+  renderPassInfo.renderPass = m_RenderPass;
+  renderPassInfo.framebuffer = std::dynamic_pointer_cast<VulkanFramebuffer>(framebuffer)->GetFramebuffers()[vulkanCommandBuffer->GetImageIndex()];
+  renderPassInfo.renderArea.offset = {0, 0};
+  renderPassInfo.renderArea.extent = m_SwapChain->GetExtent();
+
+  VkClearValue vkClearColor = {{{clearColor.r, clearColor.g, clearColor.b, clearColor.a}}};
+  renderPassInfo.clearValueCount = 1;
+  renderPassInfo.pClearValues = &vkClearColor;
+
+  vkCmdBeginRenderPass(vulkanCommandBuffer->GetCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 }

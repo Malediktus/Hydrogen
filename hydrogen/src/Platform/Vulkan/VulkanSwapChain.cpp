@@ -2,6 +2,7 @@
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <tracy/Tracy.hpp>
 #include <algorithm>
@@ -109,6 +110,12 @@ VulkanSwapChain::~VulkanSwapChain() {
 
   vkDestroySwapchainKHR(m_RenderDevice->GetDevice(), m_SwapChain, nullptr);
   vkDestroySurfaceKHR(Renderer::GetContext<VulkanContext>()->GetInstance(), m_WindowSurface, nullptr);
+}
+
+void VulkanSwapChain::AcquireNextImage(const ReferencePointer<CommandBuffer>& commandBuffer) {
+  auto vulkanCommandBuffer = std::dynamic_pointer_cast<VulkanCommandBuffer>(commandBuffer);
+  vkAcquireNextImageKHR(m_RenderDevice->GetDevice(), m_SwapChain, UINT64_MAX, vulkanCommandBuffer->GetImageAvailableSemaphore(), VK_NULL_HANDLE,
+                        vulkanCommandBuffer->GetImageIndexPointer());
 }
 
 SwapChainSupportDetails VulkanSwapChain::QuerySwapChainSupportDetails(VkPhysicalDevice device, const ReferencePointer<RenderWindow>& window) {

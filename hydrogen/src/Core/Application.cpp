@@ -1,8 +1,12 @@
 #include <imgui.h>
-
-#include <Hydrogen/Assets/AssetManager.hpp>
 #include <Hydrogen/Core/Application.hpp>
+#include <Hydrogen/Core/Window.hpp>
+#include <Hydrogen/Core/Logger.hpp>
 #include <Hydrogen/Core/Task.hpp>
+#include <Hydrogen/Event/EventManager.hpp>
+#include <Hydrogen/Renderer/Renderer.hpp>
+#include <Hydrogen/Assets/AssetManager.hpp>
+#include <Hydrogen/Scene/Scene.hpp>
 
 using namespace Hydrogen;
 

@@ -3,7 +3,6 @@
 #include "../../Renderer/SwapChain.hpp"
 #include "VulkanContext.hpp"
 #include "VulkanRenderDevice.hpp"
-#include "VulkanSemaphore.hpp"
 
 namespace Hydrogen::Vulkan {
 struct SwapChainSupportDetails {
@@ -16,6 +15,8 @@ class VulkanSwapChain : public SwapChain {
  public:
   VulkanSwapChain(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& renderDevice, bool verticalSync);
   virtual ~VulkanSwapChain();
+
+  virtual void AcquireNextImage(const ReferencePointer<CommandBuffer>& commandBuffer) override;
 
   static SwapChainSupportDetails QuerySwapChainSupportDetails(VkPhysicalDevice device, const ReferencePointer<RenderWindow>& window);
   static SwapChainSupportDetails QuerySwapChainSupportDetails(VkPhysicalDevice device, VkSurfaceKHR surface);

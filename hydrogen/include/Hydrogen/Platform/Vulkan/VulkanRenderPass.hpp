@@ -11,6 +11,7 @@ class VulkanRenderPass : public RenderPass {
   VulkanRenderPass(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain);
   virtual ~VulkanRenderPass();
 
+  virtual void Begin(const ReferencePointer<CommandBuffer>& commandBuffer, const ReferencePointer<Framebuffer>& framebuffer, Vector4 clearColor) override;
   VkRenderPass GetRenderPass() { return m_RenderPass; }
 
  private:

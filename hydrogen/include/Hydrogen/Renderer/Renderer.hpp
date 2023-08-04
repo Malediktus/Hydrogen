@@ -8,11 +8,9 @@
 #include "Camera.hpp"
 #include "CommandBuffer.hpp"
 #include "Context.hpp"
-#include "Fence.hpp"
 #include "Framebuffer.hpp"
 #include "RenderDevice.hpp"
 #include "RendererAPI.hpp"
-#include "Semaphore.hpp"
 #include "Shader.hpp"
 #include "SwapChain.hpp"
 #include "Texture.hpp"
@@ -86,14 +84,12 @@ class Renderer {
  private:
   bool m_FirstFrame;
   static ReferencePointer<Context> s_Context;
+  ReferencePointer<RenderDevice> m_Device;
   ReferencePointer<SwapChain> m_SwapChain;
   ReferencePointer<RenderPass> m_RenderPass;
   ReferencePointer<Shader> m_Shader;
   ReferencePointer<Framebuffer> m_Framebuffer;
   ReferencePointer<CommandBuffer> m_CommandBuffer;
-  ReferencePointer<Semaphore> m_ImageAvailableSemaphore;
-  ReferencePointer<Semaphore> m_RenderFinishedSemaphore;
-  ReferencePointer<Fence> m_InFlightFence;
   ReferencePointer<VertexBuffer> m_VertexBuffer;
 };
 }  // namespace Hydrogen

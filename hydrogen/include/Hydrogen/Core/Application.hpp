@@ -1,16 +1,14 @@
 #pragma once
 
-#include "../Event/EventManager.hpp"
-#include "../Math/Math.hpp"
-#include "../Renderer/Context.hpp"
-#include "../Renderer/RenderPass.hpp"
-#include "../Renderer/Renderer.hpp"
-#include "../Scene/Scene.hpp"
-#include "Logger.hpp"
 #include "Memory.hpp"
-#include "Window.hpp"
+#include "../Math/Math.hpp"
 
 namespace Hydrogen {
+class Logger;
+class Window;
+class Scene;
+class Event;
+
 class Application {
  public:
   Application();

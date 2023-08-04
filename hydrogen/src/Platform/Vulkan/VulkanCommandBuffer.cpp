@@ -7,7 +7,9 @@
 using namespace Hydrogen;
 using namespace Hydrogen::Vulkan;
 
-VulkanCommandBuffer::VulkanCommandBuffer(const ReferencePointer<RenderDevice>& renderDevice) : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)) {
+VulkanCommandBuffer::VulkanCommandBuffer(const ReferencePointer<RenderDevice>& renderDevice)
+    : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)),
+    m_ImageIndex(0) {
   VkCommandBufferAllocateInfo allocInfo{};
   allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
   allocInfo.commandPool = m_RenderDevice->GetCommandPool();
@@ -41,34 +43,16 @@ VulkanCommandBuffer::~VulkanCommandBuffer() {
 void VulkanCommandBuffer::Reset() {
   vkWaitForFences(m_RenderDevice->GetDevice(), 1, &m_InFlightFence, VK_TRUE, UINT64_MAX);
   vkResetFences(m_RenderDevice->GetDevice(), 1, &m_InFlightFence);
-
   vkResetCommandBuffer(m_CommandBuffer, 0);
 }
 
-void VulkanCommandBuffer::Begin(const ReferencePointer<RenderPass>& renderPass, const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<Framebuffer>& framebuffer,
-                                Vector4 clearColor) {
-  vkAcquireNextImageKHR(m_RenderDevice->GetDevice(), std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)->GetSwapChain(), UINT64_MAX, m_ImageAvailableSemaphore, VK_NULL_HANDLE,
-                        &m_ImageIndex);
-
+void VulkanCommandBuffer::Begin() {
   VkCommandBufferBeginInfo beginInfo{};
   beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
   beginInfo.flags = 0;                   // Optional
   beginInfo.pInheritanceInfo = nullptr;  // Optional
 
   VK_CHECK_ERROR(vkBeginCommandBuffer(m_CommandBuffer, &beginInfo), "Failed to begin vulkan command buffer!");
-
-  VkRenderPassBeginInfo renderPassInfo{};
-  renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-  renderPassInfo.renderPass = std::dynamic_pointer_cast<VulkanRenderPass>(renderPass)->GetRenderPass();
-  renderPassInfo.framebuffer = std::dynamic_pointer_cast<VulkanFramebuffer>(framebuffer)->GetFramebuffers()[m_ImageIndex];
-  renderPassInfo.renderArea.offset = {0, 0};
-  renderPassInfo.renderArea.extent = std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)->GetExtent();
-
-  VkClearValue vkClearColor = {{{clearColor.r, clearColor.g, clearColor.b, clearColor.a}}};
-  renderPassInfo.clearValueCount = 1;
-  renderPassInfo.pClearValues = &vkClearColor;
-
-  vkCmdBeginRenderPass(m_CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 }
 
 void VulkanCommandBuffer::End(const ReferencePointer<SwapChain> swapChain) {
@@ -132,9 +116,11 @@ void VulkanCommandBuffer::CmdSetViewport(const ReferencePointer<SwapChain>& swap
   viewport.minDepth = 0.0f;
   viewport.maxDepth = 1.0f;
   vkCmdSetViewport(m_CommandBuffer, 0, 1, &viewport);
+}
 
+void VulkanCommandBuffer::CmdSetScissor(const ReferencePointer<SwapChain>& swapChain, int offsetX, int offsetY) {
   VkRect2D scissor{};
-  scissor.offset = {0, 0};
-  scissor.extent = swapChainExtent;
+  scissor.offset = {offsetX, offsetY};
+  scissor.extent = std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)->GetExtent();
   vkCmdSetScissor(m_CommandBuffer, 0, 1, &scissor);
 }
