@@ -82,6 +82,10 @@ VulkanShader::VulkanShader(const BufferLayout& vertexLayout, const ReferencePoin
   DynamicArray<VkPipelineShaderStageCreateInfo> shaderStageCreateInfos;
   shaderStageCreateInfos.reserve(3);
 
+  m_VertexShaderModule = VK_NULL_HANDLE;
+  m_FragmentShaderModule = VK_NULL_HANDLE;
+  m_GeometryShaderModule = VK_NULL_HANDLE;
+
   if (vertexSrc.size() > 0) {
     VkShaderModuleCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
