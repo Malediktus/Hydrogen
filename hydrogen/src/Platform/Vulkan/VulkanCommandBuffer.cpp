@@ -55,17 +55,19 @@ void VulkanCommandBuffer::Begin() {
   VK_CHECK_ERROR(vkBeginCommandBuffer(m_CommandBuffer, &beginInfo), "Failed to begin vulkan command buffer!");
 }
 
-void VulkanCommandBuffer::End(const ReferencePointer<SwapChain> swapChain) {
+void VulkanCommandBuffer::End() {
   vkCmdEndRenderPass(m_CommandBuffer);
   VK_CHECK_ERROR(vkEndCommandBuffer(m_CommandBuffer), "Failed to end vulkan command buffer!");
+}
 
+void VulkanCommandBuffer::CmdUploadResources() {
   VkSubmitInfo submitInfo{};
   submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-  VkSemaphore waitSemaphores1[] = {m_ImageAvailableSemaphore};
+  VkSemaphore waitSemaphores[] = {m_ImageAvailableSemaphore};
   VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
   submitInfo.waitSemaphoreCount = 1;
-  submitInfo.pWaitSemaphores = waitSemaphores1;
+  submitInfo.pWaitSemaphores = waitSemaphores;
   submitInfo.pWaitDstStageMask = waitStages;
   submitInfo.commandBufferCount = 1;
   submitInfo.pCommandBuffers = &m_CommandBuffer;
@@ -76,13 +78,16 @@ void VulkanCommandBuffer::End(const ReferencePointer<SwapChain> swapChain) {
 
   VK_CHECK_ERROR(vkQueueSubmit(m_RenderDevice->GetGraphicsQueue(), 1, &submitInfo, m_InFlightFence), "Failed to submit vulkan graphics queue!");
 
-  VkSemaphore waitSemaphores2[] = {m_RenderFinishedSemaphore};
+}
+
+void VulkanCommandBuffer::CmdDisplayImage(const ReferencePointer<SwapChain> swapChain) {
+  VkSemaphore waitSemaphores[] = {m_RenderFinishedSemaphore};
 
   VkPresentInfoKHR presentInfo{};
   presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
   presentInfo.waitSemaphoreCount = 1;
-  presentInfo.pWaitSemaphores = waitSemaphores2;
+  presentInfo.pWaitSemaphores = waitSemaphores;
 
   VkSwapchainKHR swapChains[] = {std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)->GetSwapChain()};
   presentInfo.swapchainCount = 1;

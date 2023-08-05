@@ -47,13 +47,16 @@ set(HEADER_LIST
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanRenderPass.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/MacOS/MacOSWindow.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Windows/WindowsWindow.hpp")
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/MacOS/MacOSEntry.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Windows/WindowsWindow.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Windows/WindowsEntry.hpp")
 
 set(SOURCE_LIST
     src/Core/Platform.cpp
     src/Core/Memory.cpp
     src/Core/Logger.cpp
     src/Core/Application.cpp
+    src/Core/Entry.cpp
     src/Core/Task.cpp
     src/Core/Cache.cpp
     src/Core/Window.cpp
@@ -86,7 +89,9 @@ set(SOURCE_LIST
     src/Platform/Vulkan/VulkanRenderPass.cpp
     src/Platform/Vulkan/VulkanCommandBuffer.cpp
     src/Platform/MacOS/MacOSWindow.cpp
-    src/Platform/Windows/WindowsWindow.cpp)
+    src/Platform/MacOS/MacOSEntry.cpp
+    src/Platform/Windows/WindowsWindow.cpp
+    src/Platform/Windows/WindowsEntry.cpp)
 
 add_library(Hydrogen ${SOURCE_LIST} ${HEADER_LIST})
 

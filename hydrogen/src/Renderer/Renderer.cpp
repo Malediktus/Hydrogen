@@ -38,5 +38,7 @@ void Renderer::Render() {
   m_CommandBuffer->CmdSetViewport(m_SwapChain);
   m_CommandBuffer->CmdSetScissor(m_SwapChain);
   m_CommandBuffer->CmdDraw(m_VertexBuffer);
-  m_CommandBuffer->End(m_SwapChain);
+  m_CommandBuffer->End();
+  m_CommandBuffer->CmdUploadResources();
+  m_CommandBuffer->CmdDisplayImage(m_SwapChain);
 }

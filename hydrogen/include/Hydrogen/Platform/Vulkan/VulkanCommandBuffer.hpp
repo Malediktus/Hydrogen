@@ -15,8 +15,10 @@ class VulkanCommandBuffer : public CommandBuffer {
 
   virtual void Reset() override;
   virtual void Begin() override;
-  virtual void End(const ReferencePointer<SwapChain> swapChain) override;
+  virtual void End() override;
 
+  virtual void CmdUploadResources() override;
+  virtual void CmdDisplayImage(const ReferencePointer<SwapChain> swapChain) override;
   virtual void CmdDraw(const ReferencePointer<VertexBuffer>& vertexBuffer) override;
   virtual void CmdSetViewport(const ReferencePointer<SwapChain>& swapChain, uint32_t width = UINT32_MAX, uint32_t height = UINT32_MAX) override;
   virtual void CmdSetScissor(const ReferencePointer<SwapChain>& swapChain, int offsetX = 0, int offsetY = 0) override;

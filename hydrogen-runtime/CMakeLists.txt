@@ -1,4 +1,9 @@
-add_executable(HydrogenDemo demo.cpp)
+if(MSVC)
+    add_executable(HydrogenDemo WIN32 demo.cpp)
+else()
+    add_executable(HydrogenDemo demo.cpp)
+endif()
+
 target_compile_features(HydrogenDemo PRIVATE cxx_std_17)
 
 if(MSVC)
