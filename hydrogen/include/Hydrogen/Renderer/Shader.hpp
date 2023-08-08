@@ -9,7 +9,7 @@
 #include "Buffer.hpp"
 #include "CommandBuffer.hpp"
 #include "RenderDevice.hpp"
-#include "RenderPass.hpp"
+#include "Framebuffer.hpp"
 #include "SwapChain.hpp"
 
 namespace Hydrogen {
@@ -22,7 +22,7 @@ class Shader {
   virtual const String& GetName() const = 0;
 
   static ReferencePointer<Shader> Create(const BufferLayout& vertexLayout, const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
-                                         const ReferencePointer<RenderPass>& renderPass, const String& name, const DynamicArray<uint32_t>& vertexSrc,
+                                         const ReferencePointer<Framebuffer>& framebuffer, const String& name, const DynamicArray<uint32_t>& vertexSrc,
                                          const DynamicArray<uint32_t>& fragmentSrc, const DynamicArray<uint32_t>& geometrySrc);
 };
 
@@ -31,7 +31,7 @@ class ShaderLibrary {
   void Add(const String& name, const ReferencePointer<Shader>& shader);
   void Add(const ReferencePointer<Shader>& shader);
   ReferencePointer<Shader> Load(const BufferLayout& vertexLayout, const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
-                                const ReferencePointer<RenderPass>& renderPass, const String& name, const DynamicArray<uint32_t>& vertexSrc,
+                                const ReferencePointer<Framebuffer>& framebuffer, const String& name, const DynamicArray<uint32_t>& vertexSrc,
                                 const DynamicArray<uint32_t>& fragmentSrc, const DynamicArray<uint32_t>& geometrySrc);
 
   ReferencePointer<Shader> Get(const String& name);

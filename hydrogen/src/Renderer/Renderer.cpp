@@ -15,10 +15,9 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const Reference
   const float vertices[] = {0.0f, -0.5f, 1.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f};
 
   m_SwapChain = SwapChain::Create(window, device, true);
-  m_RenderPass = RenderPass::Create(device, m_SwapChain);
+  m_Framebuffer = Framebuffer::Create(device, m_SwapChain);
   m_Shader = AssetManager::Get<ShaderAsset>("assets/Raw.glsl")
-                 ->CreateShader({{ShaderDataType::Float2, "Position", false}, {ShaderDataType::Float3, "Color", false}}, device, m_SwapChain, m_RenderPass);
-  m_Framebuffer = Framebuffer::Create(device, m_SwapChain, m_RenderPass);
+                 ->CreateShader({{ShaderDataType::Float2, "Position", false}, {ShaderDataType::Float3, "Color", false}}, device, m_SwapChain, m_Framebuffer);
 
   m_CommandBuffers.resize(s_MaxFramesInFlight);
   for (uint32_t i = 0; i < s_MaxFramesInFlight; i++)
@@ -40,14 +39,19 @@ void Renderer::Render() {
 
   commandBuffer->Reset();
   m_SwapChain->AcquireNextImage(commandBuffer);
+
   commandBuffer->Begin();
-  m_RenderPass->Begin(commandBuffer, m_Framebuffer, {1.0f, 0.0f, 1.0f, 1.0f});
-  m_Shader->Bind(commandBuffer);
-  m_VertexBuffer->Bind(commandBuffer);
-  commandBuffer->CmdSetViewport(m_SwapChain);
-  commandBuffer->CmdSetScissor(m_SwapChain);
-  commandBuffer->CmdDraw(m_VertexBuffer);
+  {
+    m_Framebuffer->Bind(commandBuffer);
+    m_Shader->Bind(commandBuffer);
+    m_VertexBuffer->Bind(commandBuffer);
+
+    commandBuffer->CmdSetViewport(m_SwapChain);
+    commandBuffer->CmdSetScissor(m_SwapChain);
+    commandBuffer->CmdDraw(m_VertexBuffer);
+  }
   commandBuffer->End();
+
   commandBuffer->CmdUploadResources();
   commandBuffer->CmdDisplayImage(m_SwapChain);
 

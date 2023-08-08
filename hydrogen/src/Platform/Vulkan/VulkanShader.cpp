@@ -56,12 +56,12 @@ static VkFormat ShaderDataTypeToVkFormat(ShaderDataType type) {
 }  // namespace Hydrogen::Vulkan::Utils
 
 VulkanShader::VulkanShader(const BufferLayout& vertexLayout, const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
-                           const ReferencePointer<RenderPass>& renderPass, const String& name, const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc,
+                           const ReferencePointer<Framebuffer>& framebuffer, const String& name, const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc,
                            const DynamicArray<uint32_t>& geometrySrc)
     : m_Name(name),
       m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)),
       m_SwapChain(std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)),
-      m_RenderPass(std::dynamic_pointer_cast<VulkanRenderPass>(renderPass)) {
+      m_Framebuffer(std::dynamic_pointer_cast<VulkanFramebuffer>(framebuffer)) {
   ZoneScoped;
 
   VkVertexInputBindingDescription bindingDescription{};
@@ -247,7 +247,7 @@ VulkanShader::VulkanShader(const BufferLayout& vertexLayout, const ReferencePoin
   pipelineInfo.pColorBlendState = &colorBlending;
   pipelineInfo.pDynamicState = &dynamicState;
   pipelineInfo.layout = m_PipelineLayout;
-  pipelineInfo.renderPass = m_RenderPass->GetRenderPass();
+  pipelineInfo.renderPass = m_Framebuffer->GetRenderPass();
   pipelineInfo.subpass = 0;
   pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;  // Optional
   pipelineInfo.basePipelineIndex = -1;               // Optional

@@ -100,8 +100,8 @@ class ShaderAsset : public Asset {
   }
 
   ReferencePointer<Shader> CreateShader(const BufferLayout& vertexLayout, const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
-                                        const ReferencePointer<RenderPass>& renderPass) {
-    return Shader::Create(vertexLayout, renderDevice, swapChain, renderPass, m_Name, m_VertexShader, m_FragmentShader, m_GeometryShader);
+                                        const ReferencePointer<Framebuffer>& framebuffer) {
+    return Shader::Create(vertexLayout, renderDevice, swapChain, framebuffer, m_Name, m_VertexShader, m_FragmentShader, m_GeometryShader);
   }
 
   const DynamicArray<uint32_t>& GetVertexShader() { return m_VertexShader; }

@@ -3,7 +3,6 @@
 #include "../../Renderer/CommandBuffer.hpp"
 #include "VulkanFramebuffer.hpp"
 #include "VulkanRenderDevice.hpp"
-#include "VulkanRenderPass.hpp"
 #include "VulkanShader.hpp"
 #include "VulkanSwapChain.hpp"
 
