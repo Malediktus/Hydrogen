@@ -41,8 +41,12 @@ class WindowsWindow : public Window {
   void* GetVulkanWindowSurface() override;
 
  private:
+  void OnWindowResize(GLFWwindow* window, int width, int height);
+  void OnWindowClose(GLFWwindow* window);
+  void OnKeyboardEvent(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+
   GLFWwindow* m_Window;
-  static bool s_GlfwInitialized;
   void* m_VulkanSurface;
 };
 }  // namespace Hydrogen

@@ -8,12 +8,12 @@
 
 using namespace Hydrogen;
 
-bool WindowsWindow::s_GlfwInitialized;
+Window* Window::s_MainWindow = nullptr;
 
 WindowsWindow::WindowsWindow(const std::string& title, uint32_t width, uint32_t height) {
-  if (!s_GlfwInitialized) {
-    HY_ASSERT(glfwInit(), "Init glfw");
-    s_GlfwInitialized = true;
+  if (s_MainWindow == nullptr) {
+    HY_ASSERT(glfwInit(), "Failed to initialize GLFW!");
+    s_MainWindow = this;
   }
 
   auto api = RenderWindow::ChooseRenderingAPI(glfwVulkanSupported());
@@ -35,7 +35,12 @@ WindowsWindow::WindowsWindow(const std::string& title, uint32_t width, uint32_t 
   HY_ASSERT(m_Window, "glfw window is null");
 }
 
-WindowsWindow::~WindowsWindow() { glfwDestroyWindow(m_Window); }
+WindowsWindow::~WindowsWindow() {
+  glfwDestroyWindow(m_Window);
+  if (s_MainWindow == this) {
+    glfwTerminate();
+  }
+}
 
 void WindowsWindow::SetTitle(const std::string& title) { glfwSetWindowTitle(m_Window, title.c_str()); }
 

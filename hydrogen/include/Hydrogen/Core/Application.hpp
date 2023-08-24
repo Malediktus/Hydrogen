@@ -7,7 +7,6 @@ namespace Hydrogen {
 class Logger;
 class Window;
 class Scene;
-class Event;
 
 class Application {
  public:
@@ -20,7 +19,6 @@ class Application {
   virtual void OnShutdown() = 0;
   virtual void OnUpdate() = 0;
   virtual void OnImGuiDraw() = 0;
-  virtual void OnEvent(const Event& event) = 0;
 
  protected:
   ReferencePointer<Logger> Console;
@@ -34,7 +32,6 @@ class Application {
 
  private:
   bool m_Initialized = false;
-  void OnResize(const Event& event);
 };
 
 extern ReferencePointer<Application> CreateApplication();

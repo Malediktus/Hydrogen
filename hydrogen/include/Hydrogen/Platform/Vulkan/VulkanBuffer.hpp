@@ -4,7 +4,17 @@
 #include "VulkanRenderDevice.hpp"
 
 namespace Hydrogen::Vulkan {
-class VulkanVertexBuffer : public VertexBuffer {
+class VulkanBuffer {
+ public:
+  VulkanBuffer(ReferencePointer<VulkanRenderDevice> renderDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties);
+  virtual ~VulkanBuffer() = default;
+
+ protected:
+  VkBuffer m_Buffer;
+  VkDeviceMemory m_BufferMemory;
+};
+
+class VulkanVertexBuffer : public VertexBuffer, public VulkanBuffer {
  public:
   VulkanVertexBuffer(const ReferencePointer<RenderDevice>& device, size_t size);
   VulkanVertexBuffer(const ReferencePointer<RenderDevice>& device, float* vertices, size_t size);
@@ -17,15 +27,13 @@ class VulkanVertexBuffer : public VertexBuffer {
   virtual const BufferLayout& GetLayout() const override { return m_Layout; }
   virtual void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
 
-  VkBuffer GetVertexBuffer() { return m_VertexBuffer; }
+  VkBuffer GetVertexBuffer() { return m_Buffer; }
   size_t GetSize() { return m_Size; }
 
  private:
   uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
   ReferencePointer<VulkanRenderDevice> m_RenderDevice;
-  VkBuffer m_VertexBuffer;
-  VkDeviceMemory m_VertexBufferMemory;
   BufferLayout m_Layout;
   size_t m_Size;
 };

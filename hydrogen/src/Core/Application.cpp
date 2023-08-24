@@ -3,7 +3,6 @@
 #include <Hydrogen/Core/Window.hpp>
 #include <Hydrogen/Core/Logger.hpp>
 #include <Hydrogen/Core/Task.hpp>
-#include <Hydrogen/Event/EventManager.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <Hydrogen/Assets/AssetManager.hpp>
 #include <Hydrogen/Scene/Scene.hpp>
@@ -81,19 +80,6 @@ void Application::Run() {
 
   CurrentScene = NewReferencePointer<Scene>();
 
-  // Register event callbacks
-  EventDispatcher::Subscribe<WindowResizeEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
-  EventDispatcher::Subscribe<WindowCloseEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
-  EventDispatcher::Subscribe<KeyPressEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
-  EventDispatcher::Subscribe<KeyReleaseEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
-  EventDispatcher::Subscribe<KeyRepeatEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
-  EventDispatcher::Subscribe<MouseMoveEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
-  EventDispatcher::Subscribe<MousePressEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
-  EventDispatcher::Subscribe<MouseReleaseEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
-  EventDispatcher::Subscribe<MouseScrollEvent>(std::bind(&Application::OnEvent, this, std::placeholders::_1));
-
-  EventDispatcher::Subscribe<WindowResizeEvent>(std::bind(&Application::OnResize, this, std::placeholders::_1));
-
   m_Initialized = true;
   OnInit();
 
@@ -138,10 +124,4 @@ void Application::Run() {
   renderer.reset();
   renderDevice.reset();
   Renderer::SetContext(nullptr);
-}
-
-void Application::OnResize(const Event& event) {
-  if (!m_Initialized) return;
-  auto resizeEvent = dynamic_cast<const WindowResizeEvent&>(event);
-  HY_LOG_DEBUG("Resizing renderer: {}, {}", resizeEvent.GetWidth(), resizeEvent.GetHeight());
 }

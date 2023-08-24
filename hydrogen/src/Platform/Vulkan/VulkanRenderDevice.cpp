@@ -15,8 +15,10 @@ VulkanRenderDevice::VulkanRenderDevice(std::function<std::size_t(const RenderDev
 
   PickPhysicalDevice(deviceExtensions, deviceRateFunction);
   m_GraphicsQueueFamily = FindGraphicsQueueFamily(m_PhysicalDevice);
+  m_TransferQueueFamily = FindTransferQueueFamily(m_PhysicalDevice);
   CreateLogicalDevice(deviceExtensions, validationLayers);
   vkGetDeviceQueue(m_Device, m_GraphicsQueueFamily.value(), 0, &m_GraphicsQueue);
+  vkGetDeviceQueue(m_Device, m_TransferQueueFamily.value(), 0, &m_TransferQueue);
   CreateCommandPool();
 }
 
@@ -66,6 +68,8 @@ void VulkanRenderDevice::PickPhysicalDevice(const DynamicArray<char*>& requiredE
   for (auto& device : devices) {
     auto graphicsQueueFamily = FindGraphicsQueueFamily(device);
     if (!graphicsQueueFamily.has_value()) continue;
+    auto transferQueueFamily = FindTransferQueueFamily(device);
+    if (!transferQueueFamily.has_value()) continue;
     if (!CheckDeviceExtensionSupport(device, requiredExtensions)) continue;
 
     RenderDeviceProperties renderDeviceProperties;
@@ -171,6 +175,25 @@ VkQueueFamily VulkanRenderDevice::FindGraphicsQueueFamily(VkPhysicalDevice devic
   int i = 0;
   for (const auto& queueFamily : queueFamilies) {
     if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+      return i;
+    }
+
+    i++;
+  }
+
+  return VkQueueFamily();
+}
+
+VkQueueFamily VulkanRenderDevice::FindTransferQueueFamily(VkPhysicalDevice device) {
+  uint32_t queueFamilyCount = 0;
+  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+  DynamicArray<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+  int i = 0;
+  for (const auto& queueFamily : queueFamilies) {
+    if (queueFamily.queueFlags & VK_QUEUE_TRANSFER_BIT) {
       return i;
     }
 

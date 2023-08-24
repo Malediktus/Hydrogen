@@ -20,9 +20,9 @@ set(ASSET_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Assets/ShaderAsset.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Assets/SpriteAsset.hpp"
 )
-set(EVENT_HEADERS
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Event/EventManager.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Event/KeyCodes.hpp"
+set(EVENTS_HEADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Events/EventSystem.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Events/KeyCodes.hpp"
 )
 set(SCENE_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Scene/Scene.hpp"
@@ -71,7 +71,7 @@ set(HEADER_LIST
     ${BASE_HEADERS}
     ${CORE_HEADERS}
     ${ASSET_HEADERS}
-    ${EVENT_HEADERS}
+    ${EVENTS_HEADERS}
     ${SCENE_HEADERS}
     ${MATH_HEADERS}
     ${RENDERER_HEADERS}
@@ -93,8 +93,8 @@ set(CORE_SOURCES
 set(ASSET_SOURCES
     src/Assets/AssetManager.cpp
 )
-set(EVENT_SOURCES
-    src/Event/EventManager.cpp
+set(EVENTS_SOURCES
+    src/Events/EventSystem.cpp
 )
 set(SCENE_SOURCES
     src/Scene/Scene.cpp
@@ -137,7 +137,7 @@ set(WINDOWS_SOURCES
 set(SOURCE_LIST
     ${CORE_SOURCES}
     ${ASSET_SOURCES}
-    ${EVENT_SOURCES}
+    ${EVENTS_SOURCES}
     ${SCENE_SOURCES}
     ${RENDERER_SOURCES}
     ${VULKAN_SOURCES}
@@ -165,7 +165,7 @@ source_group(
 source_group(
     TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen"
     PREFIX "Header Files"
-    FILES ${EVENT_HEADERS}
+    FILES ${EVENTS_HEADERS}
 )
 source_group(
     TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen"
@@ -211,7 +211,7 @@ source_group(
 source_group(
     TREE "${CMAKE_CURRENT_SOURCE_DIR}/src"
     PREFIX "Source Files"
-    FILES ${EVENT_SOURCES}
+    FILES ${EVENTS_SOURCES}
 )
 source_group(
     TREE "${CMAKE_CURRENT_SOURCE_DIR}/src"

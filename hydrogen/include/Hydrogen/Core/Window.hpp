@@ -2,7 +2,8 @@
 
 #include <glm/glm.hpp>
 
-#include "../Event/KeyCodes.hpp"
+#include "../Events/KeyCodes.hpp"
+#include "../Events/EventSystem.hpp"
 #include "../Math/Math.hpp"
 #include "../Renderer/RenderWindow.hpp"
 #include "Memory.hpp"
@@ -31,5 +32,18 @@ class Window : public RenderWindow {
   virtual void Render() = 0;
 
   static ReferencePointer<Window> Create(const String& title, uint32_t width, uint32_t height);
+
+ protected:
+  static Window* s_MainWindow;
+  // HydrogenEvent<uint32_t, uint32_t> m_OnResizeEvent;
+  // HydrogenEvent<const String&> m_OnTitleChangeEvent;
+  // HydrogenEvent<> m_OnWindowCloseEvent;
+  // HydrogenEvent<KeyCode> m_OnKeyDownEvent;
+  // HydrogenEvent<KeyCode> m_OnKeyEvent;
+  // HydrogenEvent<KeyCode> m_OnKeyUpEvent;
+  // HydrogenEvent<KeyCode> m_OnMouseKeyDownEvent;
+  // HydrogenEvent<KeyCode> m_OnMouseKeyEvent;
+  // HydrogenEvent<KeyCode> m_OnMouseKeyUpEvent;
+  // HydrogenEvent<uint32_t, uint32_t> m_OnMouseMoveEvent;
 };
 }  // namespace Hydrogen

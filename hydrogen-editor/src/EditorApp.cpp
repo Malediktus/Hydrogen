@@ -38,8 +38,6 @@ class EditorApp : public Hydrogen::Application {
     }
   }
 
-  void OnEvent(const Hydrogen::Event&) override {}
-
  private:
   Hydrogen::ReferencePointer<Hydrogen::Task> m_DemoTask;
   Hydrogen::DynamicArray<Hydrogen::ReferencePointer<Panel>> m_Panels;
