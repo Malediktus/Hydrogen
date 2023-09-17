@@ -84,12 +84,15 @@ class Renderer {
  private:
   static ReferencePointer<Context> s_Context;
   static uint32_t s_MaxFramesInFlight;
+
   ReferencePointer<RenderDevice> m_Device;
   ReferencePointer<SwapChain> m_SwapChain;
   ReferencePointer<Framebuffer> m_Framebuffer;
   ReferencePointer<Shader> m_Shader;
   DynamicArray<ReferencePointer<CommandBuffer>> m_CommandBuffers;
-  ReferencePointer<VertexBuffer> m_VertexBuffer;
   uint32_t m_CurrentFrame;
+
+  ReferencePointer<VertexBuffer> m_VertexBuffer;
+  ReferencePointer<IndexBuffer> m_IndexBuffer;
 };
 }  // namespace Hydrogen

@@ -21,7 +21,8 @@ static uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags proper
 }
 }
 
-VulkanBuffer::VulkanBuffer(ReferencePointer<VulkanRenderDevice> renderDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties) {
+VulkanBuffer::VulkanBuffer(ReferencePointer<VulkanRenderDevice> renderDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties)
+    : m_RenderDevice(renderDevice) {
   ZoneScoped;
 
   auto device = renderDevice->GetDevice();
@@ -32,7 +33,7 @@ VulkanBuffer::VulkanBuffer(ReferencePointer<VulkanRenderDevice> renderDevice, Vk
   bufferInfo.usage = usage;
   bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-  VK_CHECK_ERROR(vkCreateBuffer(device, &bufferInfo, nullptr, &m_Buffer));
+  VK_CHECK_ERROR(vkCreateBuffer(device, &bufferInfo, nullptr, &m_Buffer), "Failed to create vulkan buffer");
 
   VkMemoryRequirements memoryRequirements;
   vkGetBufferMemoryRequirements(device, m_Buffer, &memoryRequirements);
@@ -42,31 +43,65 @@ VulkanBuffer::VulkanBuffer(ReferencePointer<VulkanRenderDevice> renderDevice, Vk
   allocInfo.allocationSize = memoryRequirements.size;
   allocInfo.memoryTypeIndex = Utils::FindMemoryType(memoryRequirements.memoryTypeBits, properties, renderDevice->GetPhysicalDevice());
 
-  VK_CHECK_ERROR(vkAllocateMemory(device, &allocInfo, nullptr, &m_BufferMemory));
+  VK_CHECK_ERROR(vkAllocateMemory(device, &allocInfo, nullptr, &m_BufferMemory), "Failed to allocate buffer memory");
 
   vkBindBufferMemory(device, m_Buffer, m_BufferMemory, 0);
 }
 
-VulkanVertexBuffer::VulkanVertexBuffer(const ReferencePointer<RenderDevice>& device, size_t size)
-    : VulkanBuffer(std::dynamic_pointer_cast<VulkanRenderDevice>(device), size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT),
-    m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(device)), m_Size(size) {
-  ZoneScoped;
+VulkanBuffer::~VulkanBuffer() {
+  vkDestroyBuffer(m_RenderDevice->GetDevice(), m_Buffer, nullptr);
+  vkFreeMemory(m_RenderDevice->GetDevice(), m_BufferMemory, nullptr);
 }
 
 VulkanVertexBuffer::VulkanVertexBuffer(const ReferencePointer<RenderDevice>& device, float* vertices, size_t size)
-    : VulkanBuffer(std::dynamic_pointer_cast<VulkanRenderDevice>(device), size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT),
-      m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(device)), m_Size(size) {
+    : m_Size(size),
+      VulkanBuffer(std::dynamic_pointer_cast<VulkanRenderDevice>(device), size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                   VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) {
   ZoneScoped;
 
-  SetData(vertices, size);
+  auto vulkanDevice = m_RenderDevice->GetDevice();
+
+  VulkanBuffer stagingBuffer(std::dynamic_pointer_cast<VulkanRenderDevice>(device), size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+  void* data;
+  vkMapMemory(vulkanDevice, stagingBuffer.GetBufferMemory(), 0, size, 0, &data);
+  memcpy(data, vertices, size);
+  vkUnmapMemory(vulkanDevice, stagingBuffer.GetBufferMemory());
+
+  VkCommandBufferAllocateInfo allocInfo{};
+  allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+  allocInfo.commandPool = m_RenderDevice->GetCommandPool();
+  allocInfo.commandBufferCount = 1;
+
+  VkCommandBuffer commandBuffer;
+  vkAllocateCommandBuffers(vulkanDevice, &allocInfo, &commandBuffer);
+
+  VkCommandBufferBeginInfo beginInfo{};
+  beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+  beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+  vkBeginCommandBuffer(commandBuffer, &beginInfo);
+  VkBufferCopy copyRegion{};
+  copyRegion.srcOffset = 0;
+  copyRegion.dstOffset = 0;
+  copyRegion.size = size;
+  vkCmdCopyBuffer(commandBuffer, stagingBuffer.GetBuffer(), m_Buffer, 1, &copyRegion);
+  vkEndCommandBuffer(commandBuffer);
+
+  VkSubmitInfo submitInfo{};
+  submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+  submitInfo.commandBufferCount = 1;
+  submitInfo.pCommandBuffers = &commandBuffer;
+
+  vkQueueSubmit(m_RenderDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+  vkQueueWaitIdle(m_RenderDevice->GetGraphicsQueue());
+
+  vkFreeCommandBuffers(vulkanDevice, m_RenderDevice->GetCommandPool(), 1, &commandBuffer);
 }
 
 VulkanVertexBuffer::~VulkanVertexBuffer() {
-  ZoneScoped;
-  vkDestroyBuffer(m_RenderDevice->GetDevice(), m_Buffer, nullptr);
-  vkFreeMemory(m_RenderDevice->GetDevice(), m_BufferMemory, nullptr);
 }
 
 void VulkanVertexBuffer::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const {
@@ -76,38 +111,57 @@ void VulkanVertexBuffer::Bind(const ReferencePointer<CommandBuffer>& commandBuff
   vkCmdBindVertexBuffers(std::dynamic_pointer_cast<VulkanCommandBuffer>(commandBuffer)->GetCommandBuffer(), 0, 1, vertexBuffers, offsets);
 }
 
-void VulkanVertexBuffer::SetData(const void* data, size_t size) {
+VulkanIndexBuffer::VulkanIndexBuffer(const ReferencePointer<RenderDevice>& device, uint32_t* indices, size_t size)
+    : m_Count(size / sizeof(uint32_t)),
+      VulkanBuffer(std::dynamic_pointer_cast<VulkanRenderDevice>(device), size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                   VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) {
   ZoneScoped;
 
-  void* vertexData;
-  vkMapMemory(m_RenderDevice->GetDevice(), m_BufferMemory, 0, size, 0, &vertexData);
-  memcpy(vertexData, data, (size_t)size);
-  vkUnmapMemory(m_RenderDevice->GetDevice(), m_BufferMemory);
-}
+  auto vulkanDevice = m_RenderDevice->GetDevice();
 
-uint32_t VulkanVertexBuffer::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
-  VkPhysicalDeviceMemoryProperties memProperties;
-  vkGetPhysicalDeviceMemoryProperties(m_RenderDevice->GetPhysicalDevice(), &memProperties);
+  VulkanBuffer stagingBuffer(std::dynamic_pointer_cast<VulkanRenderDevice>(device), size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-  for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-    if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
-      return i;
-    }
-  }
+  void* data;
+  vkMapMemory(vulkanDevice, stagingBuffer.GetBufferMemory(), 0, size, 0, &data);
+  memcpy(data, indices, size);
+  vkUnmapMemory(vulkanDevice, stagingBuffer.GetBufferMemory());
 
-  HY_INVOKE_ERROR("Failed to find vulkan suitable memory type for vulkan vertex buffer!");
-}
+  VkCommandBufferAllocateInfo allocInfo{};
+  allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+  allocInfo.commandPool = m_RenderDevice->GetCommandPool();
+  allocInfo.commandBufferCount = 1;
 
-VulkanIndexBuffer::VulkanIndexBuffer(const ReferencePointer<RenderDevice>& device, uint32_t* indices, size_t count)
-    : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(device)) {
-  ZoneScoped;
-  (void)indices;
-  (void)count;
+  VkCommandBuffer commandBuffer;
+  vkAllocateCommandBuffers(vulkanDevice, &allocInfo, &commandBuffer);
+
+  VkCommandBufferBeginInfo beginInfo{};
+  beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+  beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+  vkBeginCommandBuffer(commandBuffer, &beginInfo);
+  VkBufferCopy copyRegion{};
+  copyRegion.srcOffset = 0;
+  copyRegion.dstOffset = 0;
+  copyRegion.size = size;
+  vkCmdCopyBuffer(commandBuffer, stagingBuffer.GetBuffer(), m_Buffer, 1, &copyRegion);
+  vkEndCommandBuffer(commandBuffer);
+
+  VkSubmitInfo submitInfo{};
+  submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+  submitInfo.commandBufferCount = 1;
+  submitInfo.pCommandBuffers = &commandBuffer;
+
+  vkQueueSubmit(m_RenderDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+  vkQueueWaitIdle(m_RenderDevice->GetGraphicsQueue());
+
+  vkFreeCommandBuffers(vulkanDevice, m_RenderDevice->GetCommandPool(), 1, &commandBuffer);
 }
 
 VulkanIndexBuffer::~VulkanIndexBuffer() { ZoneScoped; }
 
 void VulkanIndexBuffer::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const {
   ZoneScoped;
-  (void)commandBuffer;
+  vkCmdBindIndexBuffer(std::dynamic_pointer_cast<VulkanCommandBuffer>(commandBuffer)->GetCommandBuffer(), m_Buffer, 0, VK_INDEX_TYPE_UINT32);
 }

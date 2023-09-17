@@ -112,6 +112,12 @@ void VulkanCommandBuffer::CmdDraw(const ReferencePointer<VertexBuffer>& vertexBu
   vkCmdDraw(m_CommandBuffer, static_cast<uint32_t>(std::dynamic_pointer_cast<VulkanVertexBuffer>(vertexBuffer)->GetSize()), 1, 0, 0);
 }
 
+void VulkanCommandBuffer::CmdDrawIndexed(const ReferencePointer<class VertexBuffer>& vertexBuffer, const ReferencePointer<class IndexBuffer>& indexBuffer) {
+  ZoneScoped;
+  (void)vertexBuffer;
+  vkCmdDrawIndexed(m_CommandBuffer, static_cast<uint32_t>(indexBuffer->GetCount()), 1, 0, 0, 0);
+}
+
 void VulkanCommandBuffer::CmdSetViewport(const ReferencePointer<SwapChain>& swapChain, uint32_t width, uint32_t height) {
   ZoneScoped;
 

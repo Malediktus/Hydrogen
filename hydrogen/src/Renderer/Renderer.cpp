@@ -12,7 +12,8 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const Reference
   : m_Device(device) {
   ZoneScoped;
 
-  const float vertices[] = {0.0f, -0.5f, 1.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f};
+  float vertices[] = {-0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, -0.5f, 0.5f, 1.0f, 1.0f, 1.0f};
+  uint32_t indices[] = {0, 1, 2, 2, 3, 0};
 
   m_SwapChain = SwapChain::Create(window, device, true);
   m_Framebuffer = Framebuffer::Create(device, m_SwapChain);
@@ -25,8 +26,10 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const Reference
     m_CommandBuffers[i] = CommandBuffer::Create(device);
   }
 
-  m_VertexBuffer = VertexBuffer::Create(device, (float*)vertices, sizeof(vertices));
+  m_VertexBuffer = VertexBuffer::Create(device, vertices, sizeof(vertices));
   m_VertexBuffer->SetLayout({{ShaderDataType::Float2, "Position", false}, {ShaderDataType::Float3, "Color", false}});
+  m_IndexBuffer = IndexBuffer::Create(device, indices, sizeof(indices));
+
   m_CurrentFrame = 0;
 
   HY_LOG_INFO("Initialized renderer");
@@ -45,10 +48,11 @@ void Renderer::Render() {
     m_Framebuffer->Bind(commandBuffer);
     m_Shader->Bind(commandBuffer);
     m_VertexBuffer->Bind(commandBuffer);
+    m_IndexBuffer->Bind(commandBuffer);
 
     commandBuffer->CmdSetViewport(m_SwapChain);
     commandBuffer->CmdSetScissor(m_SwapChain);
-    commandBuffer->CmdDraw(m_VertexBuffer);
+    commandBuffer->CmdDrawIndexed(m_VertexBuffer, m_IndexBuffer);
   }
   commandBuffer->End();
 

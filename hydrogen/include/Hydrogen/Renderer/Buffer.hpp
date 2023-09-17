@@ -119,13 +119,11 @@ class VertexBuffer {
   virtual ~VertexBuffer() = default;
 
   virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const = 0;
-  virtual void SetData(const void* data, size_t size) = 0;
 
   virtual const BufferLayout& GetLayout() const = 0;
   virtual void SetLayout(const BufferLayout& layout) = 0;
 
   static ReferencePointer<VertexBuffer> Create(const ReferencePointer<RenderDevice>& device, float* vertices, size_t size);
-  static ReferencePointer<VertexBuffer> Create(const ReferencePointer<RenderDevice>& device, size_t size);
 };
 
 class IndexBuffer {
@@ -133,7 +131,7 @@ class IndexBuffer {
   virtual ~IndexBuffer() = default;
 
   virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const = 0;
-  virtual uint32_t GetCount() const = 0;
+  virtual size_t GetCount() const = 0;
 
   static ReferencePointer<IndexBuffer> Create(const ReferencePointer<RenderDevice>& device, uint32_t* indices, size_t size);
 };

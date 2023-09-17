@@ -33,6 +33,8 @@ WindowsWindow::WindowsWindow(const std::string& title, uint32_t width, uint32_t 
   m_Window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
   m_VulkanSurface = nullptr;
   HY_ASSERT(m_Window, "glfw window is null");
+
+  m_OnTitleChangeEvent.Invoke(title);
 }
 
 WindowsWindow::~WindowsWindow() {
@@ -42,7 +44,10 @@ WindowsWindow::~WindowsWindow() {
   }
 }
 
-void WindowsWindow::SetTitle(const std::string& title) { glfwSetWindowTitle(m_Window, title.c_str()); }
+void WindowsWindow::SetTitle(const std::string& title) {
+  glfwSetWindowTitle(m_Window, title.c_str());
+  m_OnTitleChangeEvent.Invoke(title);
+}
 
 uint32_t WindowsWindow::GetWidth() const {
   int width, height;
@@ -150,3 +155,37 @@ void* WindowsWindow::GetVulkanWindowSurface() {
   m_VulkanSurface = (void*)surface;
   return m_VulkanSurface;
 }
+
+void WindowsWindow::OnWindowResize(GLFWwindow*, int width, int height) { m_OnViewportResizeEvent.Invoke(width, height); }
+
+void WindowsWindow::OnWindowClose(GLFWwindow*) { m_OnWindowCloseEvent.Invoke(); }
+
+void WindowsWindow::OnKeyboardInteration(GLFWwindow*, int key, int, int action, int) {
+  switch (action) {
+    case GLFW_PRESS:
+      m_OnKeyDownEvent.Invoke(static_cast<KeyCode>(key));
+      return;
+    case GLFW_REPEAT:
+      m_OnKeyEvent.Invoke(static_cast<KeyCode>(key));
+      return;
+    case GLFW_RELEASE:
+      m_OnKeyUpEvent.Invoke(static_cast<KeyCode>(key));
+      return;
+  }
+}
+
+void WindowsWindow::OnMouseButtonInteration(GLFWwindow*, int button, int action, int) {
+  switch (action) {
+    case GLFW_PRESS:
+      m_OnMouseKeyDownEvent.Invoke(static_cast<KeyCode>(button));
+      return;
+    case GLFW_REPEAT:
+      m_OnMouseKeyEvent.Invoke(static_cast<KeyCode>(button));
+      return;
+    case GLFW_RELEASE:
+      m_OnMouseKeyUpEvent.Invoke(static_cast<KeyCode>(button));
+      return;
+  }
+}
+
+void WindowsWindow::OnMouseMove(GLFWwindow*, double xpos, double ypos) { m_OnMouseMoveEvent.Invoke(static_cast<uint32_t>(xpos), static_cast<uint32_t>(ypos)); }

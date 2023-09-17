@@ -7,22 +7,23 @@ namespace Hydrogen::Vulkan {
 class VulkanBuffer {
  public:
   VulkanBuffer(ReferencePointer<VulkanRenderDevice> renderDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties);
-  virtual ~VulkanBuffer() = default;
+  virtual ~VulkanBuffer();
+
+  VkBuffer GetBuffer() { return m_Buffer; }
+  VkDeviceMemory GetBufferMemory() { return m_BufferMemory; }
 
  protected:
+  ReferencePointer<VulkanRenderDevice> m_RenderDevice;
   VkBuffer m_Buffer;
   VkDeviceMemory m_BufferMemory;
 };
 
 class VulkanVertexBuffer : public VertexBuffer, public VulkanBuffer {
  public:
-  VulkanVertexBuffer(const ReferencePointer<RenderDevice>& device, size_t size);
   VulkanVertexBuffer(const ReferencePointer<RenderDevice>& device, float* vertices, size_t size);
   virtual ~VulkanVertexBuffer();
 
   virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const override;
-
-  virtual void SetData(const void* data, size_t size) override;
 
   virtual const BufferLayout& GetLayout() const override { return m_Layout; }
   virtual void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
@@ -31,24 +32,20 @@ class VulkanVertexBuffer : public VertexBuffer, public VulkanBuffer {
   size_t GetSize() { return m_Size; }
 
  private:
-  uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-
-  ReferencePointer<VulkanRenderDevice> m_RenderDevice;
   BufferLayout m_Layout;
   size_t m_Size;
 };
 
-class VulkanIndexBuffer : public IndexBuffer {
+class VulkanIndexBuffer : public IndexBuffer, public VulkanBuffer {
  public:
-  VulkanIndexBuffer(const ReferencePointer<RenderDevice>& device, uint32_t* indices, size_t count);
+  VulkanIndexBuffer(const ReferencePointer<RenderDevice>& device, uint32_t* indices, size_t size);
   virtual ~VulkanIndexBuffer();
 
   virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const override;
 
-  virtual uint32_t GetCount() const override { return m_Count; }
+  virtual size_t GetCount() const override { return m_Count; }
 
  private:
-  ReferencePointer<VulkanRenderDevice> m_RenderDevice;
-  uint32_t m_Count;
+  size_t m_Count;
 };
 }  // namespace Hydrogen::Vulkan

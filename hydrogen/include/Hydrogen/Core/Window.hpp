@@ -31,19 +31,32 @@ class Window : public RenderWindow {
   virtual void UpdateEvents() = 0;
   virtual void Render() = 0;
 
+  const HydrogenEvent<uint32_t, uint32_t> GetResizeEvent() { return m_OnViewportResizeEvent; }
+  const HydrogenEvent<const String&> GetTitleChangeEvent() { return m_OnTitleChangeEvent; }
+  const HydrogenEvent<> GetWindowCloseEvent() { return m_OnWindowCloseEvent; }
+  const HydrogenEvent<KeyCode> GetKeyDownEvent() { return m_OnKeyDownEvent; }
+  const HydrogenEvent<KeyCode> GetKeyEvent() { return m_OnKeyEvent; }
+  const HydrogenEvent<KeyCode> GetKeyUpEvent() { return m_OnKeyUpEvent; }
+  const HydrogenEvent<KeyCode> GetMouseKeyDownEvent() { return m_OnMouseKeyDownEvent; }
+  const HydrogenEvent<KeyCode> GetMouseKeyEvent() { return m_OnMouseKeyEvent; }
+  const HydrogenEvent<KeyCode> GetMouseKeyUpEvent() { return m_OnMouseKeyUpEvent; }
+  const HydrogenEvent<uint32_t, uint32_t> GetMouseMoveEvent() { return m_OnMouseMoveEvent; }
+
   static ReferencePointer<Window> Create(const String& title, uint32_t width, uint32_t height);
 
  protected:
   static Window* s_MainWindow;
-  // HydrogenEvent<uint32_t, uint32_t> m_OnResizeEvent;
-  // HydrogenEvent<const String&> m_OnTitleChangeEvent;
-  // HydrogenEvent<> m_OnWindowCloseEvent;
-  // HydrogenEvent<KeyCode> m_OnKeyDownEvent;
-  // HydrogenEvent<KeyCode> m_OnKeyEvent;
-  // HydrogenEvent<KeyCode> m_OnKeyUpEvent;
-  // HydrogenEvent<KeyCode> m_OnMouseKeyDownEvent;
-  // HydrogenEvent<KeyCode> m_OnMouseKeyEvent;
-  // HydrogenEvent<KeyCode> m_OnMouseKeyUpEvent;
-  // HydrogenEvent<uint32_t, uint32_t> m_OnMouseMoveEvent;
+  HydrogenEvent<uint32_t, uint32_t> m_OnViewportResizeEvent;
+  HydrogenEvent<const String&> m_OnTitleChangeEvent;
+  HydrogenEvent<> m_OnWindowCloseEvent;
+  HydrogenEvent<KeyCode> m_OnKeyDownEvent;
+  HydrogenEvent<KeyCode> m_OnKeyEvent;
+  HydrogenEvent<KeyCode> m_OnKeyUpEvent;
+  HydrogenEvent<KeyCode> m_OnMouseKeyDownEvent;
+  HydrogenEvent<KeyCode> m_OnMouseKeyEvent;
+  HydrogenEvent<KeyCode> m_OnMouseKeyUpEvent;
+  HydrogenEvent<uint32_t, uint32_t> m_OnMouseMoveEvent;
+  // TODO: Mouse wheel
+  // TODO: Controller
 };
 }  // namespace Hydrogen

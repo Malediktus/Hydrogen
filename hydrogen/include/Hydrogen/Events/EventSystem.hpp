@@ -17,7 +17,7 @@ class HydrogenEvent {
 
   void Invoke(Args... args) const {
     for (const auto& callback : m_Callbacks) {
-      callback(args);
+      callback(args...);
     }
   }
 
