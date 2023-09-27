@@ -48,4 +48,17 @@ class VulkanIndexBuffer : public IndexBuffer, public VulkanBuffer {
  private:
   size_t m_Count;
 };
+
+class VulkanUniformBuffer : public UniformBuffer, public VulkanBuffer {
+ public:
+  VulkanUniformBuffer(const ReferencePointer<RenderDevice>& device, size_t size);
+  virtual ~VulkanUniformBuffer();
+
+  virtual void SetData(void* data) override;
+  virtual size_t GetSize() { return m_Size; }
+
+ private:
+  size_t m_Size;
+  void* m_MappedMemory;
+};
 }  // namespace Hydrogen::Vulkan

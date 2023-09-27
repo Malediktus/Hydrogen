@@ -3,32 +3,51 @@
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <tracy/Tracy.hpp>
 
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include <chrono>
+
 using namespace Hydrogen;
 
+struct UniformBufferObject {
+  alignas(16) glm::mat4 Model;
+  alignas(16) glm::mat4 View;
+  alignas(16) glm::mat4 Proj;
+};
+
 ReferencePointer<Context> Renderer::s_Context;
-uint32_t Renderer::s_MaxFramesInFlight = 3;
+uint32_t Renderer::s_MaxFramesInFlight = MAX_FRAMES_IN_FLIGHT;
 
 Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& device)
-  : m_Device(device) {
+  : m_Device(device), m_RenderWindow(window) {
   ZoneScoped;
 
   float vertices[] = {-0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, -0.5f, 0.5f, 1.0f, 1.0f, 1.0f};
   uint32_t indices[] = {0, 1, 2, 2, 3, 0};
 
+  m_UniformBuffer = UniformBuffer::Create(m_Device, sizeof(UniformBufferObject));
   m_SwapChain = SwapChain::Create(window, device, true);
   m_Framebuffer = Framebuffer::Create(device, m_SwapChain);
+
   m_Shader = AssetManager::Get<ShaderAsset>("assets/Raw.glsl")
-                 ->CreateShader({{ShaderDataType::Float2, "Position", false}, {ShaderDataType::Float3, "Color", false}}, device, m_SwapChain, m_Framebuffer);
+                 ->CreateShader(device, m_SwapChain, m_Framebuffer, {{ShaderDataType::Float2, "Position", false}, {ShaderDataType::Float3, "Color", false}},
+                                {{ShaderDependencyType::UniformBuffer, ShaderStage::VertexShader, m_UniformBuffer}});
 
   m_CommandBuffers.resize(s_MaxFramesInFlight);
   for (uint32_t i = 0; i < s_MaxFramesInFlight; i++)
   {
     m_CommandBuffers[i] = CommandBuffer::Create(device);
   }
-
+  
   m_VertexBuffer = VertexBuffer::Create(device, vertices, sizeof(vertices));
   m_VertexBuffer->SetLayout({{ShaderDataType::Float2, "Position", false}, {ShaderDataType::Float3, "Color", false}});
   m_IndexBuffer = IndexBuffer::Create(device, indices, sizeof(indices));
+
+  m_VertexArray = VertexArray::Create();
+  m_VertexArray->AddVertexBuffer(m_VertexBuffer);
+  m_VertexArray->SetIndexBuffer(m_IndexBuffer);
 
   m_CurrentFrame = 0;
 
@@ -38,6 +57,20 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const Reference
 Renderer::~Renderer() { m_Device->WaitForIdle(); }
 
 void Renderer::Render() {
+  static auto startTime = std::chrono::high_resolution_clock::now();
+
+  auto currentTime = std::chrono::high_resolution_clock::now();
+  float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+  UniformBufferObject ubo{};
+  ubo.Model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+  ubo.View = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+  const auto& viewportSize = m_RenderWindow->GetViewportSize();
+  ubo.Proj = glm::perspective(glm::radians(45.0f), viewportSize.x / viewportSize.y, 0.1f, 10.0f);
+  ubo.Proj[1][1] *= -1;
+
+  m_UniformBuffer->SetData(&ubo);
+
   const auto& commandBuffer = m_CommandBuffers[m_CurrentFrame];
 
   commandBuffer->Reset();
@@ -52,7 +85,7 @@ void Renderer::Render() {
 
     commandBuffer->CmdSetViewport(m_SwapChain);
     commandBuffer->CmdSetScissor(m_SwapChain);
-    commandBuffer->CmdDrawIndexed(m_VertexBuffer, m_IndexBuffer);
+    commandBuffer->CmdDrawIndexed(m_VertexArray);
   }
   commandBuffer->End();
 

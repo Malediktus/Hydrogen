@@ -157,12 +157,12 @@ void VulkanRenderDevice::CreateLogicalDevice(const DynamicArray<char*>& required
 }
 
 void VulkanRenderDevice::CreateCommandPool() {
-  VkCommandPoolCreateInfo poolInfo{};
-  poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-  poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-  poolInfo.queueFamilyIndex = m_GraphicsQueueFamily.value();
+  VkCommandPoolCreateInfo createInfo{};
+  createInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+  createInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+  createInfo.queueFamilyIndex = m_GraphicsQueueFamily.value();
 
-  VK_CHECK_ERROR(vkCreateCommandPool(m_Device, &poolInfo, nullptr, &m_CommandPool), "Failed to create vulkan command pool!");
+  VK_CHECK_ERROR(vkCreateCommandPool(m_Device, &createInfo, nullptr, &m_CommandPool), "Failed to create vulkan command pool!");
 }
 
 VkQueueFamily VulkanRenderDevice::FindGraphicsQueueFamily(VkPhysicalDevice device) {

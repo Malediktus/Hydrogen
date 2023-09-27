@@ -13,6 +13,7 @@
 #include "RendererAPI.hpp"
 #include "Shader.hpp"
 #include "SwapChain.hpp"
+#include "VertexArray.hpp"
 #include "Texture.hpp"
 
 namespace Hydrogen {
@@ -85,6 +86,7 @@ class Renderer {
   static ReferencePointer<Context> s_Context;
   static uint32_t s_MaxFramesInFlight;
 
+  ReferencePointer<RenderWindow> m_RenderWindow;
   ReferencePointer<RenderDevice> m_Device;
   ReferencePointer<SwapChain> m_SwapChain;
   ReferencePointer<Framebuffer> m_Framebuffer;
@@ -92,7 +94,9 @@ class Renderer {
   DynamicArray<ReferencePointer<CommandBuffer>> m_CommandBuffers;
   uint32_t m_CurrentFrame;
 
+  ReferencePointer<UniformBuffer> m_UniformBuffer;
   ReferencePointer<VertexBuffer> m_VertexBuffer;
   ReferencePointer<IndexBuffer> m_IndexBuffer;
+  ReferencePointer<VertexArray> m_VertexArray;
 };
 }  // namespace Hydrogen

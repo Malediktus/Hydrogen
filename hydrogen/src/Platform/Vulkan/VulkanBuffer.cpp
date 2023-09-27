@@ -165,3 +165,14 @@ void VulkanIndexBuffer::Bind(const ReferencePointer<CommandBuffer>& commandBuffe
   ZoneScoped;
   vkCmdBindIndexBuffer(std::dynamic_pointer_cast<VulkanCommandBuffer>(commandBuffer)->GetCommandBuffer(), m_Buffer, 0, VK_INDEX_TYPE_UINT32);
 }
+
+VulkanUniformBuffer::VulkanUniformBuffer(const ReferencePointer<RenderDevice>& device, size_t size)
+    : VulkanBuffer(std::dynamic_pointer_cast<VulkanRenderDevice>(device), size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT),
+      m_Size(size) {
+  vkMapMemory(m_RenderDevice->GetDevice(), m_BufferMemory, 0, size, 0, &m_MappedMemory);
+}
+
+VulkanUniformBuffer::~VulkanUniformBuffer() {}
+
+void VulkanUniformBuffer::SetData(void* data) { memcpy(m_MappedMemory, data, m_Size); }

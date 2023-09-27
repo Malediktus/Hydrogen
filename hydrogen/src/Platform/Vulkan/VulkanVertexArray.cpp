@@ -11,20 +11,25 @@ VulkanVertexArray::~VulkanVertexArray() {
   ZoneScoped;
 }
 
-void VulkanVertexArray::Bind() const {
+void VulkanVertexArray::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const {
   ZoneScoped;
-}
+  HY_ASSERT(m_IndexBuffer, "No index buffer provided!");
+  HY_ASSERT(m_VertexBuffers.size() != 0, "No vertex buffers provided!");
 
-void VulkanVertexArray::Unbind() const {
-  ZoneScoped;
+  m_IndexBuffer->Bind(commandBuffer);
+  m_VertexBuffers[0]->Bind(commandBuffer);
 }
 
 void VulkanVertexArray::AddVertexBuffer(const ReferencePointer<VertexBuffer>& vertexBuffer) {
   ZoneScoped;
   HY_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "At lease one value is needed in vertex buffer layout");
+  HY_ASSERT(m_VertexBuffers.size() == 0, "Multiple vertex buffers per vertex array are unimplemented!");
+
+  m_VertexBuffers.push_back(vertexBuffer);
 }
 
 void VulkanVertexArray::SetIndexBuffer(const ReferencePointer<IndexBuffer>& indexBuffer) {
   ZoneScoped;
-  (void)indexBuffer;
+  
+  m_IndexBuffer = indexBuffer;
 }

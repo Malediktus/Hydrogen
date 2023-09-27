@@ -4,6 +4,7 @@
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanShader.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
 #include <array>
 #include <glm/gtc/type_ptr.hpp>
 #include <tracy/Tracy.hpp>
@@ -53,16 +54,87 @@ static VkFormat ShaderDataTypeToVkFormat(ShaderDataType type) {
       HY_INVOKE_ERROR("Invalid ShaderDataType value!");
   }
 }
-}  // namespace Hydrogen::Vulkan::Utils
 
-VulkanShader::VulkanShader(const BufferLayout& vertexLayout, const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
-                           const ReferencePointer<Framebuffer>& framebuffer, const String& name, const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc,
-                           const DynamicArray<uint32_t>& geometrySrc)
+static VkShaderStageFlags ShaderStageToVkShaderStageFlags(ShaderStage stage) {
+  switch (stage) {
+    case ShaderStage::VertexShader:
+      return VK_SHADER_STAGE_VERTEX_BIT;
+      break;
+    case ShaderStage::PixelShader:
+      return VK_SHADER_STAGE_FRAGMENT_BIT;
+      break;
+    case ShaderStage::GeometryShader:
+      return VK_SHADER_STAGE_GEOMETRY_BIT;
+      break;
+    default:
+      HY_INVOKE_ERROR("Invalid ShaderStage value!");
+  }
+}
+} // namespace Hydrogen::Vulkan::Utils
+
+VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<Framebuffer>& framebuffer,
+                           const BufferLayout& vertexLayout, ShaderDependencyGraph dependencyGraph, const String& name, const DynamicArray<uint32_t>& vertexSrc,
+                           const DynamicArray<uint32_t>& fragmentSrc, const DynamicArray<uint32_t>& geometrySrc)
     : m_Name(name),
+      m_HasDependencies(dependencyGraph.Dependencies.size() > 0),
       m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)),
       m_SwapChain(std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)),
       m_Framebuffer(std::dynamic_pointer_cast<VulkanFramebuffer>(framebuffer)) {
   ZoneScoped;
+
+  m_DescriptorPool = VK_NULL_HANDLE;
+  m_DescriptorSet = VK_NULL_HANDLE;
+  m_DescriptorSetLayout = VK_NULL_HANDLE;
+
+  if (m_HasDependencies) {
+    DynamicArray<VkDescriptorSetLayoutBinding> m_DescriptorSetLayoutBindings(dependencyGraph.Dependencies.size());
+    uint32_t numUniformBuffers = 0;
+
+    for (size_t i = 0; i < dependencyGraph.Dependencies.size(); i++) {
+      VkDescriptorSetLayoutBinding layoutBinding{};
+      layoutBinding.binding = static_cast<uint32_t>(i);
+      layoutBinding.descriptorCount = 1;
+      layoutBinding.stageFlags = Utils::ShaderStageToVkShaderStageFlags(dependencyGraph.Dependencies[i].Stage);
+      layoutBinding.pImmutableSamplers = nullptr;
+
+      switch (dependencyGraph.Dependencies[i].Type) {
+        case ShaderDependencyType::UniformBuffer:
+          numUniformBuffers++;
+          layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+          break;
+        default:
+          HY_INVOKE_ERROR("Invalid ShaderDependencyType value!");
+          break;
+      }
+
+      m_DescriptorSetLayoutBindings[i] = layoutBinding;
+    }
+
+    VkDescriptorSetLayoutCreateInfo descriptorLayoutCreateInfo{};
+    descriptorLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    descriptorLayoutCreateInfo.bindingCount = static_cast<uint32_t>(m_DescriptorSetLayoutBindings.size());
+    descriptorLayoutCreateInfo.pBindings = m_DescriptorSetLayoutBindings.data();
+
+    VK_CHECK_ERROR(vkCreateDescriptorSetLayout(m_RenderDevice->GetDevice(), &descriptorLayoutCreateInfo, nullptr, &m_DescriptorSetLayout),
+                   "Failed to create Vulkan descriptor set layout");
+
+    DynamicArray<VkDescriptorPoolSize> descriptorPoolSizes;
+    if (numUniformBuffers >= 0) {
+      VkDescriptorPoolSize poolSize{};
+      poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+      poolSize.descriptorCount = numUniformBuffers;
+
+      descriptorPoolSizes.push_back(poolSize);
+    }
+
+    VkDescriptorPoolCreateInfo descriptorPoolCreateInfo{};
+    descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    descriptorPoolCreateInfo.poolSizeCount = static_cast<uint32_t>(descriptorPoolSizes.size());
+    descriptorPoolCreateInfo.pPoolSizes = descriptorPoolSizes.data();
+    descriptorPoolCreateInfo.maxSets = MAX_FRAMES_IN_FLIGHT;
+
+    VK_CHECK_ERROR(vkCreateDescriptorPool(m_RenderDevice->GetDevice(), &descriptorPoolCreateInfo, nullptr, &m_DescriptorPool), "Failed to create vulkan descriptor pool!");
+  }
 
   VkVertexInputBindingDescription bindingDescription{};
   bindingDescription.binding = 0;
@@ -182,7 +254,7 @@ VulkanShader::VulkanShader(const BufferLayout& vertexLayout, const ReferencePoin
   rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
   rasterizer.lineWidth = 1.0f;
   rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-  rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+  rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
   rasterizer.depthBiasEnable = VK_FALSE;
   rasterizer.depthBiasConstantFactor = 0.0f;  // Optional
   rasterizer.depthBiasClamp = 0.0f;           // Optional
@@ -227,10 +299,13 @@ VulkanShader::VulkanShader(const BufferLayout& vertexLayout, const ReferencePoin
 
   VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
   pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-  pipelineLayoutInfo.setLayoutCount = 0;             // Optional
-  pipelineLayoutInfo.pSetLayouts = nullptr;          // Optional
-  pipelineLayoutInfo.pushConstantRangeCount = 0;     // Optional
-  pipelineLayoutInfo.pPushConstantRanges = nullptr;  // Optional
+  pipelineLayoutInfo.setLayoutCount = 0;
+  pipelineLayoutInfo.pSetLayouts = nullptr;
+
+  if (m_HasDependencies) {
+    pipelineLayoutInfo.setLayoutCount = 1;
+    pipelineLayoutInfo.pSetLayouts = &m_DescriptorSetLayout;
+  }
 
   VK_CHECK_ERROR(vkCreatePipelineLayout(m_RenderDevice->GetDevice(), &pipelineLayoutInfo, nullptr, &m_PipelineLayout), "Failed to create vulkan pipeline layout!");
 
@@ -253,19 +328,69 @@ VulkanShader::VulkanShader(const BufferLayout& vertexLayout, const ReferencePoin
   pipelineInfo.basePipelineIndex = -1;               // Optional
 
   VK_CHECK_ERROR(vkCreateGraphicsPipelines(m_RenderDevice->GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_Pipeline), "Failed to create vulkan pipeline!");
+
+  if (m_HasDependencies) {
+    VkDescriptorSetAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    allocInfo.descriptorPool = m_DescriptorPool;
+    allocInfo.descriptorSetCount = 1;
+    allocInfo.pSetLayouts = &m_DescriptorSetLayout;
+
+    VK_CHECK_ERROR(vkAllocateDescriptorSets(m_RenderDevice->GetDevice(), &allocInfo, &m_DescriptorSet), "Failed to create vulkan descriptor set!");
+
+    for (size_t i = 0; i < dependencyGraph.Dependencies.size(); i++) {
+      switch (dependencyGraph.Dependencies[i].Type) {
+        case ShaderDependencyType::UniformBuffer: {
+          ReferencePointer<VulkanUniformBuffer> uniformBuffer = std::dynamic_pointer_cast<VulkanUniformBuffer>(dependencyGraph.Dependencies[i].UniformBuffer);
+
+          VkDescriptorBufferInfo bufferInfo{};
+          bufferInfo.buffer = uniformBuffer->GetBuffer();
+          bufferInfo.offset = 0;
+          bufferInfo.range = static_cast<uint32_t>(uniformBuffer->GetSize());
+
+          VkWriteDescriptorSet descriptorWrite{};
+          descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+          descriptorWrite.dstSet = m_DescriptorSet;
+          descriptorWrite.dstBinding = 0;
+          descriptorWrite.dstArrayElement = 0;
+          descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+          descriptorWrite.descriptorCount = 1;
+          descriptorWrite.pBufferInfo = &bufferInfo;
+          descriptorWrite.pImageInfo = nullptr;        // Optional
+          descriptorWrite.pTexelBufferView = nullptr;  // Optional
+
+          vkUpdateDescriptorSets(m_RenderDevice->GetDevice(), 1, &descriptorWrite, 0, nullptr);
+          break;
+        }
+        default:
+          HY_INVOKE_ERROR("Invalid ShaderDependencyType value!");
+          break;
+      }
+    }
+  }
 }
 
 VulkanShader::~VulkanShader() {
   ZoneScoped;
+  
+  if (m_HasDependencies)
+    vkDestroyDescriptorSetLayout(m_RenderDevice->GetDevice(), m_DescriptorSetLayout, nullptr);
   vkDestroyPipeline(m_RenderDevice->GetDevice(), m_Pipeline, nullptr);
   vkDestroyPipelineLayout(m_RenderDevice->GetDevice(), m_PipelineLayout, nullptr);
 
   if (m_VertexShaderModule != VK_NULL_HANDLE) vkDestroyShaderModule(m_RenderDevice->GetDevice(), m_VertexShaderModule, nullptr);
   if (m_FragmentShaderModule != VK_NULL_HANDLE) vkDestroyShaderModule(m_RenderDevice->GetDevice(), m_FragmentShaderModule, nullptr);
   if (m_GeometryShaderModule != VK_NULL_HANDLE) vkDestroyShaderModule(m_RenderDevice->GetDevice(), m_GeometryShaderModule, nullptr);
+
+  if (m_HasDependencies)
+    vkDestroyDescriptorPool(m_RenderDevice->GetDevice(), m_DescriptorPool, nullptr);
 }
 
 void VulkanShader::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const {
   ZoneScoped;
-  vkCmdBindPipeline(std::dynamic_pointer_cast<VulkanCommandBuffer>(commandBuffer)->GetCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline);
+  auto vulkanCommandBuffer = std::dynamic_pointer_cast<VulkanCommandBuffer>(commandBuffer)->GetCommandBuffer();
+
+  if (m_HasDependencies)
+    vkCmdBindDescriptorSets(vulkanCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_DescriptorSet, 0, nullptr);
+  vkCmdBindPipeline(vulkanCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline);
 }

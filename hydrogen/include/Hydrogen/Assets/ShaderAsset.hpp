@@ -99,9 +99,10 @@ class ShaderAsset : public Asset {
     HY_LOG_INFO("Finished loading shader asset '{}'!", filepath);
   }
 
-  ReferencePointer<Shader> CreateShader(const BufferLayout& vertexLayout, const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
-                                        const ReferencePointer<Framebuffer>& framebuffer) {
-    return Shader::Create(vertexLayout, renderDevice, swapChain, framebuffer, m_Name, m_VertexShader, m_FragmentShader, m_GeometryShader);
+  ReferencePointer<Shader> CreateShader(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
+                                        const ReferencePointer<Framebuffer>& framebuffer, const BufferLayout& vertexLayout,
+                                        const ShaderDependencyGraph dependencyGraph) {
+    return Shader::Create(renderDevice, swapChain, framebuffer, vertexLayout, dependencyGraph, m_Name, m_VertexShader, m_FragmentShader, m_GeometryShader);
   }
 
   const DynamicArray<uint32_t>& GetVertexShader() { return m_VertexShader; }

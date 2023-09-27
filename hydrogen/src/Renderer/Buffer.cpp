@@ -30,3 +30,16 @@ ReferencePointer<IndexBuffer> IndexBuffer::Create(const ReferencePointer<RenderD
   }
   return nullptr;
 }
+
+ReferencePointer<UniformBuffer> UniformBuffer::Create(const ReferencePointer<RenderDevice>& device, size_t size) {
+  ZoneScoped;
+  switch (Renderer::GetAPI()) {
+    case RendererAPI::API::Vulkan:
+      return NewReferencePointer<Vulkan::VulkanUniformBuffer>(device, size);
+    default:
+      HY_ASSERT_CHECK(false,
+                      "Invalid renderer API value returned from "
+                      "Renderer::GetRendererAPI()");
+  }
+  return nullptr;
+}
