@@ -1,5 +1,5 @@
-#include <Hydrogen/Core/Logger.hpp>
 #include <Hydrogen/Core/Platform.hpp>
+#include <Hydrogen/Core/Assert.hpp>
 
 using namespace Hydrogen;
 

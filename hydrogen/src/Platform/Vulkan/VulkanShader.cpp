@@ -1,10 +1,13 @@
-#include <Hydrogen/Core/Logger.hpp>
-#include <Hydrogen/Core/Memory.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanShader.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanFramebuffer.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanTexture.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
+#include <Hydrogen/Renderer/ShaderCompiler.hpp>
+#include <Hydrogen/Renderer/Buffer.hpp>
+#include <Hydrogen/Core/Base.hpp>
 #include <array>
 #include <glm/gtc/type_ptr.hpp>
 #include <tracy/Tracy.hpp>
@@ -89,10 +92,11 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
   if (m_HasDependencies) {
     DynamicArray<VkDescriptorSetLayoutBinding> m_DescriptorSetLayoutBindings(dependencyGraph.Dependencies.size());
     uint32_t numUniformBuffers = 0;
+    uint32_t numTextures = 0;
 
     for (size_t i = 0; i < dependencyGraph.Dependencies.size(); i++) {
       VkDescriptorSetLayoutBinding layoutBinding{};
-      layoutBinding.binding = static_cast<uint32_t>(i);
+      layoutBinding.binding = dependencyGraph.Dependencies[i].Location;
       layoutBinding.descriptorCount = 1;
       layoutBinding.stageFlags = Utils::ShaderStageToVkShaderStageFlags(dependencyGraph.Dependencies[i].Stage);
       layoutBinding.pImmutableSamplers = nullptr;
@@ -101,6 +105,10 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
         case ShaderDependencyType::UniformBuffer:
           numUniformBuffers++;
           layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+          break;
+        case ShaderDependencyType::Texture:
+          numTextures++;
+          layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
           break;
         default:
           HY_INVOKE_ERROR("Invalid ShaderDependencyType value!");
@@ -123,6 +131,14 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
       VkDescriptorPoolSize poolSize{};
       poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
       poolSize.descriptorCount = numUniformBuffers;
+
+      descriptorPoolSizes.push_back(poolSize);
+    }
+
+    if (numTextures >= 0) {
+      VkDescriptorPoolSize poolSize{};
+      poolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+      poolSize.descriptorCount = numTextures;
 
       descriptorPoolSizes.push_back(poolSize);
     }
@@ -351,13 +367,31 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
           VkWriteDescriptorSet descriptorWrite{};
           descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
           descriptorWrite.dstSet = m_DescriptorSet;
-          descriptorWrite.dstBinding = 0;
+          descriptorWrite.dstBinding = dependencyGraph.Dependencies[i].Location;
           descriptorWrite.dstArrayElement = 0;
           descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
           descriptorWrite.descriptorCount = 1;
           descriptorWrite.pBufferInfo = &bufferInfo;
-          descriptorWrite.pImageInfo = nullptr;        // Optional
-          descriptorWrite.pTexelBufferView = nullptr;  // Optional
+
+          vkUpdateDescriptorSets(m_RenderDevice->GetDevice(), 1, &descriptorWrite, 0, nullptr);
+          break;
+        }
+        case ShaderDependencyType::Texture: {
+          ReferencePointer<VulkanTexture2D> texture = std::dynamic_pointer_cast<VulkanTexture2D>(dependencyGraph.Dependencies[i].Texture);
+
+          VkDescriptorImageInfo imageInfo{};
+          imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+          imageInfo.imageView = texture->GetImageView();
+          imageInfo.sampler = texture->GetSampler();
+
+          VkWriteDescriptorSet descriptorWrite{};
+          descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+          descriptorWrite.dstSet = m_DescriptorSet;
+          descriptorWrite.dstBinding = dependencyGraph.Dependencies[i].Location;
+          descriptorWrite.dstArrayElement = 0;
+          descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+          descriptorWrite.descriptorCount = 1;
+          descriptorWrite.pImageInfo = &imageInfo;
 
           vkUpdateDescriptorSets(m_RenderDevice->GetDevice(), 1, &descriptorWrite, 0, nullptr);
           break;

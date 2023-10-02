@@ -1,19 +1,19 @@
 #pragma once
 
 #include "../../Renderer/Buffer.hpp"
-#include "VulkanRenderDevice.hpp"
+#include <vulkan/vulkan.h>
 
 namespace Hydrogen::Vulkan {
 class VulkanBuffer {
  public:
-  VulkanBuffer(ReferencePointer<VulkanRenderDevice> renderDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties);
+  VulkanBuffer(ReferencePointer<class VulkanRenderDevice> renderDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties);
   virtual ~VulkanBuffer();
 
   VkBuffer GetBuffer() { return m_Buffer; }
   VkDeviceMemory GetBufferMemory() { return m_BufferMemory; }
 
  protected:
-  ReferencePointer<VulkanRenderDevice> m_RenderDevice;
+  ReferencePointer<class VulkanRenderDevice> m_RenderDevice;
   VkBuffer m_Buffer;
   VkDeviceMemory m_BufferMemory;
 };

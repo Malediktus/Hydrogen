@@ -1,6 +1,11 @@
-#include <Hydrogen/Assets/AssetManager.hpp>
-#include <Hydrogen/Core/Logger.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
+#include <Hydrogen/Renderer/Buffer.hpp>
+#include <Hydrogen/Renderer/SwapChain.hpp>
+#include <Hydrogen/Renderer/Framebuffer.hpp>
+#include <Hydrogen/Renderer/CommandBuffer.hpp>
+#include <Hydrogen/Renderer/VertexArray.hpp>
+#include <Hydrogen/Renderer/RenderWindow.hpp>
+#include <Hydrogen/Assets/AssetManager.hpp>
 #include <tracy/Tracy.hpp>
 
 #define GLM_FORCE_RADIANS
@@ -20,20 +25,36 @@ struct UniformBufferObject {
 ReferencePointer<Context> Renderer::s_Context;
 uint32_t Renderer::s_MaxFramesInFlight = MAX_FRAMES_IN_FLIGHT;
 
-Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& device)
-  : m_Device(device), m_RenderWindow(window) {
+Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& device) : m_Device(device), m_RenderWindow(window) {
   ZoneScoped;
 
-  float vertices[] = {-0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, -0.5f, 0.5f, 1.0f, 1.0f, 1.0f};
+  float vertices[] = {-0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f,  -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+                      0.5f,  0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f, -0.5f, 0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
   uint32_t indices[] = {0, 1, 2, 2, 3, 0};
 
-  m_UniformBuffer = UniformBuffer::Create(m_Device, sizeof(UniformBufferObject));
   m_SwapChain = SwapChain::Create(window, device, true);
   m_Framebuffer = Framebuffer::Create(device, m_SwapChain);
 
-  m_Shader = AssetManager::Get<ShaderAsset>("assets/Raw.glsl")
-                 ->CreateShader(device, m_SwapChain, m_Framebuffer, {{ShaderDataType::Float2, "Position", false}, {ShaderDataType::Float3, "Color", false}},
-                                {{ShaderDependencyType::UniformBuffer, ShaderStage::VertexShader, m_UniformBuffer}});
+  m_UniformBuffer = UniformBuffer::Create(m_Device, sizeof(UniformBufferObject));
+  m_Texture = AssetManager::Get<SpriteAsset>("assets/Textures/texture.jpg")->CreateTexture2D(m_Device);
+
+  ShaderDependency uniformBuffer{};
+  uniformBuffer.Type = ShaderDependencyType::UniformBuffer;
+  uniformBuffer.Stage = ShaderStage::VertexShader;
+  uniformBuffer.Location = 0;
+  uniformBuffer.UniformBuffer = m_UniformBuffer;
+
+  ShaderDependency texture{};
+  texture.Type = ShaderDependencyType::Texture;
+  texture.Stage = ShaderStage::PixelShader;
+  texture.Location = 1;
+  texture.Texture = m_Texture;
+
+  m_Shader =
+      AssetManager::Get<ShaderAsset>("assets/Raw.glsl")
+                 ->CreateShader(device, m_SwapChain, m_Framebuffer,
+                                {{ShaderDataType::Float2, "Position", false}, {ShaderDataType::Float3, "Color", false}, {ShaderDataType::Float2, "TexCoords", false}},
+                                {uniformBuffer, texture});
 
   m_CommandBuffers.resize(s_MaxFramesInFlight);
   for (uint32_t i = 0; i < s_MaxFramesInFlight; i++)
@@ -42,7 +63,7 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const Reference
   }
   
   m_VertexBuffer = VertexBuffer::Create(device, vertices, sizeof(vertices));
-  m_VertexBuffer->SetLayout({{ShaderDataType::Float2, "Position", false}, {ShaderDataType::Float3, "Color", false}});
+  m_VertexBuffer->SetLayout({{ShaderDataType::Float2, "Position", false}, {ShaderDataType::Float3, "Color", false}, {ShaderDataType::Float2, "TexCoords", false}});
   m_IndexBuffer = IndexBuffer::Create(device, indices, sizeof(indices));
 
   m_VertexArray = VertexArray::Create();
@@ -86,6 +107,8 @@ void Renderer::Render() {
     commandBuffer->CmdSetViewport(m_SwapChain);
     commandBuffer->CmdSetScissor(m_SwapChain);
     commandBuffer->CmdDrawIndexed(m_VertexArray);
+
+    commandBuffer->CmdDrawImGuiDrawData();
   }
   commandBuffer->End();
 

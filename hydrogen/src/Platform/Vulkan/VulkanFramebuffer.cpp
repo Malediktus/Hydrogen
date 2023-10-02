@@ -1,7 +1,9 @@
-#include <Hydrogen/Core/Logger.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanFramebuffer.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
+#include <Hydrogen/Core/Assert.hpp>
+#include <Hydrogen/Core/Base.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen;
@@ -51,8 +53,8 @@ VulkanFramebuffer::VulkanFramebuffer(const ReferencePointer<RenderDevice>& rende
 
   VK_CHECK_ERROR(vkCreateRenderPass(m_RenderDevice->GetDevice(), &renderPassInfo, nullptr, &m_RenderPass), "Failed to create vulkan render pass!");
 
-  auto swapChainImageViews = m_SwapChain->GetImageViews();
-  auto swapChainExtent = m_SwapChain->GetExtent();
+  const auto& swapChainImageViews = m_SwapChain->GetImageViews();
+  const auto& swapChainExtent = m_SwapChain->GetExtent();
 
   m_Framebuffers.resize(swapChainImageViews.size());
 

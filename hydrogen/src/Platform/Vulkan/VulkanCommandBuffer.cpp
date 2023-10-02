@@ -1,7 +1,12 @@
-#include <Hydrogen/Core/Logger.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanVertexArray.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanShader.hpp>
+#include <Hydrogen/Core/Assert.hpp>
+#include <Hydrogen/Core/Base.hpp>
+#include <backends/imgui_impl_vulkan.h>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen;
@@ -147,4 +152,11 @@ void VulkanCommandBuffer::CmdSetScissor(const ReferencePointer<SwapChain>& swapC
   scissor.offset = {offsetX, offsetY};
   scissor.extent = std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)->GetExtent();
   vkCmdSetScissor(m_CommandBuffer, 0, 1, &scissor);
+}
+
+void VulkanCommandBuffer::CmdDrawImGuiDrawData(const ReferencePointer<Shader>& shader) {
+  VkPipeline pipeline = nullptr;
+  if (shader != nullptr) pipeline = std::dynamic_pointer_cast<VulkanShader>(shader)->GetPipeline();
+
+  ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), m_CommandBuffer, pipeline);
 }

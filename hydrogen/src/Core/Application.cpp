@@ -1,11 +1,13 @@
-#include <imgui.h>
 #include <Hydrogen/Core/Application.hpp>
-#include <Hydrogen/Core/Window.hpp>
 #include <Hydrogen/Core/Logger.hpp>
+#include <Hydrogen/Core/Window.hpp>
 #include <Hydrogen/Core/Task.hpp>
-#include <Hydrogen/Renderer/Renderer.hpp>
 #include <Hydrogen/Assets/AssetManager.hpp>
+#include <Hydrogen/Renderer/Context.hpp>
+#include <Hydrogen/Renderer/Renderer.hpp>
+#include <Hydrogen/Renderer/Framebuffer.hpp>
 #include <Hydrogen/Scene/Scene.hpp>
+#include <imgui.h>
 
 using namespace Hydrogen;
 
@@ -17,7 +19,6 @@ Application::Application() {
 void Application::Run() {
   OnSetup();
   AppWindow = Window::Create(ApplicationInfo.Name, static_cast<uint32_t>(ApplicationInfo.WindowSize.x), static_cast<uint32_t>(ApplicationInfo.WindowSize.y));
-  auto popup = Window::Create("Popup", 500, 500);
 
   AssetManager::Init();
 
@@ -33,7 +34,7 @@ void Application::Run() {
   Renderer::SetContext(renderContext);
   renderContext->Init(clientProject, engineProject);
 
-  auto renderDevice = RenderDevice::Create([](const RenderDeviceProperties& deviceProperties) -> std::size_t {
+  MainRenderDevice = RenderDevice::Create([](const RenderDeviceProperties& deviceProperties) -> std::size_t {
     size_t result = 0;
 
     switch (deviceProperties.DeviceType) {
@@ -51,11 +52,10 @@ void Application::Run() {
     return result;
   });
 
-  HY_ASSERT(!renderDevice->ScreenSupported(AppWindow), "Screen is not supported!");  // TODO: Choose other graphics API or device
-  auto renderer = NewReferencePointer<Renderer>(AppWindow, renderDevice);
+  HY_ASSERT(!MainRenderDevice->ScreenSupported(AppWindow), "Screen is not supported!");  // TODO: Choose other graphics API or device
+  auto renderer = NewReferencePointer<Renderer>(AppWindow, MainRenderDevice);
 
-  HY_ASSERT(!renderDevice->ScreenSupported(popup), "Screen is not supported!");
-  auto renderer2 = NewReferencePointer<Renderer>(popup, renderDevice);
+  auto rendererAPI = RendererAPI::Create(MainRenderDevice, renderer->GetFramebuffer());
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -64,8 +64,7 @@ void Application::Run() {
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable Docking
-  io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable Multi-Viewport
-                                                         // / Platform Windows
+  // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable Multi-Viewport (Unimplemented  in vulkan)
 
   ImGui::StyleColorsDark();
 
@@ -76,7 +75,7 @@ void Application::Run() {
   }
 
   AppWindow->SetupImGui();
-  // RenderCommand::GetRendererAPI()->SetupImGui();
+  rendererAPI->SetupImGui();
 
   CurrentScene = NewReferencePointer<Scene>();
 
@@ -84,26 +83,16 @@ void Application::Run() {
   OnInit();
 
   while (!AppWindow->GetWindowClose()) {
-    if (popup != nullptr) {
-      popup->Render();
-      popup->UpdateEvents();
-      renderer2->Render();
-
-      if (popup->GetWindowClose()) {
-        popup.reset();
-        renderer2.reset();
-      };
-    }
-
     TaskManager::Update();
     OnUpdate();
-    renderer->Render();
 
     AppWindow->ImGuiNewFrame();
-    // ImGui::NewFrame();
+    rendererAPI->ImGuiNewFrame();
+    ImGui::NewFrame();
     OnImGuiDraw();
-    // ImGui::Render();
-    // RenderCommand::GetRendererAPI()->ImGuiRenderDrawData(ImGui::GetDrawData());
+    ImGui::Render();
+
+    renderer->Render(); // Also renders imgui draw data
 
     AppWindow->UpdateImGuiPlatformWindows();
 
@@ -113,15 +102,15 @@ void Application::Run() {
 
   OnShutdown();
 
-  // RenderCommand::GetRendererAPI()->DestroyImGui();
+  MainRenderDevice->WaitForIdle();
+
+  rendererAPI->DestroyImGui();
   AppWindow->DestroyImGui();
   ImGui::DestroyContext();
 
-  renderDevice->WaitForIdle();
+  //renderer.reset();
+  //MainRenderDevice.reset();
+  //Renderer::SetContext(nullptr);
 
   TaskManager::Shutdown();
-  if (popup != nullptr) renderer2.reset();
-  renderer.reset();
-  renderDevice.reset();
-  Renderer::SetContext(nullptr);
 }

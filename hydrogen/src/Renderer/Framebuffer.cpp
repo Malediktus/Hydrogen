@@ -1,6 +1,7 @@
 #include <Hydrogen/Platform/Vulkan/VulkanFramebuffer.hpp>
 #include <Hydrogen/Renderer/Framebuffer.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
+#include <Hydrogen/Core/Assert.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen;

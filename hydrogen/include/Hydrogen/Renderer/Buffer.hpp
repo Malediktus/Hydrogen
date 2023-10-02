@@ -42,7 +42,7 @@ static uint32_t ShaderDataTypeSize(ShaderDataType type) {
 }  // namespace Utils
 
 struct BufferElement {
-  std::string Name;
+  String Name;
   ShaderDataType Type;
   uint32_t Size;
   uint64_t Offset;
@@ -50,7 +50,7 @@ struct BufferElement {
 
   BufferElement() : Type(ShaderDataType::Float), Size(Utils::ShaderDataTypeSize(ShaderDataType::Float)), Offset(0), Normalized(false) {}
 
-  BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
+  BufferElement(ShaderDataType type, const String& name, bool normalized = false)
       : Name(name), Type(type), Size(Utils::ShaderDataTypeSize(type)), Offset(0), Normalized(normalized) {}
 
   uint32_t GetComponentCount() const {

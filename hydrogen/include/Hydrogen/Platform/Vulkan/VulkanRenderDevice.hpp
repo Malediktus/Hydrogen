@@ -1,8 +1,9 @@
 #pragma once
 
 #include "../../Renderer/RenderDevice.hpp"
-#include "VulkanContext.hpp"
+#include <vulkan/vulkan.h>
 #include <optional>
+#include <functional>
 
 namespace Hydrogen::Vulkan {
 using VkQueueFamily = std::optional<uint32_t>;
@@ -12,7 +13,7 @@ class VulkanRenderDevice : public RenderDevice {
   VulkanRenderDevice(std::function<std::size_t(const RenderDeviceProperties&)> deviceRateFunction);
   virtual ~VulkanRenderDevice();
 
-  virtual bool ScreenSupported(const ReferencePointer<RenderWindow>& window) override;
+  virtual bool ScreenSupported(const ReferencePointer<class RenderWindow>& window) override;
   virtual void WaitForIdle() override;
 
   VkPhysicalDevice GetPhysicalDevice() { return m_PhysicalDevice; }

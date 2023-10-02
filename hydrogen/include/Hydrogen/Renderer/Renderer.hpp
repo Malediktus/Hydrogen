@@ -1,20 +1,10 @@
 #pragma once
 
-#include <glm/glm.hpp>
-#include <memory>
-#include <string>
+#include "../Renderer/RendererAPI.hpp"
+#include "../Core/Memory.hpp"
+#include "../Math/Math.hpp"
 
-#include "Buffer.hpp"
-#include "Camera.hpp"
-#include "CommandBuffer.hpp"
-#include "Context.hpp"
-#include "Framebuffer.hpp"
-#include "RenderDevice.hpp"
-#include "RendererAPI.hpp"
-#include "Shader.hpp"
-#include "SwapChain.hpp"
-#include "VertexArray.hpp"
-#include "Texture.hpp"
+#include <tracy/tracy.hpp>
 
 namespace Hydrogen {
 enum LightType { None = 0, Point = 1, Directional = 2, Spot = 3 };
@@ -67,14 +57,15 @@ struct SpotLight : public Light {
 
 class Renderer {
  public:
-  Renderer(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& device);
+  Renderer(const ReferencePointer<class RenderWindow>& window, const ReferencePointer<class RenderDevice>& device);
   ~Renderer();
 
   void Render();
 
   inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
-  static void SetContext(ReferencePointer<Context> context) { s_Context = context; }
+  static void SetContext(ReferencePointer<class Context> context) { s_Context = context; }
+  const ReferencePointer<class Framebuffer>& GetFramebuffer() { return m_Framebuffer; }
 
   template <typename T>
   static ReferencePointer<T> GetContext() {
@@ -86,17 +77,18 @@ class Renderer {
   static ReferencePointer<Context> s_Context;
   static uint32_t s_MaxFramesInFlight;
 
-  ReferencePointer<RenderWindow> m_RenderWindow;
-  ReferencePointer<RenderDevice> m_Device;
-  ReferencePointer<SwapChain> m_SwapChain;
-  ReferencePointer<Framebuffer> m_Framebuffer;
-  ReferencePointer<Shader> m_Shader;
-  DynamicArray<ReferencePointer<CommandBuffer>> m_CommandBuffers;
+  ReferencePointer<class RenderWindow> m_RenderWindow;
+  ReferencePointer<class RenderDevice> m_Device;
+  ReferencePointer<class SwapChain> m_SwapChain;
+  ReferencePointer<class Framebuffer> m_Framebuffer;
+  ReferencePointer<class Shader> m_Shader;
+  DynamicArray<ReferencePointer<class CommandBuffer>> m_CommandBuffers;
   uint32_t m_CurrentFrame;
 
-  ReferencePointer<UniformBuffer> m_UniformBuffer;
-  ReferencePointer<VertexBuffer> m_VertexBuffer;
-  ReferencePointer<IndexBuffer> m_IndexBuffer;
-  ReferencePointer<VertexArray> m_VertexArray;
+  ReferencePointer<class UniformBuffer> m_UniformBuffer;
+  ReferencePointer<class VertexBuffer> m_VertexBuffer;
+  ReferencePointer<class IndexBuffer> m_IndexBuffer;
+  ReferencePointer<class VertexArray> m_VertexArray;
+  ReferencePointer<class Texture2D> m_Texture;
 };
 }  // namespace Hydrogen

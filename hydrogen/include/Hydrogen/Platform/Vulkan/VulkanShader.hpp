@@ -1,21 +1,15 @@
 #pragma once
 
 #include <unordered_map>
+#include <vulkan/vulkan.h>
 
-#include "../../Math/Math.hpp"
-#include "../../Renderer/Renderer.hpp"
 #include "../../Renderer/Shader.hpp"
-#include "VulkanContext.hpp"
-#include "VulkanRenderDevice.hpp"
-#include "VulkanFramebuffer.hpp"
-#include "VulkanSwapChain.hpp"
-
-typedef unsigned int GLenum;
+#include "../../Core/Memory.hpp"
 
 namespace Hydrogen::Vulkan {
 class VulkanShader : public Shader {
  public:
-  VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<Framebuffer>& framebuffer,
+  VulkanShader(const ReferencePointer<class RenderDevice>& renderDevice, const ReferencePointer<class SwapChain>& swapChain, const ReferencePointer<class Framebuffer>& framebuffer,
                const BufferLayout& vertexLayout, ShaderDependencyGraph dependencyGraph, const String& name, const DynamicArray<uint32_t>& vertexSrc,
                const DynamicArray<uint32_t>& fragmentSrc, const DynamicArray<uint32_t>& geometrySrc);
   virtual ~VulkanShader();
@@ -28,9 +22,9 @@ class VulkanShader : public Shader {
  private:
   String m_Name;
   bool m_HasDependencies;
-  ReferencePointer<VulkanRenderDevice> m_RenderDevice;
-  ReferencePointer<VulkanSwapChain> m_SwapChain;
-  ReferencePointer<VulkanFramebuffer> m_Framebuffer;
+  ReferencePointer<class VulkanRenderDevice> m_RenderDevice;
+  ReferencePointer<class VulkanSwapChain> m_SwapChain;
+  ReferencePointer<class VulkanFramebuffer> m_Framebuffer;
   VkShaderModule m_VertexShaderModule;
   VkShaderModule m_FragmentShaderModule;
   VkShaderModule m_GeometryShaderModule;

@@ -2,6 +2,7 @@
 
 #include "Memory.hpp"
 #include "../Math/Math.hpp"
+#include "../Renderer/RenderDevice.hpp"
 
 namespace Hydrogen {
 class Logger;
@@ -24,6 +25,7 @@ class Application {
   ReferencePointer<Logger> Console;
   ReferencePointer<Window> AppWindow;
   ReferencePointer<Scene> CurrentScene;
+  ReferencePointer<RenderDevice> MainRenderDevice;
   struct _ApplicationInfo {
     String Name;
     Vector3 Version;

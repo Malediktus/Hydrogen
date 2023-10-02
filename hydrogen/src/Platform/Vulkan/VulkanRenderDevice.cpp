@@ -1,8 +1,10 @@
-#include <Hydrogen/Core/Logger.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
+#include <Hydrogen/Core/Base.hpp>
+#include <Hydrogen/Core/Window.hpp>
+#include <Hydrogen/Core/Assert.hpp>
 #include <set>
 #include <tracy/Tracy.hpp>
 
@@ -138,6 +140,7 @@ void VulkanRenderDevice::CreateLogicalDevice(const DynamicArray<char*>& required
   graphicsQueueCreateInfo.pQueuePriorities = &queuePriority;
 
   VkPhysicalDeviceFeatures deviceFeatures{};
+  deviceFeatures.samplerAnisotropy = VK_TRUE; // TODO: Check if application want anisotropy and check if device supports it
 
   VkDeviceCreateInfo createInfo{};
   createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;

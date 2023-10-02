@@ -1,4 +1,5 @@
 #include <Hydrogen/Renderer/RenderWindow.hpp>
+#include <Hydrogen/Core/Assert.hpp>
 
 using namespace Hydrogen;
 

@@ -2,8 +2,8 @@
 #include <fstream>
 #include <sstream>
 #include <Hydrogen/Core/Cache.hpp>
-#include <Hydrogen/Core/Assert.hpp>
 #include <Hydrogen/Core/Base.hpp>
+#include <Hydrogen/Core/Assert.hpp>
 
 using namespace Hydrogen;
 

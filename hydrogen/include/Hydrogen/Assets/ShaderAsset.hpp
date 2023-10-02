@@ -5,6 +5,13 @@
 #include <ostream>
 #include <sstream>
 
+#include "../Renderer/RenderDevice.hpp"
+#include "../Renderer/Buffer.hpp"
+#include "../Renderer/SwapChain.hpp"
+#include "../Renderer/Framebuffer.hpp"
+
+#include "../Core/Base.hpp"
+#include "../Core/Assert.hpp"
 #include "../Core/Cache.hpp"
 #include "../Renderer/Shader.hpp"
 #include "../Renderer/ShaderCompiler.hpp"
