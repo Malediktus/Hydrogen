@@ -1,8 +1,9 @@
 #pragma once
 
 #include "../../Renderer/RenderDevice.hpp"
-#include "VulkanContext.hpp"
+#include <vulkan/vulkan.h>
 #include <optional>
+#include <functional>
 
 namespace Hydrogen::Vulkan {
 using VkQueueFamily = std::optional<uint32_t>;
@@ -12,13 +13,15 @@ class VulkanRenderDevice : public RenderDevice {
   VulkanRenderDevice(std::function<std::size_t(const RenderDeviceProperties&)> deviceRateFunction);
   virtual ~VulkanRenderDevice();
 
-  virtual bool ScreenSupported(const ReferencePointer<RenderWindow>& window) override;
+  virtual bool ScreenSupported(const ReferencePointer<class RenderWindow>& window) override;
   virtual void WaitForIdle() override;
 
   VkPhysicalDevice GetPhysicalDevice() { return m_PhysicalDevice; }
-  VkDevice GetDevice() { return m_Device; }
-  VkQueue GetGraphicsQueue() { return m_GraphicsQueue; }
   VkQueueFamily GetGraphicsQueueFamily() { return m_GraphicsQueueFamily; }
+  VkQueueFamily GetTransferQueueFamily() { return m_TransferQueueFamily; }
+  VkQueue GetGraphicsQueue() { return m_GraphicsQueue; }
+  VkQueue GetTransferQueue() { return m_TransferQueue; }
+  VkDevice GetDevice() { return m_Device; }
   VkCommandPool GetCommandPool() { return m_CommandPool; }
 
  private:
@@ -28,12 +31,15 @@ class VulkanRenderDevice : public RenderDevice {
   void CreateCommandPool();
 
   VkQueueFamily FindGraphicsQueueFamily(VkPhysicalDevice device);
+  VkQueueFamily FindTransferQueueFamily(VkPhysicalDevice device);
   bool CheckDeviceExtensionSupport(VkPhysicalDevice device, const DynamicArray<char*>& deviceExtensions);
 
   VkPhysicalDevice m_PhysicalDevice;
   VkQueueFamily m_GraphicsQueueFamily;
-  VkDevice m_Device;
+  VkQueueFamily m_TransferQueueFamily;
   VkQueue m_GraphicsQueue;
+  VkQueue m_TransferQueue;
+  VkDevice m_Device;
   VkCommandPool m_CommandPool;
 };
 }  // namespace Hydrogen::Vulkan

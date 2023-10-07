@@ -2,23 +2,30 @@
 
 #include "../../Renderer/Texture.hpp"
 
+#include <vulkan/vulkan.h>
+
 namespace Hydrogen::Vulkan {
 class VulkanTexture2D : public Texture2D {
  public:
-  VulkanTexture2D(const int width, const int height, Texture2DStorageType storageType);
-  VulkanTexture2D(const int width, const int height, const void* data, Texture2DStorageType usageType);
+  VulkanTexture2D(const ReferencePointer<class RenderDevice>& device, const uint32_t width, const uint32_t height, const void* data);
   virtual ~VulkanTexture2D();
 
   virtual uint32_t GetWidth() const override { return m_Width; }
   virtual uint32_t GetHeight() const override { return m_Height; }
 
-  virtual void Bind(uint32_t slot = 0) const override;
-  virtual void Resize(uint32_t width, uint32_t height) override;
-  virtual void* GetNative() const override;
+  VkImageView GetImageView() { return m_ImageView; }
+  VkImage GetImage() { return m_Image; }
+  VkSampler GetSampler() { return m_Sampler; }
 
  private:
-  uint32_t m_InternalFormat, m_Format, m_Type;
+  void TransitionImageLayout(VkCommandBuffer commandBuffer, VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+
   uint32_t m_Width, m_Height;
-  uint32_t m_RendererID;
+  ReferencePointer<class VulkanRenderDevice> m_RenderDevice;
+
+  VkImage m_Image;
+  VkDeviceMemory m_ImageMemory;
+  VkImageView m_ImageView;
+  VkSampler m_Sampler;
 };
 }  // namespace Hydrogen::Vulkan

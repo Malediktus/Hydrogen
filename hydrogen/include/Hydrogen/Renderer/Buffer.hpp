@@ -42,7 +42,7 @@ static uint32_t ShaderDataTypeSize(ShaderDataType type) {
 }  // namespace Utils
 
 struct BufferElement {
-  std::string Name;
+  String Name;
   ShaderDataType Type;
   uint32_t Size;
   uint64_t Offset;
@@ -50,7 +50,7 @@ struct BufferElement {
 
   BufferElement() : Type(ShaderDataType::Float), Size(Utils::ShaderDataTypeSize(ShaderDataType::Float)), Offset(0), Normalized(false) {}
 
-  BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
+  BufferElement(ShaderDataType type, const String& name, bool normalized = false)
       : Name(name), Type(type), Size(Utils::ShaderDataTypeSize(type)), Offset(0), Normalized(normalized) {}
 
   uint32_t GetComponentCount() const {
@@ -92,12 +92,12 @@ class BufferLayout {
   BufferLayout(const std::initializer_list<BufferElement>& elements) : m_Elements(elements) { CalculateOffsetsAndStride(); }
 
   inline uint32_t GetStride() const { return m_Stride; }
-  inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }
+  inline const DynamicArray<BufferElement>& GetElements() const { return m_Elements; }
 
-  std::vector<BufferElement>::iterator begin() { return m_Elements.begin(); }
-  std::vector<BufferElement>::iterator end() { return m_Elements.end(); }
-  std::vector<BufferElement>::const_iterator begin() const { return m_Elements.begin(); }
-  std::vector<BufferElement>::const_iterator end() const { return m_Elements.end(); }
+  DynamicArray<BufferElement>::iterator begin() { return m_Elements.begin(); }
+  DynamicArray<BufferElement>::iterator end() { return m_Elements.end(); }
+  DynamicArray<BufferElement>::const_iterator begin() const { return m_Elements.begin(); }
+  DynamicArray<BufferElement>::const_iterator end() const { return m_Elements.end(); }
 
  private:
   void CalculateOffsetsAndStride() {
@@ -110,33 +110,38 @@ class BufferLayout {
     }
   }
 
-  std::vector<BufferElement> m_Elements;
+  DynamicArray<BufferElement> m_Elements;
   uint32_t m_Stride = 0;
 };
 
 class VertexBuffer {
  public:
-  virtual ~VertexBuffer() {}
+  virtual ~VertexBuffer() = default;
 
   virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const = 0;
-
-  virtual void SetData(const void* data, size_t size) = 0;
 
   virtual const BufferLayout& GetLayout() const = 0;
   virtual void SetLayout(const BufferLayout& layout) = 0;
 
   static ReferencePointer<VertexBuffer> Create(const ReferencePointer<RenderDevice>& device, float* vertices, size_t size);
-  static ReferencePointer<VertexBuffer> Create(const ReferencePointer<RenderDevice>& device, size_t size);
 };
 
 class IndexBuffer {
  public:
-  virtual ~IndexBuffer() {}
+  virtual ~IndexBuffer() = default;
 
   virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const = 0;
-
-  virtual uint32_t GetCount() const = 0;
+  virtual size_t GetCount() const = 0;
 
   static ReferencePointer<IndexBuffer> Create(const ReferencePointer<RenderDevice>& device, uint32_t* indices, size_t size);
+};
+
+class UniformBuffer {
+ public:
+  virtual ~UniformBuffer() = default;
+
+  virtual void SetData(void* data) = 0;
+
+  static ReferencePointer<UniformBuffer> Create(const ReferencePointer<RenderDevice>& device, size_t size);
 };
 }  // namespace Hydrogen

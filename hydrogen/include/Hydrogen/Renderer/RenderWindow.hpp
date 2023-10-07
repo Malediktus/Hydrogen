@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "RendererAPI.hpp"
+#include "../Math/Math.hpp"
 
 namespace Hydrogen {
 class RenderWindow {

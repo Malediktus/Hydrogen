@@ -4,8 +4,6 @@
 
 #include "../../Renderer/Context.hpp"
 
-#define VK_CHECK_ERROR(expr, msg) HY_ASSERT((expr) == VK_SUCCESS, msg)
-
 namespace Hydrogen::Vulkan {
 class VulkanContext : public Context {
  public:

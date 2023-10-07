@@ -1,24 +1,24 @@
 #pragma once
 
 #include "../../Renderer/SwapChain.hpp"
-#include "VulkanContext.hpp"
 #include "VulkanRenderDevice.hpp"
+#include <vulkan/vulkan.h>
 
 namespace Hydrogen::Vulkan {
 struct SwapChainSupportDetails {
-  VkSurfaceCapabilitiesKHR Capabilities;
+  VkSurfaceCapabilitiesKHR Capabilities = {};
   DynamicArray<VkSurfaceFormatKHR> Formats;
   DynamicArray<VkPresentModeKHR> PresentModes;
 };
 
 class VulkanSwapChain : public SwapChain {
  public:
-  VulkanSwapChain(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& renderDevice, bool verticalSync);
+  VulkanSwapChain(const ReferencePointer<class RenderWindow>& window, const ReferencePointer<class RenderDevice>& renderDevice, bool verticalSync);
   virtual ~VulkanSwapChain();
 
-  virtual void AcquireNextImage(const ReferencePointer<CommandBuffer>& commandBuffer) override;
+  virtual void AcquireNextImage(const ReferencePointer<class CommandBuffer>& commandBuffer) override;
 
-  static SwapChainSupportDetails QuerySwapChainSupportDetails(VkPhysicalDevice device, const ReferencePointer<RenderWindow>& window);
+  static SwapChainSupportDetails QuerySwapChainSupportDetails(VkPhysicalDevice device, const ReferencePointer<class RenderWindow>& window);
   static SwapChainSupportDetails QuerySwapChainSupportDetails(VkPhysicalDevice device, VkSurfaceKHR surface);
 
   VkSurfaceKHR GetWindowSurface() { return m_WindowSurface; }
@@ -31,18 +31,21 @@ class VulkanSwapChain : public SwapChain {
   const DynamicArray<VkImageView>& GetImageViews() { return m_SwapChainImageViews; }
 
  private:
+  void FindPresentQueueFamily();
+  void CreateSwapChain(SwapChainSupportDetails swapChainSupport, VkSurfaceFormatKHR surfaceFormat, VkPresentModeKHR presentMode, uint32_t imageCount);
+  void CreateImageViews();
   VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const DynamicArray<VkSurfaceFormatKHR>& availableFormats);
   VkPresentModeKHR ChooseSwapPresentMode(const DynamicArray<VkPresentModeKHR>& availablePresentModes, bool prefereVerticalSync);
   VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
-  VkQueue m_PresentQueue;
+  ReferencePointer<class RenderWindow> m_RenderWindow;
+  ReferencePointer<class VulkanRenderDevice> m_RenderDevice;
   VkQueueFamily m_PresentQueueFamily;
+  VkQueue m_PresentQueue;
   VkSurfaceKHR m_WindowSurface;
   VkSwapchainKHR m_SwapChain;
   VkExtent2D m_Extent;
   VkFormat m_SwapChainImageFormat;
-  ReferencePointer<RenderWindow> m_RenderWindow;
-  ReferencePointer<VulkanRenderDevice> m_RenderDevice;
   DynamicArray<VkImage> m_SwapChainImages;
   DynamicArray<VkImageView> m_SwapChainImageViews;
 };

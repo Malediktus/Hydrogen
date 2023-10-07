@@ -1,5 +1,7 @@
-#include <Hydrogen/Core/Logger.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
+#include <Hydrogen/Core/Assert.hpp>
+#include <Hydrogen/Core/Window.hpp>
+#include <Hydrogen/Core/Base.hpp>
 #include <set>
 #include <tracy/Tracy.hpp>
 

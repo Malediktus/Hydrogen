@@ -1,7 +1,12 @@
-#include <Hydrogen/Core/Logger.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanVertexArray.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanShader.hpp>
+#include <Hydrogen/Core/Assert.hpp>
+#include <Hydrogen/Core/Base.hpp>
+#include <backends/imgui_impl_vulkan.h>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen;
@@ -10,6 +15,8 @@ using namespace Hydrogen::Vulkan;
 VulkanCommandBuffer::VulkanCommandBuffer(const ReferencePointer<RenderDevice>& renderDevice)
     : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)),
     m_ImageIndex(0) {
+  ZoneScoped;
+
   VkCommandBufferAllocateInfo allocInfo{};
   allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
   allocInfo.commandPool = m_RenderDevice->GetCommandPool();
@@ -32,6 +39,7 @@ VulkanCommandBuffer::VulkanCommandBuffer(const ReferencePointer<RenderDevice>& r
 }
 
 VulkanCommandBuffer::~VulkanCommandBuffer() {
+  ZoneScoped;
   vkWaitForFences(m_RenderDevice->GetDevice(), 1, &m_InFlightFence, VK_TRUE, UINT64_MAX);
   vkResetFences(m_RenderDevice->GetDevice(), 1, &m_InFlightFence);
 
@@ -41,12 +49,14 @@ VulkanCommandBuffer::~VulkanCommandBuffer() {
 }
 
 void VulkanCommandBuffer::Reset() {
+  ZoneScoped;
   vkWaitForFences(m_RenderDevice->GetDevice(), 1, &m_InFlightFence, VK_TRUE, UINT64_MAX);
   vkResetFences(m_RenderDevice->GetDevice(), 1, &m_InFlightFence);
   vkResetCommandBuffer(m_CommandBuffer, 0);
 }
 
 void VulkanCommandBuffer::Begin() {
+  ZoneScoped;
   VkCommandBufferBeginInfo beginInfo{};
   beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
   beginInfo.flags = 0;                   // Optional
@@ -56,11 +66,14 @@ void VulkanCommandBuffer::Begin() {
 }
 
 void VulkanCommandBuffer::End() {
+  ZoneScoped;
   vkCmdEndRenderPass(m_CommandBuffer);
   VK_CHECK_ERROR(vkEndCommandBuffer(m_CommandBuffer), "Failed to end vulkan command buffer!");
 }
 
 void VulkanCommandBuffer::CmdUploadResources() {
+  ZoneScoped;
+
   VkSubmitInfo submitInfo{};
   submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
@@ -81,6 +94,8 @@ void VulkanCommandBuffer::CmdUploadResources() {
 }
 
 void VulkanCommandBuffer::CmdDisplayImage(const ReferencePointer<SwapChain> swapChain) {
+  ZoneScoped;
+
   VkSemaphore waitSemaphores[] = {m_RenderFinishedSemaphore};
 
   VkPresentInfoKHR presentInfo{};
@@ -98,10 +113,18 @@ void VulkanCommandBuffer::CmdDisplayImage(const ReferencePointer<SwapChain> swap
 }
 
 void VulkanCommandBuffer::CmdDraw(const ReferencePointer<VertexBuffer>& vertexBuffer) {
+  ZoneScoped;
   vkCmdDraw(m_CommandBuffer, static_cast<uint32_t>(std::dynamic_pointer_cast<VulkanVertexBuffer>(vertexBuffer)->GetSize()), 1, 0, 0);
 }
 
+void VulkanCommandBuffer::CmdDrawIndexed(const ReferencePointer<class VertexArray>& vertexArray) {
+  ZoneScoped;
+  vkCmdDrawIndexed(m_CommandBuffer, static_cast<uint32_t>(vertexArray->GetIndexBuffer()->GetCount()), 1, 0, 0, 0);
+}
+
 void VulkanCommandBuffer::CmdSetViewport(const ReferencePointer<SwapChain>& swapChain, uint32_t width, uint32_t height) {
+  ZoneScoped;
+
   auto swapChainExtent = std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)->GetExtent();
 
   float viewportWidth = static_cast<float>(width);
@@ -124,8 +147,16 @@ void VulkanCommandBuffer::CmdSetViewport(const ReferencePointer<SwapChain>& swap
 }
 
 void VulkanCommandBuffer::CmdSetScissor(const ReferencePointer<SwapChain>& swapChain, int offsetX, int offsetY) {
+  ZoneScoped;
   VkRect2D scissor{};
   scissor.offset = {offsetX, offsetY};
   scissor.extent = std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)->GetExtent();
   vkCmdSetScissor(m_CommandBuffer, 0, 1, &scissor);
+}
+
+void VulkanCommandBuffer::CmdDrawImGuiDrawData(const ReferencePointer<Shader>& shader) {
+  VkPipeline pipeline = nullptr;
+  if (shader != nullptr) pipeline = std::dynamic_pointer_cast<VulkanShader>(shader)->GetPipeline();
+
+  ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), m_CommandBuffer, pipeline);
 }

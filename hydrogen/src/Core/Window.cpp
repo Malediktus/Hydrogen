@@ -1,5 +1,3 @@
-#include <Hydrogen/Core/Logger.hpp>
-#include <Hydrogen/Core/Platform.hpp>
 #include <Hydrogen/Core/Window.hpp>
 #include <Hydrogen/Platform/MacOS/MacOSWindow.hpp>
 #include <Hydrogen/Platform/Windows/WindowsWindow.hpp>

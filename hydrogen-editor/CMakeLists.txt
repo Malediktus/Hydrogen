@@ -1,5 +1,5 @@
 if(MSVC)
-    add_executable(HydrogenEditor WIN32
+    add_executable(HydrogenEditor# WIN32
         include/Panels/AssetNavigatorPanel.hpp
         include/Panel.hpp
         src/EditorApp.cpp

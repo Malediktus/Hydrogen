@@ -24,8 +24,8 @@ template <typename T>
 using ScopePointer = std::unique_ptr<T>;
 
 template <typename T, typename... Args>
-constexpr ScopePointer<T> ScopeNewPointer(Args&&... args) {
-  return std::unique_ptr<T>(std::forward<Args>(args)...);
+constexpr ScopePointer<T> NewScopePointer(Args&&... args) {
+  return std::make_unique<T>(std::forward<Args>(args)...);
 }
 
 template <typename T, std::size_t N>

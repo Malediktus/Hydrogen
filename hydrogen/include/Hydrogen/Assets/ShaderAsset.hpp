@@ -5,6 +5,13 @@
 #include <ostream>
 #include <sstream>
 
+#include "../Renderer/RenderDevice.hpp"
+#include "../Renderer/Buffer.hpp"
+#include "../Renderer/SwapChain.hpp"
+#include "../Renderer/Framebuffer.hpp"
+
+#include "../Core/Base.hpp"
+#include "../Core/Assert.hpp"
 #include "../Core/Cache.hpp"
 #include "../Renderer/Shader.hpp"
 #include "../Renderer/ShaderCompiler.hpp"
@@ -15,15 +22,15 @@ class ShaderAsset : public Asset {
  public:
   ShaderAsset() { m_AssetInfo.Preload = true; }
 
-  void Load(const String& filepath) override {
+  void Load(const std::filesystem::path& filepath) override {
     HY_ASSERT(!filepath.empty(),
               "Parameter 'filepath' of type 'const String&' in function "
               "ShaderAsset::Load(const String& filepath) is an empty string!");
-    HY_LOG_INFO("Loading shader asset '{}'!", filepath);
+    HY_LOG_INFO("Loading shader asset '{}'!", filepath.string());
 
-    m_Name = FILENAME_FROM_PATH(filepath);
+    m_Name = filepath.filename().string();
 
-    if (filepath.substr(filepath.find_last_of(".") + 1) == "glsl") {
+    if (filepath.extension() == ".glsl") {
       for (const auto& dirEntry : std::filesystem::directory_iterator(filepath)) {
         ShaderStage stage;
         DynamicArray<uint32_t>* currentShader;
@@ -96,12 +103,13 @@ class ShaderAsset : public Asset {
       HY_INVOKE_ERROR("Only glsl is supported for now!");
     }
 
-    HY_LOG_INFO("Finished loading shader asset '{}'!", filepath);
+    HY_LOG_INFO("Finished loading shader asset '{}'!", filepath.string());
   }
 
-  ReferencePointer<Shader> CreateShader(const BufferLayout& vertexLayout, const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
-                                        const ReferencePointer<RenderPass>& renderPass) {
-    return Shader::Create(vertexLayout, renderDevice, swapChain, renderPass, m_Name, m_VertexShader, m_FragmentShader, m_GeometryShader);
+  ReferencePointer<Shader> CreateShader(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
+                                        const ReferencePointer<Framebuffer>& framebuffer, const BufferLayout& vertexLayout,
+                                        const ShaderDependencyGraph dependencyGraph) {
+    return Shader::Create(renderDevice, swapChain, framebuffer, vertexLayout, dependencyGraph, m_Name, m_VertexShader, m_FragmentShader, m_GeometryShader);
   }
 
   const DynamicArray<uint32_t>& GetVertexShader() { return m_VertexShader; }

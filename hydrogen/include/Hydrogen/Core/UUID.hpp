@@ -2,9 +2,6 @@
 
 #include <random>
 
-#include "Logger.hpp"
-#include "Memory.hpp"
-
 namespace Hydrogen {
 class UUID {
  public:

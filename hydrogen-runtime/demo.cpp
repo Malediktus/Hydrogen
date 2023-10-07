@@ -37,8 +37,6 @@ class DemoApplication : public Hydrogen::Application {
 
   void OnImGuiDraw() override {}
 
-  void OnEvent(const Hydrogen::Event&) override { Console->Debug("An event occured"); }
-
  private:
   Hydrogen::ReferencePointer<Hydrogen::Task> m_DemoTask;
 };
