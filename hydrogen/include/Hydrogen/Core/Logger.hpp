@@ -13,28 +13,28 @@ class Logger {
   Logger(String name, LogLevel logLevel = LogLevel::Info, String format = "%^[%T] %n: %v%$", bool out = true, String filename = "");
 
   template <typename... Args>
-  inline void Trace(Args&&... args) {
-    m_Logger->trace(std::forward<Args>(args)...);
+  inline void Trace(spdlog::format_string_t<Args...> fmt, Args &&...args) {
+    m_Logger->trace(fmt, std::forward<Args>(args)...);
   }
   template <typename... Args>
-  inline void Debug(Args&&... args) {
-    m_Logger->debug(std::forward<Args>(args)...);
+  inline void Debug(spdlog::format_string_t<Args...> fmt, Args &&...args) {
+    m_Logger->debug(fmt, std::forward<Args>(args)...);
   }
   template <typename... Args>
-  inline void Info(Args&&... args) {
-    m_Logger->info(std::forward<Args>(args)...);
+  inline void Info(spdlog::format_string_t<Args...> fmt, Args &&...args) {
+    m_Logger->info(fmt, std::forward<Args>(args)...);
   }
   template <typename... Args>
-  inline void Warn(Args&&... args) {
-    m_Logger->warn(std::forward<Args>(args)...);
+  inline void Warn(spdlog::format_string_t<Args...> fmt, Args &&...args) {
+    m_Logger->warn(fmt, std::forward<Args>(args)...);
   }
   template <typename... Args>
-  inline void Error(Args&&... args) {
-    m_Logger->error(std::forward<Args>(args)...);
+  inline void Error(spdlog::format_string_t<Args...> fmt, Args &&...args) {
+    m_Logger->error(fmt, std::forward<Args>(args)...);
   }
   template <typename... Args>
-  inline void Fatal(Args&&... args) {
-    m_Logger->critical(std::forward<Args>(args)...);
+  inline void Fatal(spdlog::format_string_t<Args...> fmt, Args &&...args) {
+    m_Logger->critical(fmt, std::forward<Args>(args)...);
   }
 
  private:

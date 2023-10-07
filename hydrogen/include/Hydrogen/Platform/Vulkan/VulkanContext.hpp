@@ -4,8 +4,6 @@
 
 #include "../../Renderer/Context.hpp"
 
-#define VK_CHECK_ERROR(expr, msg) HY_ASSERT((expr) == VK_SUCCESS, msg)
-
 namespace Hydrogen::Vulkan {
 class VulkanContext : public Context {
  public:
@@ -14,26 +12,26 @@ class VulkanContext : public Context {
 
   virtual void Init(ProjectInformation clientInfo, ProjectInformation engineInfo) override;
 
-  const DynamicArray<const char*>& GetInstanceExtensions() { return m_InstanceExtensions; }
-  const DynamicArray<const char*>& GetDeviceExtensions() { return m_DeviceExtensions; }
-  const DynamicArray<const char*>& GetValidationLayers() { return m_ValidationLayers; }
+  const DynamicArray<char*>& GetInstanceExtensions() { return m_InstanceExtensions; }
+  const DynamicArray<char*>& GetDeviceExtensions() { return m_DeviceExtensions; }
+  const DynamicArray<char*>& GetValidationLayers() { return m_ValidationLayers; }
 
   VkInstance GetInstance() { return m_Instance; }
 
  private:
-  void ConfigureExtensionsAndValidationLayers(const DynamicArray<const char*>& requiredExtensions);
+  void ConfigureExtensionsAndValidationLayers(const DynamicArray<char*>& requiredExtensions);
   void PopulateApplicationInfo(VkApplicationInfo& appInfo, const ProjectInformation& clientInfo, const ProjectInformation& engineInfo);
   void CreateInstance(VkApplicationInfo appInfo, VkInstanceCreateFlags flags, PFN_vkDebugUtilsMessengerCallbackEXT debugCallback);
-  void CheckExtensionSupport(const DynamicArray<const char*>& extensions);
-  void CheckValidationLayerSupport(const DynamicArray<const char*>& validationLayers);
+  void CheckExtensionSupport(const DynamicArray<char*>& extensions);
+  void CheckValidationLayerSupport(const DynamicArray<char*>& validationLayers);
   void CreateDebugMessenger(PFN_vkDebugUtilsMessengerCallbackEXT callback);
   void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo, PFN_vkDebugUtilsMessengerCallbackEXT callback);
 
   ReferencePointer<RenderWindow> m_MainWindow;
   VkInstance m_Instance;
   VkDebugUtilsMessengerEXT m_DebugMessenger;
-  DynamicArray<const char*> m_InstanceExtensions;
-  DynamicArray<const char*> m_DeviceExtensions;
-  DynamicArray<const char*> m_ValidationLayers;
+  DynamicArray<char*> m_InstanceExtensions;
+  DynamicArray<char*> m_DeviceExtensions;
+  DynamicArray<char*> m_ValidationLayers;
 };
 }  // namespace Hydrogen::Vulkan

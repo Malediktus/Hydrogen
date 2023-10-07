@@ -1,6 +1,7 @@
 #include <Hydrogen/Platform/Vulkan/VulkanVertexArray.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <Hydrogen/Renderer/VertexArray.hpp>
+#include <Hydrogen/Core/Assert.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen;

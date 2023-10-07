@@ -1,8 +1,10 @@
-#include <Hydrogen/Core/Logger.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
+#include <Hydrogen/Core/Base.hpp>
+#include <Hydrogen/Core/Window.hpp>
+#include <Hydrogen/Core/Assert.hpp>
 #include <set>
 #include <tracy/Tracy.hpp>
 
@@ -15,8 +17,10 @@ VulkanRenderDevice::VulkanRenderDevice(std::function<std::size_t(const RenderDev
 
   PickPhysicalDevice(deviceExtensions, deviceRateFunction);
   m_GraphicsQueueFamily = FindGraphicsQueueFamily(m_PhysicalDevice);
+  m_TransferQueueFamily = FindTransferQueueFamily(m_PhysicalDevice);
   CreateLogicalDevice(deviceExtensions, validationLayers);
   vkGetDeviceQueue(m_Device, m_GraphicsQueueFamily.value(), 0, &m_GraphicsQueue);
+  vkGetDeviceQueue(m_Device, m_TransferQueueFamily.value(), 0, &m_TransferQueue);
   CreateCommandPool();
 }
 
@@ -50,7 +54,7 @@ bool VulkanRenderDevice::ScreenSupported(const ReferencePointer<RenderWindow>& w
 
 void VulkanRenderDevice::WaitForIdle() { vkDeviceWaitIdle(m_Device); }
 
-void VulkanRenderDevice::PickPhysicalDevice(const DynamicArray<const char*>& requiredExtensions,
+void VulkanRenderDevice::PickPhysicalDevice(const DynamicArray<char*>& requiredExtensions,
                                             const std::function<std::size_t(const RenderDeviceProperties&)>& deviceRateFunction) {
   auto instance = Renderer::GetContext<VulkanContext>()->GetInstance();
 
@@ -66,6 +70,8 @@ void VulkanRenderDevice::PickPhysicalDevice(const DynamicArray<const char*>& req
   for (auto& device : devices) {
     auto graphicsQueueFamily = FindGraphicsQueueFamily(device);
     if (!graphicsQueueFamily.has_value()) continue;
+    auto transferQueueFamily = FindTransferQueueFamily(device);
+    if (!transferQueueFamily.has_value()) continue;
     if (!CheckDeviceExtensionSupport(device, requiredExtensions)) continue;
 
     RenderDeviceProperties renderDeviceProperties;
@@ -124,7 +130,7 @@ void VulkanRenderDevice::PopulateRenderDeviceProperties(RenderDeviceProperties& 
   }
 }
 
-void VulkanRenderDevice::CreateLogicalDevice(const DynamicArray<const char*>& requiredExtensions, const DynamicArray<const char*>& validationLayers) {
+void VulkanRenderDevice::CreateLogicalDevice(const DynamicArray<char*>& requiredExtensions, const DynamicArray<char*>& validationLayers) {
   float queuePriority = 1.0f;
 
   VkDeviceQueueCreateInfo graphicsQueueCreateInfo{};
@@ -134,6 +140,7 @@ void VulkanRenderDevice::CreateLogicalDevice(const DynamicArray<const char*>& re
   graphicsQueueCreateInfo.pQueuePriorities = &queuePriority;
 
   VkPhysicalDeviceFeatures deviceFeatures{};
+  deviceFeatures.samplerAnisotropy = VK_TRUE; // TODO: Check if application want anisotropy and check if device supports it
 
   VkDeviceCreateInfo createInfo{};
   createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -153,12 +160,12 @@ void VulkanRenderDevice::CreateLogicalDevice(const DynamicArray<const char*>& re
 }
 
 void VulkanRenderDevice::CreateCommandPool() {
-  VkCommandPoolCreateInfo poolInfo{};
-  poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-  poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-  poolInfo.queueFamilyIndex = m_GraphicsQueueFamily.value();
+  VkCommandPoolCreateInfo createInfo{};
+  createInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+  createInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+  createInfo.queueFamilyIndex = m_GraphicsQueueFamily.value();
 
-  VK_CHECK_ERROR(vkCreateCommandPool(m_Device, &poolInfo, nullptr, &m_CommandPool), "Failed to create vulkan command pool!");
+  VK_CHECK_ERROR(vkCreateCommandPool(m_Device, &createInfo, nullptr, &m_CommandPool), "Failed to create vulkan command pool!");
 }
 
 VkQueueFamily VulkanRenderDevice::FindGraphicsQueueFamily(VkPhysicalDevice device) {
@@ -180,7 +187,26 @@ VkQueueFamily VulkanRenderDevice::FindGraphicsQueueFamily(VkPhysicalDevice devic
   return VkQueueFamily();
 }
 
-bool VulkanRenderDevice::CheckDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char*>& deviceExtensions) {
+VkQueueFamily VulkanRenderDevice::FindTransferQueueFamily(VkPhysicalDevice device) {
+  uint32_t queueFamilyCount = 0;
+  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+  DynamicArray<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+  vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+  int i = 0;
+  for (const auto& queueFamily : queueFamilies) {
+    if (queueFamily.queueFlags & VK_QUEUE_TRANSFER_BIT) {
+      return i;
+    }
+
+    i++;
+  }
+
+  return VkQueueFamily();
+}
+
+bool VulkanRenderDevice::CheckDeviceExtensionSupport(VkPhysicalDevice device, const DynamicArray<char*>& deviceExtensions) {
   uint32_t extensionCount;
   vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
 

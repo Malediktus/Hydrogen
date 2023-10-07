@@ -1,10 +1,9 @@
 #pragma once
 
-#include "Application.hpp"
+#include "Platform.hpp"
 
-int main() {
-  auto app = Hydrogen::CreateApplication();
-
-  app->Run();
-  HY_LOG_DEBUG("Finished running client application!");
-}
+#if defined HY_PLATFORM_WINDOWS
+#include "Platform/Windows/WindowsEntry.hpp"
+#elif defined HY_PLATFORM_MACOS
+#include "Platform/MacOS/MacOSEntry.hpp"
+#endif

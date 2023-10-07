@@ -1,17 +1,19 @@
 #include <Hydrogen/Platform/Vulkan/VulkanShader.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <Hydrogen/Renderer/Shader.hpp>
+#include <Hydrogen/Core/Assert.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen;
 
-ReferencePointer<Shader> Shader::Create(const BufferLayout& vertexLayout, const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
-                                        const ReferencePointer<RenderPass>& renderPass, const String& name, const DynamicArray<uint32_t>& vertexSrc,
-                                        const DynamicArray<uint32_t>& fragmentSrc, const DynamicArray<uint32_t>& geometrySrc) {
+ReferencePointer<Shader> Shader::Create(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
+                                        const ReferencePointer<Framebuffer>& framebuffer, const BufferLayout& vertexLayout, ShaderDependencyGraph dependencyGraph,
+                                        const String& name, const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc,
+                                        const DynamicArray<uint32_t>& geometrySrc) {
   ZoneScoped;
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
-      return NewReferencePointer<Vulkan::VulkanShader>(vertexLayout, renderDevice, swapChain, renderPass, name, vertexSrc, fragmentSrc, geometrySrc);
+      return NewReferencePointer<Vulkan::VulkanShader>(renderDevice, swapChain, framebuffer, vertexLayout, dependencyGraph, name, vertexSrc, fragmentSrc, geometrySrc);
     default:
       HY_ASSERT_CHECK(false,
                       "Invalid renderer API value returned from "
@@ -31,11 +33,12 @@ void ShaderLibrary::Add(const ReferencePointer<Shader>& shader) {
   auto& name = shader->GetName();
   Add(name, shader);
 }
-ReferencePointer<Shader> ShaderLibrary::Load(const BufferLayout& vertexLayout, const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
-                                             const ReferencePointer<RenderPass>& renderPass, const String& name, const DynamicArray<uint32_t>& vertexSrc,
-                                             const DynamicArray<uint32_t>& fragmentSrc, const DynamicArray<uint32_t>& geometrySrc) {
+ReferencePointer<Shader> ShaderLibrary::Load(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
+                                             const ReferencePointer<Framebuffer>& framebuffer, const BufferLayout& vertexLayout, ShaderDependencyGraph dependencyGraph,
+                                             const String& name, const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc,
+                                             const DynamicArray<uint32_t>& geometrySrc) {
   ZoneScoped;
-  auto shader = Shader::Create(vertexLayout, renderDevice, swapChain, renderPass, name, vertexSrc, fragmentSrc, geometrySrc);
+  auto shader = Shader::Create(renderDevice, swapChain, framebuffer, vertexLayout, dependencyGraph, name, vertexSrc, fragmentSrc, geometrySrc);
   Add(name, shader);
   return shader;
 }

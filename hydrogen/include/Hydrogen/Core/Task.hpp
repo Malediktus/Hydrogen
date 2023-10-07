@@ -1,9 +1,7 @@
 #pragma once
 
 #include <vector>
-
 #include "Memory.hpp"
-#include "UUID.hpp"
 
 namespace Hydrogen {
 class Task {

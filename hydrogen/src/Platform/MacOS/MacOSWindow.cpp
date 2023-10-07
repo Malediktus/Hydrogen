@@ -1,9 +1,9 @@
 #include <backends/imgui_impl_glfw.h>
 #include <imgui.h>
 
-#include <Hydrogen/Core/Logger.hpp>
 #include <Hydrogen/Platform/MacOS/MacOSWindow.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
+#include <Hydrogen/Core/Base.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 
 using namespace Hydrogen;
@@ -74,13 +74,13 @@ bool MacOSWindow::GetMouseKeyUp(KeyCode key) const { return glfwGetMouseButton(m
 uint32_t MacOSWindow::GetMouseX() const {
   double x, y;
   glfwGetCursorPos(m_Window, &x, &y);
-  return x;
+  return static_cast<uint32_t>(x);
 }
 
 uint32_t MacOSWindow::GetMouseY() const {
   double x, y;
   glfwGetCursorPos(m_Window, &x, &y);
-  return y;
+  return static_cast<uint32_t>(y);
 }
 
 Vector2 MacOSWindow::GetMousePos() const {
@@ -106,15 +106,15 @@ void MacOSWindow::Render() {
 }
 
 void MacOSWindow::SetupImGui() {
-  // ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
+  ImGui_ImplGlfw_InitForVulkan(m_Window, true);  // TODO: Make API indenpendent
 }
 
 void MacOSWindow::ImGuiNewFrame() {
-  // ImGui_ImplGlfw_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
 }
 
 void MacOSWindow::DestroyImGui() {
-  // ImGui_ImplGlfw_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
 }
 
 void MacOSWindow::SetupOpenglContext(int, int) { glfwMakeContextCurrent(m_Window); }
@@ -130,15 +130,15 @@ void MacOSWindow::UpdateImGuiPlatformWindows() {
   // }
 }
 
-const std::vector<const char*> MacOSWindow::GetVulkanWindowExtensions() {
+const DynamicArray<char*> MacOSWindow::GetVulkanWindowExtensions() {
   uint32_t glfwExtensionCount = 0;
   const char** glfwExtensions;
   glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
-  std::vector<const char*> result;
+  DynamicArray<char*> result;
   result.reserve(glfwExtensionCount);
   for (uint32_t i = 0; i < glfwExtensionCount; i++) {
-    result.push_back(glfwExtensions[i]);
+    result.push_back((char*)glfwExtensions[i]);
   }
 
   return result;

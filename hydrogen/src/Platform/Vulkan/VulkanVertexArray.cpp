@@ -1,6 +1,6 @@
-#include <Hydrogen/Core/Logger.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanVertexArray.hpp>
+#include <Hydrogen/Renderer/Buffer.hpp>
+#include <Hydrogen/Core/Assert.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen::Vulkan;
@@ -9,26 +9,27 @@ VulkanVertexArray::VulkanVertexArray() { ZoneScoped; }
 
 VulkanVertexArray::~VulkanVertexArray() {
   ZoneScoped;
-  HY_LOG_TRACE("Deleted Vulkan vertex array (ID: {})", m_RendererID);
 }
 
-void VulkanVertexArray::Bind() const {
+void VulkanVertexArray::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const {
   ZoneScoped;
-  HY_LOG_TRACE("Bound Vulkan vertex array (ID: {})", m_RendererID);
-}
+  HY_ASSERT(m_IndexBuffer, "No index buffer provided!");
+  HY_ASSERT(m_VertexBuffers.size() != 0, "No vertex buffers provided!");
 
-void VulkanVertexArray::Unbind() const {
-  ZoneScoped;
-  HY_LOG_TRACE("Unbount Vulkan vertex array (ID: {})", m_RendererID);
+  m_VertexBuffers[0]->Bind(commandBuffer);
+  m_IndexBuffer->Bind(commandBuffer);
 }
 
 void VulkanVertexArray::AddVertexBuffer(const ReferencePointer<VertexBuffer>& vertexBuffer) {
   ZoneScoped;
   HY_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "At lease one value is needed in vertex buffer layout");
-  HY_LOG_TRACE("Attached vertex buffer to Vulkan vertex array (ID: {})", m_RendererID);
+  HY_ASSERT(m_VertexBuffers.size() == 0, "Multiple vertex buffers per vertex array are unimplemented!");
+
+  m_VertexBuffers.push_back(vertexBuffer);
 }
 
 void VulkanVertexArray::SetIndexBuffer(const ReferencePointer<IndexBuffer>& indexBuffer) {
   ZoneScoped;
-  HY_LOG_TRACE("Set index buffer of Vulkan vertex array (ID: {})", m_RendererID);
+  
+  m_IndexBuffer = indexBuffer;
 }

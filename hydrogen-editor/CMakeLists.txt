@@ -1,13 +1,21 @@
-add_executable(HydrogenEditor
-    include/Panels/AssetNavigatorPanel.hpp
-    include/Panel.hpp
-    src/EditorApp.cpp
-)
+if(MSVC)
+    add_executable(HydrogenEditor# WIN32
+        include/Panels/AssetNavigatorPanel.hpp
+        include/Panel.hpp
+        src/EditorApp.cpp
+    )
+else()
+    add_executable(HydrogenEditor
+        include/Panels/AssetNavigatorPanel.hpp
+        include/Panel.hpp
+        src/EditorApp.cpp
+    )
+endif()
 
 target_compile_features(HydrogenEditor PRIVATE cxx_std_17)
 
 if(MSVC)
-    target_compile_options(HydrogenEditor PRIVATE /W4 /WX)
+    target_compile_options(HydrogenEditor PRIVATE /W4)
 else()
     target_compile_options(HydrogenEditor PRIVATE -Wall -Wextra -Wpedantic)
 endif()

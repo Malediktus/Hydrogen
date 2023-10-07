@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Core/Memory.hpp"
+#include <filesystem>
 
 namespace Hydrogen {
 class Asset {
@@ -10,7 +11,7 @@ class Asset {
   };
 
   virtual ~Asset() = default;
-  virtual void Load(const String& filepath) = 0;
+  virtual void Load(const std::filesystem::path& filepath) = 0;
 
   AssetInfo GetInfo() { return m_AssetInfo; }
 
