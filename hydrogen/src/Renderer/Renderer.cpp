@@ -6,6 +6,8 @@
 #include <Hydrogen/Renderer/VertexArray.hpp>
 #include <Hydrogen/Renderer/RenderWindow.hpp>
 #include <Hydrogen/Assets/AssetManager.hpp>
+#include <Hydrogen/Scene/Scene.hpp>
+#include <Hydrogen/Scene/Components.hpp>
 #include <tracy/Tracy.hpp>
 
 #define GLM_FORCE_RADIANS
@@ -25,18 +27,14 @@ struct UniformBufferObject {
 ReferencePointer<Context> Renderer::s_Context;
 uint32_t Renderer::s_MaxFramesInFlight = MAX_FRAMES_IN_FLIGHT;
 
-Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& device) : m_Device(device), m_RenderWindow(window) {
+Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& device, const ScopePointer<class Scene>& scene)
+    : m_Device(device), m_RenderWindow(window), m_Scene(scene) {
   ZoneScoped;
-
-  float vertices[] = {-0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f,  -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-                      0.5f,  0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f, -0.5f, 0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
-  uint32_t indices[] = {0, 1, 2, 2, 3, 0};
 
   m_SwapChain = SwapChain::Create(window, device, true);
   m_Framebuffer = Framebuffer::Create(device, m_SwapChain);
-
+  m_Texture = AssetManager::Get<SpriteAsset>("assets/Meshes/viking_room.png")->CreateTexture2D(m_Device);
   m_UniformBuffer = UniformBuffer::Create(m_Device, sizeof(UniformBufferObject));
-  m_Texture = AssetManager::Get<SpriteAsset>("assets/Textures/texture.jpg")->CreateTexture2D(m_Device);
 
   ShaderDependency uniformBuffer{};
   uniformBuffer.Type = ShaderDependencyType::UniformBuffer;
@@ -50,25 +48,14 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const Reference
   texture.Location = 1;
   texture.Texture = m_Texture;
 
-  m_Shader =
-      AssetManager::Get<ShaderAsset>("assets/Raw.glsl")
+  m_Shader = AssetManager::Get<ShaderAsset>("assets/Raw.glsl")
                  ->CreateShader(device, m_SwapChain, m_Framebuffer,
-                                {{ShaderDataType::Float2, "Position", false}, {ShaderDataType::Float3, "Color", false}, {ShaderDataType::Float2, "TexCoords", false}},
-                                {uniformBuffer, texture});
+                         {{ShaderDataType::Float3, "Position", false}, {ShaderDataType::Float3, "Normal", false}, {ShaderDataType::Float2, "TexCoords", false}}, {uniformBuffer, texture});
 
   m_CommandBuffers.resize(s_MaxFramesInFlight);
-  for (uint32_t i = 0; i < s_MaxFramesInFlight; i++)
-  {
+  for (uint32_t i = 0; i < s_MaxFramesInFlight; i++) {
     m_CommandBuffers[i] = CommandBuffer::Create(device);
   }
-  
-  m_VertexBuffer = VertexBuffer::Create(device, vertices, sizeof(vertices));
-  m_VertexBuffer->SetLayout({{ShaderDataType::Float2, "Position", false}, {ShaderDataType::Float3, "Color", false}, {ShaderDataType::Float2, "TexCoords", false}});
-  m_IndexBuffer = IndexBuffer::Create(device, indices, sizeof(indices));
-
-  m_VertexArray = VertexArray::Create();
-  m_VertexArray->AddVertexBuffer(m_VertexBuffer);
-  m_VertexArray->SetIndexBuffer(m_IndexBuffer);
 
   m_CurrentFrame = 0;
 
@@ -84,15 +71,19 @@ void Renderer::Render() {
   float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
   UniformBufferObject ubo{};
-  ubo.Model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+  ubo.Model = glm::rotate(glm::mat4(1.0f), time * glm::radians(20.0f), glm::vec3(0.0f, 0.0f, 1.0f));
   ubo.View = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
   const auto& viewportSize = m_RenderWindow->GetViewportSize();
-  ubo.Proj = glm::perspective(glm::radians(45.0f), viewportSize.x / viewportSize.y, 0.1f, 10.0f);
+  ubo.Proj = glm::perspective(glm::radians(45.0f), viewportSize.x / viewportSize.y, 0.001f, 1000.0f);
   ubo.Proj[1][1] *= -1;
 
   m_UniformBuffer->SetData(&ubo);
-
   const auto& commandBuffer = m_CommandBuffers[m_CurrentFrame];
+
+  auto entities = m_Scene->GetEntitiesByName("Room");
+  auto children = entities[0].GetChildrenByName("mesh_all1_Texture1_0");
+  auto& entity = children[0];
+  auto& vertexArray = entity.GetComponent<MeshRendererComponent>().VertexArrays[0];
 
   commandBuffer->Reset();
   m_SwapChain->AcquireNextImage(commandBuffer);
@@ -101,12 +92,11 @@ void Renderer::Render() {
   {
     m_Framebuffer->Bind(commandBuffer);
     m_Shader->Bind(commandBuffer);
-    m_VertexBuffer->Bind(commandBuffer);
-    m_IndexBuffer->Bind(commandBuffer);
+    vertexArray->Bind(commandBuffer);
 
     commandBuffer->CmdSetViewport(m_SwapChain);
     commandBuffer->CmdSetScissor(m_SwapChain);
-    commandBuffer->CmdDrawIndexed(m_VertexArray);
+    commandBuffer->CmdDrawIndexed(vertexArray);
 
     commandBuffer->CmdDrawImGuiDrawData();
   }

@@ -16,3 +16,6 @@
 [submodule "extern/glslang"]
 	path = extern/glslang
 	url = https://github.com/KhronosGroup/glslang
+[submodule "extern/yaml-cpp"]
+	path = extern/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp

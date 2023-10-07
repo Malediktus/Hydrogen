@@ -57,7 +57,7 @@ struct SpotLight : public Light {
 
 class Renderer {
  public:
-  Renderer(const ReferencePointer<class RenderWindow>& window, const ReferencePointer<class RenderDevice>& device);
+  Renderer(const ReferencePointer<class RenderWindow>& window, const ReferencePointer<class RenderDevice>& device, const ScopePointer<class Scene>& scene);
   ~Renderer();
 
   void Render();
@@ -77,6 +77,7 @@ class Renderer {
   static ReferencePointer<Context> s_Context;
   static uint32_t s_MaxFramesInFlight;
 
+  const ScopePointer<class Scene>& m_Scene;
   ReferencePointer<class RenderWindow> m_RenderWindow;
   ReferencePointer<class RenderDevice> m_Device;
   ReferencePointer<class SwapChain> m_SwapChain;
@@ -86,9 +87,6 @@ class Renderer {
   uint32_t m_CurrentFrame;
 
   ReferencePointer<class UniformBuffer> m_UniformBuffer;
-  ReferencePointer<class VertexBuffer> m_VertexBuffer;
-  ReferencePointer<class IndexBuffer> m_IndexBuffer;
-  ReferencePointer<class VertexArray> m_VertexArray;
   ReferencePointer<class Texture2D> m_Texture;
 };
 }  // namespace Hydrogen

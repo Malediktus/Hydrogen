@@ -24,7 +24,7 @@ class Application {
  protected:
   ReferencePointer<Logger> Console;
   ReferencePointer<Window> AppWindow;
-  ReferencePointer<Scene> CurrentScene;
+  ScopePointer<Scene> CurrentScene;
   ReferencePointer<RenderDevice> MainRenderDevice;
   struct _ApplicationInfo {
     String Name;

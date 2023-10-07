@@ -22,15 +22,15 @@ class ShaderAsset : public Asset {
  public:
   ShaderAsset() { m_AssetInfo.Preload = true; }
 
-  void Load(const String& filepath) override {
+  void Load(const std::filesystem::path& filepath) override {
     HY_ASSERT(!filepath.empty(),
               "Parameter 'filepath' of type 'const String&' in function "
               "ShaderAsset::Load(const String& filepath) is an empty string!");
-    HY_LOG_INFO("Loading shader asset '{}'!", filepath);
+    HY_LOG_INFO("Loading shader asset '{}'!", filepath.string());
 
-    m_Name = FILENAME_FROM_PATH(filepath);
+    m_Name = filepath.filename().string();
 
-    if (filepath.substr(filepath.find_last_of(".") + 1) == "glsl") {
+    if (filepath.extension() == ".glsl") {
       for (const auto& dirEntry : std::filesystem::directory_iterator(filepath)) {
         ShaderStage stage;
         DynamicArray<uint32_t>* currentShader;
@@ -103,7 +103,7 @@ class ShaderAsset : public Asset {
       HY_INVOKE_ERROR("Only glsl is supported for now!");
     }
 
-    HY_LOG_INFO("Finished loading shader asset '{}'!", filepath);
+    HY_LOG_INFO("Finished loading shader asset '{}'!", filepath.string());
   }
 
   ReferencePointer<Shader> CreateShader(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,

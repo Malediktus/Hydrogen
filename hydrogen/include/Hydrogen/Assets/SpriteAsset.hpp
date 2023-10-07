@@ -18,14 +18,14 @@ class SpriteAsset : public Asset {
     m_Height = 0;
   }
 
-  void Load(const String& filepath) override {
+  void Load(const std::filesystem::path& filepath) override {
     HY_ASSERT(!filepath.empty(),
               "Parameter 'filepath' of type 'const String&' in function "
               "SpriteAsset::Load(const String& filepath) is an empty string!");
-    HY_LOG_INFO("Loading sprite asset '{}'!", filepath);
-    m_Pixels = stbi_load(filepath.c_str(), (int*)&m_Width, (int*)&m_Height, (int*)&m_Channels, STBI_rgb_alpha);
-    HY_ASSERT(m_Pixels, "Failed to load sprite {}", filepath);
-    HY_LOG_INFO("Finished loading sprite asset '{}'!", filepath);
+    HY_LOG_INFO("Loading sprite asset '{}'!", filepath.string());
+    m_Pixels = stbi_load(filepath.string().c_str(), (int*)&m_Width, (int*)&m_Height, (int*)&m_Channels, STBI_rgb_alpha);
+    HY_ASSERT(m_Pixels, "Failed to load sprite {}", filepath.string());
+    HY_LOG_INFO("Finished loading sprite asset '{}'!", filepath.string());
   }
 
   ReferencePointer<Texture2D> CreateTexture2D(const ReferencePointer<RenderDevice>& renderDevice) {

@@ -2,74 +2,68 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
-#include "../Core/UUID.hpp"
-#include "../Renderer/Renderer.hpp"
-#include "../Renderer/VertexArray.hpp"
+#include "../Core/Memory.hpp"
 
 namespace Hydrogen {
-struct IDComponent {
-  UUID ID;
-
-  IDComponent() = default;
-  // IDComponent(const IDComponent&) = default;
-  IDComponent(const UUID id) : ID(id) {}
-};
+class Entity;
 
 struct TagComponent {
-  String Tag;
-
   TagComponent() = default;
-  // TagComponent(const TagComponent&) = default;
-  TagComponent(const String& tag) : Tag(tag) {}
+  ~TagComponent() = default;
+
+  TagComponent(TagComponent& other) : Name(other.Name), Tag(other.Tag), UUID(0) {}
+
+  TagComponent(const String& name) : Name(name), Tag(""), UUID(0) {}
+  TagComponent(const String& name, const String& tag) : Name(name), Tag(tag), UUID(0) {}
+
+  String Name;
+  String Tag;
+  uint64_t UUID;
 };
 
 struct TransformComponent {
-  Vector3 Translation = {0.0f, 0.0f, 0.0f};
-  Vector3 Rotation = {0.0f, 0.0f, 0.0f};
-  Vector3 Scale = {1.0f, 1.0f, 1.0f};
-
   TransformComponent() = default;
-  // TransformComponent(const TransformComponent&) = default;
-  TransformComponent(const Vector3& translation) : Translation(translation) {}
+  ~TransformComponent() = default;
 
-  Matrix4 GetTransform() const {
-    Matrix4 rotation = glm::toMat4(glm::quat(Rotation));
+  TransformComponent(TransformComponent&) = default;
 
-    return glm::translate(Matrix4(1.0f), Translation) * rotation * glm::scale(Matrix4(1.0f), Scale);
+  TransformComponent(const glm::vec3& translation) : Translation(translation) {}
+
+  glm::vec3 Translation = {0.0f, 0.0f, 0.0f};
+  glm::vec3 Rotation = {0.0f, 0.0f, 0.0f};
+  glm::vec3 Scale = {1.0f, 1.0f, 1.0f};
+
+  glm::mat4 GetTransform() const {
+    glm::mat4 rotation = glm::toMat4(glm::quat(Rotation));
+
+    return glm::translate(glm::mat4(1.0f), Translation) * rotation * glm::scale(glm::mat4(1.0f), Scale);
   }
 };
 
+struct HierarchyComponent {
+  HierarchyComponent() = default;
+  ~HierarchyComponent() = default;
+
+  HierarchyComponent(HierarchyComponent& other) : Parent(other.Parent), Children(other.Children) {}
+
+  HierarchyComponent(Entity parent) : Parent(parent) {}
+
+  void AddChild(Entity child) { Children.push_back(child); }
+
+  class Entity Parent;
+  DynamicArray<class Entity> Children;
+};
+
 struct MeshRendererComponent {
-  DynamicArray<ReferencePointer<VertexArray>> VertexArrays = {};
-  ReferencePointer<Shader> MeshShader = {};
-
   MeshRendererComponent() = default;
-  MeshRendererComponent(const MeshRendererComponent&) = default;
-};
+  ~MeshRendererComponent() = default;
 
-struct PointLightComponent {
-  PointLight _PointLight = {1.0f, 1.0f, 1.0f, Vector3(1.0f), Vector3(1.0f), Vector3(1.0f)};
+  MeshRendererComponent(MeshRendererComponent&) = default;
 
-  PointLightComponent() = default;
-  // PointLightComponent(const PointLightComponent&) = default;
-  PointLightComponent(const PointLight& pointLight) : _PointLight(pointLight) {}
-};
-
-struct SpotLightComponent {
-  SpotLight _SpotLight = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, Vector3(1.0f), Vector3(1.0f), Vector3(1.0f)};
-
-  SpotLightComponent() = default;
-  SpotLightComponent(const SpotLightComponent&) = default;
-  SpotLightComponent(const SpotLight& spotLight) : _SpotLight(spotLight) {}
-};
-
-struct DirectionalLightComponent {
-  DirectionalLight _DirectionalLight = {Vector3(1.0f), Vector3(1.0f), Vector3(1.0f)};
-
-  DirectionalLightComponent() = default;
-  DirectionalLightComponent(const DirectionalLightComponent&) = default;
-  DirectionalLightComponent(const DirectionalLight& directionalLight) : _DirectionalLight(directionalLight) {}
+  DynamicArray<ReferencePointer<class VertexArray>> VertexArrays;
 };
 }  // namespace Hydrogen

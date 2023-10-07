@@ -127,7 +127,7 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
                    "Failed to create Vulkan descriptor set layout");
 
     DynamicArray<VkDescriptorPoolSize> descriptorPoolSizes;
-    if (numUniformBuffers >= 0) {
+    if (numUniformBuffers > 0) {
       VkDescriptorPoolSize poolSize{};
       poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
       poolSize.descriptorCount = numUniformBuffers;
@@ -135,7 +135,7 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
       descriptorPoolSizes.push_back(poolSize);
     }
 
-    if (numTextures >= 0) {
+    if (numTextures > 0) {
       VkDescriptorPoolSize poolSize{};
       poolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
       poolSize.descriptorCount = numTextures;

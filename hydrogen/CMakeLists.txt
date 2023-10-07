@@ -17,6 +17,7 @@ set(CORE_HEADERS
 set(ASSET_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Assets/Asset.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Assets/AssetManager.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Assets/MeshAsset.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Assets/ShaderAsset.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Assets/SpriteAsset.hpp"
 )
@@ -26,7 +27,9 @@ set(EVENTS_HEADERS
 )
 set(SCENE_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Scene/Scene.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Scene/Entity.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Scene/Components.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Scene/SceneSerialization.hpp"
 )
 set(MATH_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Math/Math.hpp"
@@ -98,6 +101,9 @@ set(EVENTS_SOURCES
 )
 set(SCENE_SOURCES
     src/Scene/Scene.cpp
+    src/Scene/Entity.cpp
+    src/Scene/Components.cpp
+    src/Scene/SceneSerialization.cpp
 )
 set(RENDERER_SOURCES
     src/Renderer/Buffer.cpp
@@ -259,4 +265,4 @@ set(GLSLANGLIBS
     SPIRV)
 
 target_link_libraries(Hydrogen PRIVATE glfw Vulkan::Vulkan)
-target_link_libraries(Hydrogen PUBLIC spdlog::spdlog stb_image imgui glm EnTT::EnTT TracyClient ${GLSLANGLIBS})
+target_link_libraries(Hydrogen PUBLIC yaml-cpp assimp::assimp spdlog::spdlog stb_image imgui glm EnTT::EnTT TracyClient ${GLSLANGLIBS})

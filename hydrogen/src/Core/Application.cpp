@@ -47,13 +47,18 @@ void Application::Run() {
         return 0;  // Support only GPUs
     }
 
-    for (auto heap : deviceProperties.MemoryHeaps) result += heap.MemorySize / 1024;  // Choose the GPU with most memory
+    for (auto& heap : deviceProperties.MemoryHeaps) result += heap.MemorySize / 1024;  // Choose the GPU with most memory
 
     return result;
   });
 
+  CurrentScene = NewScopePointer<Scene>("Main Scene");
+
+  auto test = AssetManager::Get<MeshAsset>("assets/Meshes/viking_room.obj");
+  test->Spawn(MainRenderDevice, CurrentScene, "Room");
+
   HY_ASSERT(!MainRenderDevice->ScreenSupported(AppWindow), "Screen is not supported!");  // TODO: Choose other graphics API or device
-  auto renderer = NewReferencePointer<Renderer>(AppWindow, MainRenderDevice);
+  auto renderer = NewReferencePointer<Renderer>(AppWindow, MainRenderDevice, CurrentScene);
 
   auto rendererAPI = RendererAPI::Create(MainRenderDevice, renderer->GetFramebuffer());
 
@@ -76,8 +81,6 @@ void Application::Run() {
 
   AppWindow->SetupImGui();
   rendererAPI->SetupImGui();
-
-  CurrentScene = NewReferencePointer<Scene>();
 
   m_Initialized = true;
   OnInit();
