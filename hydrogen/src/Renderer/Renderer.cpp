@@ -33,7 +33,7 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const Reference
 
   m_SwapChain = SwapChain::Create(window, device, true);
   m_Framebuffer = Framebuffer::Create(device, m_SwapChain);
-  m_Texture = AssetManager::Get<SpriteAsset>("assets/Meshes/viking_room/viking_room.png")->CreateTexture2D(m_Device);
+  m_Texture = AssetManager::Get<SpriteAsset>("assets/Meshes/Monkey/diffuse.png")->CreateTexture2D(m_Device);
   m_UniformBuffer = UniformBuffer::Create(m_Device, sizeof(UniformBufferObject));
 
   ShaderDependency uniformBuffer{};
@@ -80,10 +80,23 @@ void Renderer::Render() {
   m_UniformBuffer->SetData(&ubo);
   const auto& commandBuffer = m_CommandBuffers[m_CurrentFrame];
 
-  auto entities = m_Scene->GetEntitiesByName("Room");
-  auto children = entities[0].GetChildrenByName("mesh_all1_Texture1_0");
-  auto& entity = children[0];
-  auto& vertexArray = entity.GetComponent<MeshRendererComponent>().VertexArrays[0];
+  DynamicArray<ReferencePointer<VertexArray>> vertexArrays;
+  auto entities = m_Scene->GetEntities();
+  for (auto& entity : entities) {
+    if (entity.HasComponent<MeshRendererComponent>()) {
+      for (auto& vertexArray : entity.GetComponent<MeshRendererComponent>().VertexArrays) {
+        vertexArrays.push_back(vertexArray);
+      }
+    }
+    auto children = entity.GetChildren();
+    for (auto& child : children) {
+      if (child.HasComponent<MeshRendererComponent>()) {
+        for (auto& vertexArray : child.GetComponent<MeshRendererComponent>().VertexArrays) {
+          vertexArrays.push_back(vertexArray);
+        }
+      }
+    }
+  }
 
   commandBuffer->Reset();
   m_SwapChain->AcquireNextImage(commandBuffer);
@@ -92,11 +105,14 @@ void Renderer::Render() {
   {
     m_Framebuffer->Bind(commandBuffer);
     m_Shader->Bind(commandBuffer);
-    vertexArray->Bind(commandBuffer);
 
     commandBuffer->CmdSetViewport(m_SwapChain);
     commandBuffer->CmdSetScissor(m_SwapChain);
-    commandBuffer->CmdDrawIndexed(vertexArray);
+
+    for (auto& vertexArray : vertexArrays) {
+      vertexArray->Bind(commandBuffer);
+      commandBuffer->CmdDrawIndexed(vertexArray);
+    }
 
     commandBuffer->CmdDrawImGuiDrawData();
   }

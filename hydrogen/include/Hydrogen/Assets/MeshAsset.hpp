@@ -41,7 +41,7 @@ class MeshAsset : public Asset {
     importer.FreeScene();
   }
    
-  static const DynamicArray<String> GetFileExtensions() { return DynamicArray<String>{".obj"}; }
+  static const DynamicArray<String> GetFileExtensions() { return DynamicArray<String>{".obj", ".fbx"}; }
 
   static bool CheckFileExtensions(const String& ext) {
     auto exts = GetFileExtensions();

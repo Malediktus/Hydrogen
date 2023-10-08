@@ -2,6 +2,7 @@
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
+#include <Hydrogen/Renderer/RenderWindow.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <Hydrogen/Core/Window.hpp>
 #include <Hydrogen/Core/Base.hpp>
@@ -9,6 +10,21 @@
 #include <algorithm>
 
 using namespace Hydrogen::Vulkan;
+
+namespace Hydrogen::Vulkan::Utils {
+static uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, VkPhysicalDevice physicalDevice) {
+  VkPhysicalDeviceMemoryProperties memoryProperties;
+  vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
+
+  for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++) {
+    if ((typeFilter & (1 << i)) && (memoryProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+      return i;
+    }
+  }
+
+  HY_INVOKE_ERROR("Failed to find suitable memory type!");
+}
+}  // namespace Hydrogen::Vulkan::Utils
 
 VulkanSwapChain::VulkanSwapChain(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& renderDevice, bool verticalSync)
     : m_RenderWindow(window), m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)) {
@@ -35,10 +51,15 @@ VulkanSwapChain::VulkanSwapChain(const ReferencePointer<RenderWindow>& window, c
   vkGetSwapchainImagesKHR(m_RenderDevice->GetDevice(), m_SwapChain, &imageCount, m_SwapChainImages.data());
 
   CreateImageViews();
+  CreateDepthImage();
 }
 
 VulkanSwapChain::~VulkanSwapChain() {
   ZoneScoped;
+
+  vkDestroyImageView(m_RenderDevice->GetDevice(), m_DepthImageView, nullptr);
+  vkDestroyImage(m_RenderDevice->GetDevice(), m_DepthImage, nullptr);
+  vkFreeMemory(m_RenderDevice->GetDevice(), m_DepthImageMemory, nullptr);
 
   for (auto imageView : m_SwapChainImageViews) {
     vkDestroyImageView(m_RenderDevice->GetDevice(), imageView, nullptr);
@@ -128,6 +149,61 @@ void VulkanSwapChain::CreateImageViews() {
   }
 }
 
+void VulkanSwapChain::CreateDepthImage() {
+  auto depthFormat = FindSupportedFormat({VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT}, VK_IMAGE_TILING_OPTIMAL,
+                                         VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT, m_RenderDevice->GetPhysicalDevice());
+
+  VkImageCreateInfo imageInfo{};
+  imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+  imageInfo.imageType = VK_IMAGE_TYPE_2D;
+  imageInfo.extent.width = m_Extent.width;
+  imageInfo.extent.height = m_Extent.height;
+  imageInfo.extent.depth = 1;
+  imageInfo.mipLevels = 1;
+  imageInfo.arrayLayers = 1;
+  imageInfo.format = depthFormat;
+  imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+  imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+  imageInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+  imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+  imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+  if (vkCreateImage(m_RenderDevice->GetDevice(), &imageInfo, nullptr, &m_DepthImage) != VK_SUCCESS) {
+    HY_INVOKE_ERROR("Failed to create image!");
+  }
+
+  VkMemoryRequirements memRequirements;
+  vkGetImageMemoryRequirements(m_RenderDevice->GetDevice(), m_DepthImage, &memRequirements);
+
+  VkMemoryAllocateInfo allocInfo{};
+  allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+  allocInfo.allocationSize = memRequirements.size;
+  allocInfo.memoryTypeIndex = Utils::FindMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_RenderDevice->GetPhysicalDevice());
+
+  if (vkAllocateMemory(m_RenderDevice->GetDevice(), &allocInfo, nullptr, &m_DepthImageMemory) != VK_SUCCESS) {
+    HY_INVOKE_ERROR("Failed to allocate image memory!");
+  }
+
+  vkBindImageMemory(m_RenderDevice->GetDevice(), m_DepthImage, m_DepthImageMemory, 0);
+
+  VkImageViewCreateInfo createInfo{};
+  createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+  createInfo.image = m_DepthImage;
+  createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+  createInfo.format = depthFormat;
+  createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+  createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+  createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+  createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+  createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+  createInfo.subresourceRange.baseMipLevel = 0;
+  createInfo.subresourceRange.levelCount = 1;
+  createInfo.subresourceRange.baseArrayLayer = 0;
+  createInfo.subresourceRange.layerCount = 1;
+
+  VK_CHECK_ERROR(vkCreateImageView(m_RenderDevice->GetDevice(), &createInfo, nullptr, &m_DepthImageView), "Failed to create vulkan image view!");
+}
+
 SwapChainSupportDetails VulkanSwapChain::QuerySwapChainSupportDetails(VkPhysicalDevice device, const ReferencePointer<RenderWindow>& window) {
   SwapChainSupportDetails details;
   VkSurfaceKHR surface = (VkSurfaceKHR)window->GetVulkanWindowSurface();
@@ -210,4 +286,19 @@ VkExtent2D VulkanSwapChain::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& cap
 
     return actualExtent;
   }
+}
+
+VkFormat VulkanSwapChain::FindSupportedFormat(const DynamicArray<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features, VkPhysicalDevice physicalDevice) {
+  for (VkFormat format : candidates) {
+    VkFormatProperties props;
+    vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
+
+    if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
+      return format;
+    } else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features) {
+      return format;
+    }
+  }
+
+  HY_INVOKE_ERROR("Failed to find supported format!");
 }
