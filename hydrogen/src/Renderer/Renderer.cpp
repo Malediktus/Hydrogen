@@ -33,7 +33,7 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const Reference
 
   m_SwapChain = SwapChain::Create(window, device, true);
   m_Framebuffer = Framebuffer::Create(device, m_SwapChain);
-  m_Texture = AssetManager::Get<SpriteAsset>("assets/Meshes/viking_room.png")->CreateTexture2D(m_Device);
+  m_Texture = AssetManager::Get<SpriteAsset>("assets/Meshes/viking_room/viking_room.png")->CreateTexture2D(m_Device);
   m_UniformBuffer = UniformBuffer::Create(m_Device, sizeof(UniformBufferObject));
 
   ShaderDependency uniformBuffer{};

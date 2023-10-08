@@ -54,7 +54,7 @@ void Application::Run() {
 
   CurrentScene = NewScopePointer<Scene>("Main Scene");
 
-  auto test = AssetManager::Get<MeshAsset>("assets/Meshes/viking_room.obj");
+  auto test = AssetManager::Get<MeshAsset>("assets/Meshes/viking_room/viking_room.obj");
   test->Spawn(MainRenderDevice, CurrentScene, "Room");
 
   HY_ASSERT(!MainRenderDevice->ScreenSupported(AppWindow), "Screen is not supported!");  // TODO: Choose other graphics API or device
