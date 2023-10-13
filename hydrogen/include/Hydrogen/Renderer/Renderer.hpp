@@ -87,6 +87,7 @@ class Renderer {
   uint32_t m_CurrentFrame;
 
   ReferencePointer<class UniformBuffer> m_UniformBuffer;
+  ReferencePointer<class UniformBuffer> m_LightBuffer;
   ReferencePointer<class Texture2D> m_Texture;
 };
 }  // namespace Hydrogen
