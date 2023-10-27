@@ -10,8 +10,7 @@ class Framebuffer {
 
   static ReferencePointer<Framebuffer> Create(const ReferencePointer<class RenderDevice>& renderDevice, const ReferencePointer<class SwapChain>& swapChain);
 
-  virtual void Bind(const ReferencePointer<class CommandBuffer>& commandBuffer) = 0;
-  virtual const Vector4& GetClearColor() const = 0;
-  virtual void SetClearColor(const Vector4& color) = 0;
+  virtual void Begin(Vector4 clearColor, const ReferencePointer<class CommandBuffer>& commandBuffer) = 0;
+  virtual void End(const ReferencePointer<class CommandBuffer>& commandBuffer) = 0;
 };
 }  // namespace Hydrogen

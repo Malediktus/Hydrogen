@@ -365,54 +365,6 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
     allocInfo.pSetLayouts = &m_DescriptorSetLayout;
 
     VK_CHECK_ERROR(vkAllocateDescriptorSets(m_RenderDevice->GetDevice(), &allocInfo, &m_DescriptorSet), "Failed to create vulkan descriptor set!");
-
-    for (size_t i = 0; i < dependencyGraph.Dependencies.size(); i++) {
-      switch (dependencyGraph.Dependencies[i].Type) {
-        case ShaderDependencyType::UniformBuffer: {
-          ReferencePointer<VulkanUniformBuffer> uniformBuffer = std::dynamic_pointer_cast<VulkanUniformBuffer>(dependencyGraph.Dependencies[i].UniformBuffer);
-
-          VkDescriptorBufferInfo bufferInfo{};
-          bufferInfo.buffer = uniformBuffer->GetBuffer();
-          bufferInfo.offset = 0;
-          bufferInfo.range = static_cast<uint32_t>(uniformBuffer->GetSize());
-
-          VkWriteDescriptorSet descriptorWrite{};
-          descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-          descriptorWrite.dstSet = m_DescriptorSet;
-          descriptorWrite.dstBinding = dependencyGraph.Dependencies[i].Location;
-          descriptorWrite.dstArrayElement = 0;
-          descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-          descriptorWrite.descriptorCount = 1;
-          descriptorWrite.pBufferInfo = &bufferInfo;
-
-          vkUpdateDescriptorSets(m_RenderDevice->GetDevice(), 1, &descriptorWrite, 0, nullptr);
-          break;
-        }
-        case ShaderDependencyType::Texture: {
-          ReferencePointer<VulkanTexture2D> texture = std::dynamic_pointer_cast<VulkanTexture2D>(dependencyGraph.Dependencies[i].Texture);
-
-          VkDescriptorImageInfo imageInfo{};
-          imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-          imageInfo.imageView = texture->GetImageView();
-          imageInfo.sampler = texture->GetSampler();
-
-          VkWriteDescriptorSet descriptorWrite{};
-          descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-          descriptorWrite.dstSet = m_DescriptorSet;
-          descriptorWrite.dstBinding = dependencyGraph.Dependencies[i].Location;
-          descriptorWrite.dstArrayElement = 0;
-          descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-          descriptorWrite.descriptorCount = 1;
-          descriptorWrite.pImageInfo = &imageInfo;
-
-          vkUpdateDescriptorSets(m_RenderDevice->GetDevice(), 1, &descriptorWrite, 0, nullptr);
-          break;
-        }
-        default:
-          HY_INVOKE_ERROR("Invalid ShaderDependencyType value!");
-          break;
-      }
-    }
   }
 }
 
@@ -430,6 +382,46 @@ VulkanShader::~VulkanShader() {
 
   if (m_HasDependencies)
     vkDestroyDescriptorPool(m_RenderDevice->GetDevice(), m_DescriptorPool, nullptr);
+}
+
+void VulkanShader::SetBuffer(const ReferencePointer<class UniformBuffer>& buffer, uint32_t location) {
+  ReferencePointer<VulkanUniformBuffer> uniformBuffer = std::dynamic_pointer_cast<VulkanUniformBuffer>(buffer);
+
+  VkDescriptorBufferInfo bufferInfo{};
+  bufferInfo.buffer = uniformBuffer->GetBuffer();
+  bufferInfo.offset = 0;
+  bufferInfo.range = static_cast<uint32_t>(uniformBuffer->GetSize());
+
+  VkWriteDescriptorSet descriptorWrite{};
+  descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+  descriptorWrite.dstSet = m_DescriptorSet;
+  descriptorWrite.dstBinding = location;
+  descriptorWrite.dstArrayElement = 0;
+  descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+  descriptorWrite.descriptorCount = 1;
+  descriptorWrite.pBufferInfo = &bufferInfo;
+
+  vkUpdateDescriptorSets(m_RenderDevice->GetDevice(), 1, &descriptorWrite, 0, nullptr);
+}
+
+void VulkanShader::SetTexture(const ReferencePointer<class Texture2D>& texture, uint32_t location) {
+  ReferencePointer<VulkanTexture2D> vulkanTexture = std::dynamic_pointer_cast<VulkanTexture2D>(texture);
+
+  VkDescriptorImageInfo imageInfo{};
+  imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+  imageInfo.imageView = vulkanTexture->GetImageView();
+  imageInfo.sampler = vulkanTexture->GetSampler();
+
+  VkWriteDescriptorSet descriptorWrite{};
+  descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+  descriptorWrite.dstSet = m_DescriptorSet;
+  descriptorWrite.dstBinding = location;
+  descriptorWrite.dstArrayElement = 0;
+  descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+  descriptorWrite.descriptorCount = 1;
+  descriptorWrite.pImageInfo = &imageInfo;
+
+  vkUpdateDescriptorSets(m_RenderDevice->GetDevice(), 1, &descriptorWrite, 0, nullptr);
 }
 
 void VulkanShader::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const {

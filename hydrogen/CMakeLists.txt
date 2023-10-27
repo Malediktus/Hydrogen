@@ -95,6 +95,9 @@ set(CORE_SOURCES
 )
 set(ASSET_SOURCES
     src/Assets/AssetManager.cpp
+    src/Assets/MeshAsset.cpp
+    src/Assets/ShaderAsset.cpp
+    src/Assets/SpriteAsset.cpp
 )
 set(EVENTS_SOURCES
     src/Events/EventSystem.cpp

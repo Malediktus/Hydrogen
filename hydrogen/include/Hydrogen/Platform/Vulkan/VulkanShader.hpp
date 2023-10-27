@@ -14,6 +14,8 @@ class VulkanShader : public Shader {
                const DynamicArray<uint32_t>& fragmentSrc, const DynamicArray<uint32_t>& geometrySrc);
   virtual ~VulkanShader();
 
+  virtual void SetBuffer(const ReferencePointer<class UniformBuffer>& buffer, uint32_t location) override;
+  virtual void SetTexture(const ReferencePointer<class Texture2D>& texture, uint32_t location) override;
   virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const override;
 
   virtual const String& GetName() const override { return m_Name; }

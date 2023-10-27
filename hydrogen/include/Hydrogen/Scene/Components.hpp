@@ -7,10 +7,9 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "../Core/Memory.hpp"
+#include "Entity.hpp"
 
 namespace Hydrogen {
-class Entity;
-
 struct TagComponent {
   TagComponent() = default;
   ~TagComponent() = default;
@@ -54,8 +53,8 @@ struct HierarchyComponent {
 
   void AddChild(Entity child) { Children.push_back(child); }
 
-  class Entity Parent;
-  DynamicArray<class Entity> Children;
+  Entity Parent;
+  DynamicArray<Entity> Children;
 };
 
 struct MeshRendererComponent {
@@ -64,6 +63,17 @@ struct MeshRendererComponent {
 
   MeshRendererComponent(MeshRendererComponent&) = default;
 
-  DynamicArray<ReferencePointer<class VertexArray>> VertexArrays;
+  struct Mesh {
+    ReferencePointer<class VertexArray> VertexArray;
+  };
+
+  struct Material {
+    DynamicArray<ReferencePointer<class Texture2D>> DiffuseMaps;
+    DynamicArray<ReferencePointer<class Texture2D>> SpecularMaps;
+    float Shininess;
+  };
+
+  DynamicArray<Mesh> Meshes;
+  Material _Material;
 };
 }  // namespace Hydrogen

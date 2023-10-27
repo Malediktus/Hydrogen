@@ -12,8 +12,7 @@ using namespace Hydrogen::Vulkan;
 
 VulkanFramebuffer::VulkanFramebuffer(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain)
     : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)),
-      m_SwapChain(std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)),
-      m_ClearColor(0.0f, 0.0f, 0.0f, 1.0f) {
+      m_SwapChain(std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)) {
   ZoneScoped;
 
   VkAttachmentDescription colorAttachment{};
@@ -100,13 +99,13 @@ VulkanFramebuffer::~VulkanFramebuffer() {
   vkDestroyRenderPass(m_RenderDevice->GetDevice(), m_RenderPass, nullptr);
 }
 
-void VulkanFramebuffer::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) {
+void VulkanFramebuffer::Begin(Vector4 clearColor, const ReferencePointer<class CommandBuffer>& commandBuffer) {
   ZoneScoped;
 
   auto vulkanCommandBuffer = std::dynamic_pointer_cast<VulkanCommandBuffer>(commandBuffer);
 
   StaticArray<VkClearValue, 2> clearValues{};
-  clearValues[0].color = {{m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a}};
+  clearValues[0].color = {{clearColor.r, clearColor.g, clearColor.b, clearColor.a}};
   clearValues[1].depthStencil = {1.0f, 0};
 
   VkRenderPassBeginInfo renderPassInfo{};
@@ -119,4 +118,9 @@ void VulkanFramebuffer::Bind(const ReferencePointer<CommandBuffer>& commandBuffe
   renderPassInfo.pClearValues = clearValues.data();
 
   vkCmdBeginRenderPass(vulkanCommandBuffer->GetCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+}
+
+void VulkanFramebuffer::End(const ReferencePointer<class CommandBuffer>& commandBuffer) {
+  ZoneScoped;
+  vkCmdEndRenderPass(std::dynamic_pointer_cast<VulkanCommandBuffer>(commandBuffer)->GetCommandBuffer());
 }

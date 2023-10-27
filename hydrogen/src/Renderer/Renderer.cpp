@@ -5,6 +5,8 @@
 #include <Hydrogen/Renderer/CommandBuffer.hpp>
 #include <Hydrogen/Renderer/VertexArray.hpp>
 #include <Hydrogen/Renderer/RenderWindow.hpp>
+#include <Hydrogen/Renderer/Shader.hpp>
+#include <Hydrogen/Renderer/RenderDevice.hpp>
 #include <Hydrogen/Assets/AssetManager.hpp>
 #include <Hydrogen/Scene/Scene.hpp>
 #include <Hydrogen/Scene/Components.hpp>
@@ -40,7 +42,7 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const Reference
 
   m_SwapChain = SwapChain::Create(window, device, true);
   m_Framebuffer = Framebuffer::Create(device, m_SwapChain);
-  m_Texture = AssetManager::Get<SpriteAsset>("assets/Meshes/Monkey/diffuse.png")->CreateTexture2D(m_Device);
+  m_WhiteTexture = AssetManager::Get<SpriteAsset>("assets/Textures/WhiteTexture.png")->CreateTexture2D(device);
   m_UniformBuffer = UniformBuffer::Create(m_Device, sizeof(UniformBufferObject));
 
   m_LightBuffer = UniformBuffer::Create(m_Device, sizeof(LightData));
@@ -49,24 +51,26 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const Reference
   uniformBuffer.Type = ShaderDependencyType::UniformBuffer;
   uniformBuffer.Stage = ShaderStage::VertexShader;
   uniformBuffer.Location = 0;
-  uniformBuffer.UniformBuffer = m_UniformBuffer;
 
-  ShaderDependency texture{};
-  texture.Type = ShaderDependencyType::Texture;
-  texture.Stage = ShaderStage::PixelShader;
-  texture.Location = 1;
-  texture.Texture = m_Texture;
+  ShaderDependency lightBuffer{};
+  lightBuffer.Type = ShaderDependencyType::UniformBuffer;
+  lightBuffer.Stage = ShaderStage::PixelShader;
+  lightBuffer.Location = 1;
 
-  ShaderDependency uniformBuffer2{};
-  uniformBuffer2.Type = ShaderDependencyType::UniformBuffer;
-  uniformBuffer2.Stage = ShaderStage::PixelShader;
-  uniformBuffer2.Location = 2;
-  uniformBuffer2.UniformBuffer = m_LightBuffer;
+  ShaderDependency diffuseTexture{};
+  diffuseTexture.Type = ShaderDependencyType::Texture;
+  diffuseTexture.Stage = ShaderStage::PixelShader;
+  diffuseTexture.Location = 2;
+
+  ShaderDependency specularTexture{};
+  specularTexture.Type = ShaderDependencyType::Texture;
+  specularTexture.Stage = ShaderStage::PixelShader;
+  specularTexture.Location = 3;
 
   m_Shader = AssetManager::Get<ShaderAsset>("assets/Raw.glsl")
                  ->CreateShader(device, m_SwapChain, m_Framebuffer,
                                 {{ShaderDataType::Float3, "Position", false}, {ShaderDataType::Float3, "Normal", false}, {ShaderDataType::Float2, "TexCoords", false}},
-                                {uniformBuffer, texture, uniformBuffer2});
+                                {uniformBuffer, lightBuffer, diffuseTexture, specularTexture});
 
   m_CommandBuffers.resize(s_MaxFramesInFlight);
   for (uint32_t i = 0; i < s_MaxFramesInFlight; i++) {
@@ -80,6 +84,10 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const Reference
   lightData.ObjectColor = glm::vec3(1.0f, 0.5f, 0.31f);
 
   m_LightBuffer->SetData(&lightData);
+  m_Shader->SetBuffer(m_LightBuffer, 1);
+  m_Shader->SetBuffer(m_UniformBuffer, 0);
+  m_Shader->SetTexture(m_WhiteTexture, 2);
+  m_Shader->SetTexture(m_WhiteTexture, 3);
 
   m_CurrentFrame = 0;
 
@@ -96,6 +104,7 @@ void Renderer::Render() {
 
   UniformBufferObject ubo{};
   ubo.Model = glm::rotate(glm::mat4(1.0f), time * glm::radians(20.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+  ubo.Model = glm::scale(ubo.Model, glm::vec3(0.2f, 0.2f, 0.2f));
   ubo.View = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
   const auto& viewportSize = m_RenderWindow->GetViewportSize();
   ubo.Proj = glm::perspective(glm::radians(45.0f), viewportSize.x / viewportSize.y, 0.001f, 1000.0f);
@@ -103,48 +112,74 @@ void Renderer::Render() {
 
   m_UniformBuffer->SetData(&ubo);
 
-  const auto& commandBuffer = m_CommandBuffers[m_CurrentFrame];
-
-  DynamicArray<ReferencePointer<VertexArray>> vertexArrays;
   auto entities = m_Scene->GetEntities();
-  for (auto& entity : entities) {
-    if (entity.HasComponent<MeshRendererComponent>()) {
-      for (auto& vertexArray : entity.GetComponent<MeshRendererComponent>().VertexArrays) {
-        vertexArrays.push_back(vertexArray);
-      }
-    }
-    auto children = entity.GetChildren();
-    for (auto& child : children) {
-      if (child.HasComponent<MeshRendererComponent>()) {
-        for (auto& vertexArray : child.GetComponent<MeshRendererComponent>().VertexArrays) {
-          vertexArrays.push_back(vertexArray);
-        }
-      }
-    }
-  }
+
+  const auto& commandBuffer = m_CommandBuffers[m_CurrentFrame];
 
   commandBuffer->Reset();
   m_SwapChain->AcquireNextImage(commandBuffer);
 
   commandBuffer->Begin();
-  {
-    m_Framebuffer->Bind(commandBuffer);
-    m_Shader->Bind(commandBuffer);
+  m_Framebuffer->Begin({0.0f, 0.0f, 0.0f, 1.0f}, commandBuffer);
+  m_Shader->Bind(commandBuffer);
 
-    commandBuffer->CmdSetViewport(m_SwapChain);
-    commandBuffer->CmdSetScissor(m_SwapChain);
+  commandBuffer->CmdSetViewport(m_SwapChain);
+  commandBuffer->CmdSetScissor(m_SwapChain);
 
-    for (auto& vertexArray : vertexArrays) {
-      vertexArray->Bind(commandBuffer);
-      commandBuffer->CmdDrawIndexed(vertexArray);
+  for (auto& entity : entities) {
+    if (entity.HasComponent<MeshRendererComponent>()) {
+      for (auto& mesh : entity.GetComponent<MeshRendererComponent>().Meshes) {
+        auto& material = entity.GetComponent<MeshRendererComponent>()._Material;
+        if (material.DiffuseMaps.size() > 0) {
+          //m_Shader->SetTexture(material.DiffuseMaps[0], 2);
+        } else {
+          //m_Shader->SetTexture(m_WhiteTexture, 2);
+        }
+
+        if (material.SpecularMaps.size() > 0) {
+          //m_Shader->SetTexture(material.SpecularMaps[0], 3);
+        } else {
+          //m_Shader->SetTexture(m_WhiteTexture, 3);
+        }
+
+        RenderMesh(commandBuffer, mesh.VertexArray);
+      }
     }
 
-    commandBuffer->CmdDrawImGuiDrawData();
+    auto children = entity.GetChildren();
+    for (auto& child : children) {
+      if (child.HasComponent<MeshRendererComponent>()) {
+        for (auto& mesh : child.GetComponent<MeshRendererComponent>().Meshes) {
+          auto& material = child.GetComponent<MeshRendererComponent>()._Material;
+          if (material.DiffuseMaps.size() > 0) {
+            //m_Shader->SetTexture(material.DiffuseMaps[0], 2);
+          } else {
+            //m_Shader->SetTexture(m_WhiteTexture, 2);
+          }
+
+          if (material.SpecularMaps.size() > 0) {
+            //m_Shader->SetTexture(material.SpecularMaps[0], 3);
+          } else {
+            //m_Shader->SetTexture(m_WhiteTexture, 3);
+          }
+
+          RenderMesh(commandBuffer, mesh.VertexArray);
+        }
+      }
+    }
   }
+
+  commandBuffer->CmdDrawImGuiDrawData();
+  m_Framebuffer->End(commandBuffer);
   commandBuffer->End();
 
   commandBuffer->CmdUploadResources();
   commandBuffer->CmdDisplayImage(m_SwapChain);
 
   m_CurrentFrame = (m_CurrentFrame + 1) % s_MaxFramesInFlight;
+}
+
+void Renderer::RenderMesh(const ReferencePointer<CommandBuffer>& commandBuffer, const ReferencePointer<class VertexArray>& vertexArray) {
+  vertexArray->Bind(commandBuffer);
+  commandBuffer->CmdDrawIndexed(vertexArray);
 }

@@ -67,7 +67,6 @@ void VulkanCommandBuffer::Begin() {
 
 void VulkanCommandBuffer::End() {
   ZoneScoped;
-  vkCmdEndRenderPass(m_CommandBuffer);
   VK_CHECK_ERROR(vkEndCommandBuffer(m_CommandBuffer), "Failed to end vulkan command buffer!");
 }
 

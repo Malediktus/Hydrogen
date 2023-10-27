@@ -1,12 +1,14 @@
 #version 450
 
-layout(binding = 1) uniform sampler2D texSampler;
-layout(binding = 2) uniform LightData {
+layout(binding = 1) uniform LightData {
   vec3 lightPos;
   vec3 viewPos;
   vec3 lightColor;
   vec3 objectColor;
 } lightData;
+
+layout(binding = 2) uniform sampler2D diffuseMap;
+layout(binding = 3) uniform sampler2D specularMap;
 
 layout(location = 0) in vec3 fragPosition;
 layout(location = 1) in vec3 fragNormal;

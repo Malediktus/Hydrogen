@@ -15,6 +15,7 @@
   if (expr) {                                                                                \
   } else {                                                                                   \
     HY_LOG_FATAL("Assertion error in " __FILE__ ": '" #expr "' is not zero | " __VA_ARGS__); \
+    __debugbreak(); \
     exit(0);                                                                                 \
   }
 

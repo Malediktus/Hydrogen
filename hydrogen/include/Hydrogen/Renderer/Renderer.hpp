@@ -61,6 +61,7 @@ class Renderer {
   ~Renderer();
 
   void Render();
+  void RenderMesh(const ReferencePointer<class CommandBuffer>& commandBuffer, const ReferencePointer<class VertexArray>& vertexArray);
 
   inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
@@ -88,6 +89,6 @@ class Renderer {
 
   ReferencePointer<class UniformBuffer> m_UniformBuffer;
   ReferencePointer<class UniformBuffer> m_LightBuffer;
-  ReferencePointer<class Texture2D> m_Texture;
+  ReferencePointer<class Texture2D> m_WhiteTexture;
 };
 }  // namespace Hydrogen

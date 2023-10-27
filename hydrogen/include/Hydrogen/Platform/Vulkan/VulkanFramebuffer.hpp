@@ -10,15 +10,13 @@ class VulkanFramebuffer : public Framebuffer {
   VulkanFramebuffer(const ReferencePointer<class RenderDevice>& renderDevice, const ReferencePointer<class SwapChain>& swapChain);
   virtual ~VulkanFramebuffer();
 
-  virtual void Bind(const ReferencePointer<class CommandBuffer>& commandBuffer) override;
-  virtual const Vector4& GetClearColor() const override { return m_ClearColor; }
-  virtual void SetClearColor(const Vector4& color) override { m_ClearColor = color; }
+  virtual void Begin(Vector4 clearColor, const ReferencePointer<class CommandBuffer>& commandBuffer) override;
+  virtual void End(const ReferencePointer<class CommandBuffer>& commandBuffer) override;
 
   const DynamicArray<VkFramebuffer>& GetFramebuffers() { return m_Framebuffers; }
   VkRenderPass GetRenderPass() { return m_RenderPass; }
 
  private:
-  Vector4 m_ClearColor;
   ReferencePointer<class VulkanRenderDevice> m_RenderDevice;
   ReferencePointer<class VulkanSwapChain> m_SwapChain;
   VkRenderPass m_RenderPass;

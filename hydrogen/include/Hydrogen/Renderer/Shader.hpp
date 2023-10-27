@@ -15,9 +15,6 @@ struct ShaderDependency {
   ShaderDependencyType Type;
   ShaderStage Stage;
   uint32_t Location;
-  
-  ReferencePointer<class UniformBuffer> UniformBuffer;
-  ReferencePointer<class  Texture2D> Texture;
 };
 
 struct ShaderDependencyGraph {
@@ -29,6 +26,8 @@ class Shader {
  public:
   virtual ~Shader() = default;
 
+  virtual void SetBuffer(const ReferencePointer<class UniformBuffer>& buffer, uint32_t location) = 0;
+  virtual void SetTexture(const ReferencePointer<class Texture2D>& texture, uint32_t location) = 0;
   virtual void Bind(const ReferencePointer<class CommandBuffer>& commandBuffer) const = 0;
 
   virtual const String& GetName() const = 0;
