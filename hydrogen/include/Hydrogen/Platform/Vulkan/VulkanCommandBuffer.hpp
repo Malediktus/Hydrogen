@@ -1,10 +1,11 @@
 #pragma once
 
-#include <cstdint>
-#include "../../Renderer/CommandBuffer.hpp"
-#include "../../Core/Memory.hpp"
-
 #include <vulkan/vulkan.h>
+
+#include <cstdint>
+
+#include "../../Core/Memory.hpp"
+#include "../../Renderer/CommandBuffer.hpp"
 
 namespace Hydrogen::Vulkan {
 class VulkanCommandBuffer : public CommandBuffer {

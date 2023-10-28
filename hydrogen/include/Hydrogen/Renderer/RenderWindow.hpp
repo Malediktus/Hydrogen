@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "RendererAPI.hpp"
 #include "../Math/Math.hpp"
+#include "RendererAPI.hpp"
 
 namespace Hydrogen {
 class RenderWindow {

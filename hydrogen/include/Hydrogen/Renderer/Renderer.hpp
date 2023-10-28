@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../Renderer/RendererAPI.hpp"
+#include <tracy/tracy.hpp>
+
 #include "../Core/Memory.hpp"
 #include "../Math/Math.hpp"
-
-#include <tracy/tracy.hpp>
+#include "../Renderer/RendererAPI.hpp"
 
 namespace Hydrogen {
 class Renderer {

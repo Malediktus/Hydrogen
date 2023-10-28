@@ -1,8 +1,9 @@
 #pragma once
 
+#include <vulkan/vulkan.h>
+
 #include "../../Renderer/SwapChain.hpp"
 #include "VulkanRenderDevice.hpp"
-#include <vulkan/vulkan.h>
 
 namespace Hydrogen::Vulkan {
 struct SwapChainSupportDetails {

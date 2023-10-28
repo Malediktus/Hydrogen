@@ -1,5 +1,5 @@
-#include <Hydrogen/Renderer/ShaderCompiler.hpp>
 #include <Hydrogen/Core/Assert.hpp>
+#include <Hydrogen/Renderer/ShaderCompiler.hpp>
 
 using namespace Hydrogen;
 

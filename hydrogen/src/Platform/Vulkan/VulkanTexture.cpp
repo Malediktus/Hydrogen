@@ -1,14 +1,12 @@
-#include <Hydrogen/Platform/Vulkan/VulkanTexture.hpp>
+#include <Hydrogen/Core/Base.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
-
-#include <Hydrogen/Core/Base.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanTexture.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen::Vulkan;
 
-namespace Hydrogen::Vulkan::Utils
-{
+namespace Hydrogen::Vulkan::Utils {
 uint32_t FindMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties) {
   VkPhysicalDeviceMemoryProperties memProperties;
   vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
@@ -21,7 +19,7 @@ uint32_t FindMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, Vk
 
   HY_INVOKE_ERROR("Failed to find suitable vulkan memory type!");
 }
-}
+}  // namespace Hydrogen::Vulkan::Utils
 
 VulkanTexture2D::VulkanTexture2D(const ReferencePointer<RenderDevice>& device, const uint32_t width, const uint32_t height, const void* data)
     : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(device)), m_Width(width), m_Height(height) {

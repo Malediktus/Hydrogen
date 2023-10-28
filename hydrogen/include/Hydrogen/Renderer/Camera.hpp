@@ -2,8 +2,9 @@
 
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "../Math/Math.hpp"
 #include <tracy/Tracy.hpp>
+
+#include "../Math/Math.hpp"
 
 namespace Hydrogen {
 class Camera {

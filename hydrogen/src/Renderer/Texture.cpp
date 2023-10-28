@@ -1,7 +1,7 @@
+#include <Hydrogen/Core/Assert.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanTexture.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <Hydrogen/Renderer/Texture.hpp>
-#include <Hydrogen/Core/Assert.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen;
@@ -18,4 +18,3 @@ ReferencePointer<Texture2D> Texture2D::Create(const ReferencePointer<RenderDevic
   }
   return nullptr;
 }
- 

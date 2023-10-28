@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Memory.hpp"
 #include "../Math/Math.hpp"
 #include "../Renderer/RenderDevice.hpp"
+#include "Memory.hpp"
 
 namespace Hydrogen {
 class Logger;

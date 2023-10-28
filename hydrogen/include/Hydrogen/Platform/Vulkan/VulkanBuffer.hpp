@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../../Renderer/Buffer.hpp"
 #include <vulkan/vulkan.h>
+
+#include "../../Renderer/Buffer.hpp"
 
 namespace Hydrogen::Vulkan {
 class VulkanBuffer {

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../Renderer/Texture.hpp"
-
 #include <vulkan/vulkan.h>
+
+#include "../../Renderer/Texture.hpp"
 
 namespace Hydrogen::Vulkan {
 class VulkanTexture2D : public Texture2D {

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../Core/Memory.hpp"
 #include <functional>
+
+#include "../Core/Memory.hpp"
 
 namespace Hydrogen {
 enum class RenderDeviceType { Unknown = 0, IntegratedGPU = 1, DiscreteGPU = 2, VirtualGPU = 3, CPU = 4 };

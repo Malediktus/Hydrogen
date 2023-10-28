@@ -1,13 +1,14 @@
+#include <imgui.h>
+
+#include <Hydrogen/Assets/AssetManager.hpp>
 #include <Hydrogen/Core/Application.hpp>
 #include <Hydrogen/Core/Logger.hpp>
-#include <Hydrogen/Core/Window.hpp>
 #include <Hydrogen/Core/Task.hpp>
-#include <Hydrogen/Assets/AssetManager.hpp>
+#include <Hydrogen/Core/Window.hpp>
 #include <Hydrogen/Renderer/Context.hpp>
-#include <Hydrogen/Renderer/Renderer.hpp>
 #include <Hydrogen/Renderer/Framebuffer.hpp>
+#include <Hydrogen/Renderer/Renderer.hpp>
 #include <Hydrogen/Scene/Scene.hpp>
-#include <imgui.h>
 
 using namespace Hydrogen;
 
@@ -95,7 +96,7 @@ void Application::Run() {
     OnImGuiDraw();
     ImGui::Render();
 
-    renderer->Render(); // Also renders imgui draw data
+    renderer->Render();  // Also renders imgui draw data
 
     AppWindow->UpdateImGuiPlatformWindows();
 
@@ -111,9 +112,9 @@ void Application::Run() {
   AppWindow->DestroyImGui();
   ImGui::DestroyContext();
 
-  //renderer.reset();
-  //MainRenderDevice.reset();
-  //Renderer::SetContext(nullptr);
+  // renderer.reset();
+  // MainRenderDevice.reset();
+  // Renderer::SetContext(nullptr);
 
   TaskManager::Shutdown();
 }

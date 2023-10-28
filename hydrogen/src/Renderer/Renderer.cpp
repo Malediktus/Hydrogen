@@ -1,22 +1,21 @@
-#include <Hydrogen/Renderer/Renderer.hpp>
-#include <Hydrogen/Renderer/Buffer.hpp>
-#include <Hydrogen/Renderer/SwapChain.hpp>
-#include <Hydrogen/Renderer/Framebuffer.hpp>
-#include <Hydrogen/Renderer/CommandBuffer.hpp>
-#include <Hydrogen/Renderer/VertexArray.hpp>
-#include <Hydrogen/Renderer/RenderWindow.hpp>
-#include <Hydrogen/Renderer/Shader.hpp>
-#include <Hydrogen/Renderer/RenderDevice.hpp>
 #include <Hydrogen/Assets/AssetManager.hpp>
-#include <Hydrogen/Scene/Scene.hpp>
+#include <Hydrogen/Renderer/Buffer.hpp>
+#include <Hydrogen/Renderer/CommandBuffer.hpp>
+#include <Hydrogen/Renderer/Framebuffer.hpp>
+#include <Hydrogen/Renderer/RenderDevice.hpp>
+#include <Hydrogen/Renderer/RenderWindow.hpp>
+#include <Hydrogen/Renderer/Renderer.hpp>
+#include <Hydrogen/Renderer/Shader.hpp>
+#include <Hydrogen/Renderer/SwapChain.hpp>
+#include <Hydrogen/Renderer/VertexArray.hpp>
 #include <Hydrogen/Scene/Components.hpp>
+#include <Hydrogen/Scene/Scene.hpp>
 #include <tracy/Tracy.hpp>
 
 #define GLM_FORCE_RADIANS
+#include <chrono>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
-#include <chrono>
 
 using namespace Hydrogen;
 
@@ -37,8 +36,7 @@ ReferencePointer<Context> Renderer::s_Context;
 ReferencePointer<RenderDevice> Renderer::s_RenderDevice;
 uint32_t Renderer::s_MaxFramesInFlight = MAX_FRAMES_IN_FLIGHT;
 
-Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ScopePointer<class Scene>& scene)
-    : m_RenderWindow(window), m_Scene(scene) {
+Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ScopePointer<class Scene>& scene) : m_RenderWindow(window), m_Scene(scene) {
   ZoneScoped;
 
   m_SwapChain = SwapChain::Create(window, s_RenderDevice, true);
@@ -132,15 +130,15 @@ void Renderer::Render() {
       for (auto& mesh : entity.GetComponent<MeshRendererComponent>().Meshes) {
         auto& material = entity.GetComponent<MeshRendererComponent>()._Material;
         if (material.DiffuseMaps.size() > 0) {
-          //m_Shader->SetTexture(material.DiffuseMaps[0], 2);
+          // m_Shader->SetTexture(material.DiffuseMaps[0], 2);
         } else {
-          //m_Shader->SetTexture(m_WhiteTexture, 2);
+          // m_Shader->SetTexture(m_WhiteTexture, 2);
         }
 
         if (material.SpecularMaps.size() > 0) {
-          //m_Shader->SetTexture(material.SpecularMaps[0], 3);
+          // m_Shader->SetTexture(material.SpecularMaps[0], 3);
         } else {
-          //m_Shader->SetTexture(m_WhiteTexture, 3);
+          // m_Shader->SetTexture(m_WhiteTexture, 3);
         }
 
         RenderMesh(commandBuffer, mesh.VertexArray);
@@ -153,15 +151,15 @@ void Renderer::Render() {
         for (auto& mesh : child.GetComponent<MeshRendererComponent>().Meshes) {
           auto& material = child.GetComponent<MeshRendererComponent>()._Material;
           if (material.DiffuseMaps.size() > 0) {
-            //m_Shader->SetTexture(material.DiffuseMaps[0], 2);
+            // m_Shader->SetTexture(material.DiffuseMaps[0], 2);
           } else {
-            //m_Shader->SetTexture(m_WhiteTexture, 2);
+            // m_Shader->SetTexture(m_WhiteTexture, 2);
           }
 
           if (material.SpecularMaps.size() > 0) {
-            //m_Shader->SetTexture(material.SpecularMaps[0], 3);
+            // m_Shader->SetTexture(material.SpecularMaps[0], 3);
           } else {
-            //m_Shader->SetTexture(m_WhiteTexture, 3);
+            // m_Shader->SetTexture(m_WhiteTexture, 3);
           }
 
           RenderMesh(commandBuffer, mesh.VertexArray);

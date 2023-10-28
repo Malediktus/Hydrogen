@@ -1,7 +1,7 @@
+#include <Hydrogen/Core/Assert.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
 #include <Hydrogen/Renderer/CommandBuffer.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
-#include <Hydrogen/Core/Assert.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen;

@@ -1,11 +1,11 @@
-#include <Hydrogen/Assets/MeshAsset.hpp>
 #include <Hydrogen/Assets/AssetManager.hpp>
+#include <Hydrogen/Assets/MeshAsset.hpp>
 #include <Hydrogen/Assets/SpriteAsset.hpp>
-#include <Hydrogen/Renderer/Texture.hpp>
 #include <Hydrogen/Renderer/Buffer.hpp>
+#include <Hydrogen/Renderer/Texture.hpp>
 #include <Hydrogen/Renderer/VertexArray.hpp>
-#include <Hydrogen/Scene/Scene.hpp>
 #include <Hydrogen/Scene/Entity.hpp>
+#include <Hydrogen/Scene/Scene.hpp>
 
 using namespace Hydrogen;
 

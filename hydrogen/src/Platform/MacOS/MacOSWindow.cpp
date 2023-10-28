@@ -1,9 +1,9 @@
 #include <backends/imgui_impl_glfw.h>
 #include <imgui.h>
 
+#include <Hydrogen/Core/Base.hpp>
 #include <Hydrogen/Platform/MacOS/MacOSWindow.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
-#include <Hydrogen/Core/Base.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 
 using namespace Hydrogen;
@@ -109,13 +109,9 @@ void MacOSWindow::SetupImGui() {
   ImGui_ImplGlfw_InitForVulkan(m_Window, true);  // TODO: Make API indenpendent
 }
 
-void MacOSWindow::ImGuiNewFrame() {
-  ImGui_ImplGlfw_NewFrame();
-}
+void MacOSWindow::ImGuiNewFrame() { ImGui_ImplGlfw_NewFrame(); }
 
-void MacOSWindow::DestroyImGui() {
-  ImGui_ImplGlfw_Shutdown();
-}
+void MacOSWindow::DestroyImGui() { ImGui_ImplGlfw_Shutdown(); }
 
 void MacOSWindow::SetupOpenglContext(int, int) { glfwMakeContextCurrent(m_Window); }
 

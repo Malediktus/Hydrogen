@@ -2,9 +2,9 @@
 
 #include <stb_image.h>
 
-#include "../Core/Memory.hpp"
 #include "../Core/Assert.hpp"
 #include "../Core/Logger.hpp"
+#include "../Core/Memory.hpp"
 #include "Asset.hpp"
 
 namespace Hydrogen {

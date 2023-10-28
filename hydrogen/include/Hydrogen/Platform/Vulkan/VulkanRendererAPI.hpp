@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../Renderer/RendererAPI.hpp"
-
 #include <vulkan/vulkan.h>
+
+#include "../../Renderer/RendererAPI.hpp"
 
 namespace Hydrogen::Vulkan {
 class VulkanRendererAPI : public RendererAPI {

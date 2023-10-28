@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../Core/Memory.hpp"
 #include <filesystem>
+
+#include "../Core/Memory.hpp"
 
 namespace Hydrogen {
 class Asset {

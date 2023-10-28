@@ -1,6 +1,6 @@
 #include <Hydrogen/Assets/SpriteAsset.hpp>
-#include <Hydrogen/Renderer/Texture.hpp>
 #include <Hydrogen/Renderer/RenderDevice.hpp>
+#include <Hydrogen/Renderer/Texture.hpp>
 
 using namespace Hydrogen;
 

@@ -1,8 +1,9 @@
 #pragma once
 
+#include <entt/entt.hpp>
+
 #include "../Core/Assert.hpp"
 #include "Scene.hpp"
-#include <entt/entt.hpp>
 
 namespace Hydrogen {
 class Entity {

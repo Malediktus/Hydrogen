@@ -5,8 +5,8 @@
 #include <ostream>
 #include <sstream>
 
-#include "../Core/Base.hpp"
 #include "../Core/Assert.hpp"
+#include "../Core/Base.hpp"
 #include "Asset.hpp"
 
 namespace Hydrogen {

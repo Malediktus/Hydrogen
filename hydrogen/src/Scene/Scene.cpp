@@ -1,8 +1,8 @@
-#include <Hydrogen/Scene/Scene.hpp>
-#include <Hydrogen/Scene/Entity.hpp>
-#include <Hydrogen/Scene/Components.hpp>
-#include <Hydrogen/Core/UUID.hpp>
 #include <Hydrogen/Core/Assert.hpp>
+#include <Hydrogen/Core/UUID.hpp>
+#include <Hydrogen/Scene/Components.hpp>
+#include <Hydrogen/Scene/Entity.hpp>
+#include <Hydrogen/Scene/Scene.hpp>
 
 using namespace Hydrogen;
 

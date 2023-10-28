@@ -1,5 +1,5 @@
-#include <Hydrogen/Scene/Entity.hpp>
 #include <Hydrogen/Scene/Components.hpp>
+#include <Hydrogen/Scene/Entity.hpp>
 #include <Hydrogen/Scene/Scene.hpp>
 
 using namespace Hydrogen;

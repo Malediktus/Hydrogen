@@ -1,15 +1,13 @@
+#include <Hydrogen/Core/Assert.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanVertexArray.hpp>
 #include <Hydrogen/Renderer/Buffer.hpp>
-#include <Hydrogen/Core/Assert.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen::Vulkan;
 
 VulkanVertexArray::VulkanVertexArray() { ZoneScoped; }
 
-VulkanVertexArray::~VulkanVertexArray() {
-  ZoneScoped;
-}
+VulkanVertexArray::~VulkanVertexArray() { ZoneScoped; }
 
 void VulkanVertexArray::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const {
   ZoneScoped;
@@ -30,6 +28,6 @@ void VulkanVertexArray::AddVertexBuffer(const ReferencePointer<VertexBuffer>& ve
 
 void VulkanVertexArray::SetIndexBuffer(const ReferencePointer<IndexBuffer>& indexBuffer) {
   ZoneScoped;
-  
+
   m_IndexBuffer = indexBuffer;
 }

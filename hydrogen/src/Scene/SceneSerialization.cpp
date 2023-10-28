@@ -1,6 +1,6 @@
-#include <Hydrogen/Scene/SceneSerialization.hpp>
-#include <Hydrogen/Scene/Scene.hpp>
 #include <Hydrogen/Scene/Entity.hpp>
+#include <Hydrogen/Scene/Scene.hpp>
+#include <Hydrogen/Scene/SceneSerialization.hpp>
 
 using namespace Hydrogen;
 

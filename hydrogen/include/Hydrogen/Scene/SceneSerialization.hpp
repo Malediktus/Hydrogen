@@ -1,7 +1,8 @@
 #pragma once
 
-#include <filesystem>
 #include <yaml-cpp/yaml.h>
+
+#include <filesystem>
 
 namespace Hydrogen {
 class Scene;

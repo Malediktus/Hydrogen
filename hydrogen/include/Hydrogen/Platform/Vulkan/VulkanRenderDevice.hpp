@@ -1,9 +1,11 @@
 #pragma once
 
-#include "../../Renderer/RenderDevice.hpp"
 #include <vulkan/vulkan.h>
-#include <optional>
+
 #include <functional>
+#include <optional>
+
+#include "../../Renderer/RenderDevice.hpp"
 
 namespace Hydrogen::Vulkan {
 using VkQueueFamily = std::optional<uint32_t>;

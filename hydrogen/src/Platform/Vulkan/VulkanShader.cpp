@@ -1,13 +1,13 @@
-#include <Hydrogen/Platform/Vulkan/VulkanShader.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanFramebuffer.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanTexture.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
-#include <Hydrogen/Renderer/ShaderCompiler.hpp>
-#include <Hydrogen/Renderer/Buffer.hpp>
 #include <Hydrogen/Core/Base.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanFramebuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanShader.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanTexture.hpp>
+#include <Hydrogen/Renderer/Buffer.hpp>
+#include <Hydrogen/Renderer/ShaderCompiler.hpp>
 #include <array>
 #include <glm/gtc/type_ptr.hpp>
 #include <tracy/Tracy.hpp>
@@ -73,7 +73,7 @@ static VkShaderStageFlags ShaderStageToVkShaderStageFlags(ShaderStage stage) {
       HY_INVOKE_ERROR("Invalid ShaderStage value!");
   }
 }
-} // namespace Hydrogen::Vulkan::Utils
+}  // namespace Hydrogen::Vulkan::Utils
 
 VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<Framebuffer>& framebuffer,
                            const BufferLayout& vertexLayout, ShaderDependencyGraph dependencyGraph, const String& name, const DynamicArray<uint32_t>& vertexSrc,
@@ -370,9 +370,8 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
 
 VulkanShader::~VulkanShader() {
   ZoneScoped;
-  
-  if (m_HasDependencies)
-    vkDestroyDescriptorSetLayout(m_RenderDevice->GetDevice(), m_DescriptorSetLayout, nullptr);
+
+  if (m_HasDependencies) vkDestroyDescriptorSetLayout(m_RenderDevice->GetDevice(), m_DescriptorSetLayout, nullptr);
   vkDestroyPipeline(m_RenderDevice->GetDevice(), m_Pipeline, nullptr);
   vkDestroyPipelineLayout(m_RenderDevice->GetDevice(), m_PipelineLayout, nullptr);
 
@@ -380,8 +379,7 @@ VulkanShader::~VulkanShader() {
   if (m_FragmentShaderModule != VK_NULL_HANDLE) vkDestroyShaderModule(m_RenderDevice->GetDevice(), m_FragmentShaderModule, nullptr);
   if (m_GeometryShaderModule != VK_NULL_HANDLE) vkDestroyShaderModule(m_RenderDevice->GetDevice(), m_GeometryShaderModule, nullptr);
 
-  if (m_HasDependencies)
-    vkDestroyDescriptorPool(m_RenderDevice->GetDevice(), m_DescriptorPool, nullptr);
+  if (m_HasDependencies) vkDestroyDescriptorPool(m_RenderDevice->GetDevice(), m_DescriptorPool, nullptr);
 }
 
 void VulkanShader::SetBuffer(const ReferencePointer<class UniformBuffer>& buffer, uint32_t location) {
@@ -428,7 +426,6 @@ void VulkanShader::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) co
   ZoneScoped;
   auto vulkanCommandBuffer = std::dynamic_pointer_cast<VulkanCommandBuffer>(commandBuffer)->GetCommandBuffer();
 
-  if (m_HasDependencies)
-    vkCmdBindDescriptorSets(vulkanCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_DescriptorSet, 0, nullptr);
+  if (m_HasDependencies) vkCmdBindDescriptorSets(vulkanCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_DescriptorSet, 0, nullptr);
   vkCmdBindPipeline(vulkanCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline);
 }

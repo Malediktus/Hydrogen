@@ -1,7 +1,7 @@
-#include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
 #include <Hydrogen/Core/Base.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen::Vulkan;
@@ -19,7 +19,7 @@ static uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags proper
 
   HY_INVOKE_ERROR("Failed to find suitable memory type!");
 }
-}
+}  // namespace Hydrogen::Vulkan::Utils
 
 VulkanBuffer::VulkanBuffer(ReferencePointer<VulkanRenderDevice> renderDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties)
     : m_RenderDevice(renderDevice) {
@@ -101,8 +101,7 @@ VulkanVertexBuffer::VulkanVertexBuffer(const ReferencePointer<RenderDevice>& dev
   vkFreeCommandBuffers(vulkanDevice, m_RenderDevice->GetCommandPool(), 1, &commandBuffer);
 }
 
-VulkanVertexBuffer::~VulkanVertexBuffer() {
-}
+VulkanVertexBuffer::~VulkanVertexBuffer() {}
 
 void VulkanVertexBuffer::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const {
   ZoneScoped;

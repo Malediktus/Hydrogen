@@ -1,11 +1,11 @@
 #include <Hydrogen/Assets/ShaderAsset.hpp>
 #include <Hydrogen/Core/Cache.hpp>
-#include <Hydrogen/Renderer/RenderDevice.hpp>
 #include <Hydrogen/Renderer/Buffer.hpp>
-#include <Hydrogen/Renderer/SwapChain.hpp>
 #include <Hydrogen/Renderer/Framebuffer.hpp>
+#include <Hydrogen/Renderer/RenderDevice.hpp>
 #include <Hydrogen/Renderer/Shader.hpp>
 #include <Hydrogen/Renderer/ShaderCompiler.hpp>
+#include <Hydrogen/Renderer/SwapChain.hpp>
 
 using namespace Hydrogen;
 
@@ -94,6 +94,7 @@ void ShaderAsset::Load(const std::filesystem::path& filepath) {
 }
 
 ReferencePointer<Shader> ShaderAsset::CreateShader(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain,
-                                      const ReferencePointer<Framebuffer>& framebuffer, const BufferLayout& vertexLayout, const ShaderDependencyGraph dependencyGraph) {
+                                                   const ReferencePointer<Framebuffer>& framebuffer, const BufferLayout& vertexLayout,
+                                                   const ShaderDependencyGraph dependencyGraph) {
   return Shader::Create(renderDevice, swapChain, framebuffer, vertexLayout, dependencyGraph, m_Name, m_VertexShader, m_FragmentShader, m_GeometryShader);
 }

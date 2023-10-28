@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+
 #include "Memory.hpp"
 
 namespace Hydrogen {

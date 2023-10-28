@@ -1,18 +1,16 @@
-#include <Hydrogen/Platform/Vulkan/VulkanFramebuffer.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
 #include <Hydrogen/Core/Assert.hpp>
 #include <Hydrogen/Core/Base.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanFramebuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen;
 using namespace Hydrogen::Vulkan;
 
 VulkanFramebuffer::VulkanFramebuffer(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain)
-    : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)),
-      m_SwapChain(std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)) {
+    : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)), m_SwapChain(std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)) {
   ZoneScoped;
 
   VkAttachmentDescription colorAttachment{};

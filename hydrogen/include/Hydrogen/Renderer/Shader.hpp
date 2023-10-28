@@ -2,8 +2,8 @@
 
 #include <unordered_map>
 
-#include "../Renderer/ShaderCompiler.hpp"
 #include "../Core/Memory.hpp"
+#include "../Renderer/ShaderCompiler.hpp"
 
 namespace Hydrogen {
 enum class ShaderDependencyType { UniformBuffer = 0, Texture = 1 };
@@ -43,9 +43,9 @@ class ShaderLibrary {
   void Add(const String& name, const ReferencePointer<class Shader>& shader);
   void Add(const ReferencePointer<class Shader>& shader);
   ReferencePointer<class Shader> Load(const ReferencePointer<class RenderDevice>& renderDevice, const ReferencePointer<class SwapChain>& swapChain,
-                                      const ReferencePointer<class Framebuffer>& framebuffer,
-                                const class BufferLayout& vertexLayout, ShaderDependencyGraph dependencyGraph, const String& name, const DynamicArray<uint32_t>& vertexSrc,
-                                const DynamicArray<uint32_t>& fragmentSrc, const DynamicArray<uint32_t>& geometrySrc);
+                                      const ReferencePointer<class Framebuffer>& framebuffer, const class BufferLayout& vertexLayout, ShaderDependencyGraph dependencyGraph,
+                                      const String& name, const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc,
+                                      const DynamicArray<uint32_t>& geometrySrc);
 
   ReferencePointer<class Shader> Get(const String& name);
 

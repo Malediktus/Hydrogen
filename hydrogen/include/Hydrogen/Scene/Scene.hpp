@@ -1,6 +1,7 @@
 #pragma once
 
 #include <entt/entt.hpp>
+
 #include "../Core/Memory.hpp"
 
 namespace Hydrogen {

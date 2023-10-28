@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../Renderer/Framebuffer.hpp"
-
 #include <vulkan/vulkan.h>
+
+#include "../../Renderer/Framebuffer.hpp"
 
 namespace Hydrogen::Vulkan {
 class VulkanFramebuffer : public Framebuffer {

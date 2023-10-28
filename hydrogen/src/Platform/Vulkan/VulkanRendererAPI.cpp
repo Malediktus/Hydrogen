@@ -1,12 +1,13 @@
-#include <imgui.h>
 #include <backends/imgui_impl_vulkan.h>
-#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanFramebuffer.hpp>
-#include <Hydrogen/Renderer/Renderer.hpp>
+#include <imgui.h>
+
 #include <Hydrogen/Core/Assert.hpp>
 #include <Hydrogen/Core/Base.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanFramebuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
+#include <Hydrogen/Renderer/Renderer.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen::Vulkan;
@@ -49,7 +50,7 @@ void VulkanRendererAPI::SetupImGui() {
   initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
   ImGui_ImplVulkan_Init(&initInfo, m_Framebuffer->GetRenderPass());
-  
+
   // Upload fonts and textures to gpu
   VkFence uploadFence;
   VkCommandBuffer commandBuffer;
@@ -74,7 +75,7 @@ void VulkanRendererAPI::SetupImGui() {
   beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
   VK_CHECK_ERROR(vkBeginCommandBuffer(commandBuffer, &beginInfo), "Failed to begin vulkan command buffer!");
-  
+
   ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
 
   VK_CHECK_ERROR(vkEndCommandBuffer(commandBuffer), "Failed to end vulkan command buffer!");

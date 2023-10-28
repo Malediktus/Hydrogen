@@ -1,9 +1,9 @@
 #include <backends/imgui_impl_glfw.h>
 #include <imgui.h>
 
-#include <Hydrogen/Platform/Windows/WindowsWindow.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
 #include <Hydrogen/Core/Base.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
+#include <Hydrogen/Platform/Windows/WindowsWindow.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 
 using namespace Hydrogen;
@@ -101,21 +101,15 @@ Vector2 WindowsWindow::GetMousePos() const {
 
 void WindowsWindow::UpdateEvents() { glfwPollEvents(); }
 
-void WindowsWindow::Render() {
-  glfwSwapBuffers(m_Window);
-}
+void WindowsWindow::Render() { glfwSwapBuffers(m_Window); }
 
 void WindowsWindow::SetupImGui() {
-  ImGui_ImplGlfw_InitForVulkan(m_Window, true); // TODO: Make API indenpendent
+  ImGui_ImplGlfw_InitForVulkan(m_Window, true);  // TODO: Make API indenpendent
 }
 
-void WindowsWindow::ImGuiNewFrame() {
-  ImGui_ImplGlfw_NewFrame();
-}
+void WindowsWindow::ImGuiNewFrame() { ImGui_ImplGlfw_NewFrame(); }
 
-void WindowsWindow::DestroyImGui() {
-  ImGui_ImplGlfw_Shutdown();
-}
+void WindowsWindow::DestroyImGui() { ImGui_ImplGlfw_Shutdown(); }
 
 void WindowsWindow::SetupOpenglContext(int, int) { glfwMakeContextCurrent(m_Window); }
 
