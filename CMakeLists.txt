@@ -122,4 +122,3 @@ add_subdirectory(extern/yaml-cpp)
 
 add_subdirectory(hydrogen)
 add_subdirectory(hydrogen-editor)
-add_subdirectory(hydrogen-runtime)

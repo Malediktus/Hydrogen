@@ -3,7 +3,7 @@
 
 using namespace Hydrogen;
 
-std::unordered_map<std::filesystem::path, ReferencePointer<Asset>> AssetManager::s_Assets;
+std::unordered_map<String, ReferencePointer<Asset>> AssetManager::s_Assets;
 
 void AssetManager::Init() {
   for (const auto& dirEntry : std::filesystem::recursive_directory_iterator("assets")) {

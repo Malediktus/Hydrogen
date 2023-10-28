@@ -1,10 +1,12 @@
 #pragma once
 
 #include <filesystem>
+#include <unordered_map>
+
 #include "../Core/Memory.hpp"
+#include "MeshAsset.hpp"
 #include "ShaderAsset.hpp"
 #include "SpriteAsset.hpp"
-#include "MeshAsset.hpp"
 
 namespace Hydrogen {
 class AssetManager {
@@ -41,6 +43,6 @@ class AssetManager {
   }
 
  private:
-  static std::unordered_map<std::filesystem::path, ReferencePointer<Asset>> s_Assets;
+  static std::unordered_map<String, ReferencePointer<Asset>> s_Assets;
 };
 }  // namespace Hydrogen

@@ -1,20 +1,20 @@
-#include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanVertexArray.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanShader.hpp>
+#include <backends/imgui_impl_vulkan.h>
+
 #include <Hydrogen/Core/Assert.hpp>
 #include <Hydrogen/Core/Base.hpp>
-#include <backends/imgui_impl_vulkan.h>
+#include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanShader.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanVertexArray.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen;
 using namespace Hydrogen::Vulkan;
 
 VulkanCommandBuffer::VulkanCommandBuffer(const ReferencePointer<RenderDevice>& renderDevice)
-    : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)),
-    m_ImageIndex(0) {
+    : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)), m_ImageIndex(0) {
   ZoneScoped;
 
   VkCommandBufferAllocateInfo allocInfo{};
@@ -50,7 +50,10 @@ VulkanCommandBuffer::~VulkanCommandBuffer() {
 
 void VulkanCommandBuffer::Reset() {
   ZoneScoped;
-  vkWaitForFences(m_RenderDevice->GetDevice(), 1, &m_InFlightFence, VK_TRUE, UINT64_MAX);
+  if (vkWaitForFences(m_RenderDevice->GetDevice(), 1, &m_InFlightFence, VK_TRUE, 500000000) == VK_TIMEOUT) {
+    HY_LOG_WARN("vkWaitForFences timed out!");
+  }
+
   vkResetFences(m_RenderDevice->GetDevice(), 1, &m_InFlightFence);
   vkResetCommandBuffer(m_CommandBuffer, 0);
 }
@@ -89,7 +92,6 @@ void VulkanCommandBuffer::CmdUploadResources() {
   submitInfo.pSignalSemaphores = signalSemaphores;
 
   VK_CHECK_ERROR(vkQueueSubmit(m_RenderDevice->GetGraphicsQueue(), 1, &submitInfo, m_InFlightFence), "Failed to submit vulkan graphics queue!");
-
 }
 
 void VulkanCommandBuffer::CmdDisplayImage(const ReferencePointer<SwapChain> swapChain) {

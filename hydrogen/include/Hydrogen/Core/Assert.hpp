@@ -11,13 +11,22 @@
     exit(0);                                                                                 \
   }
 
+#ifdef HY_PLATFORM_WINDOWS
 #define HY_ASSERT(expr, ...)                                                                 \
   if (expr) {                                                                                \
   } else {                                                                                   \
     HY_LOG_FATAL("Assertion error in " __FILE__ ": '" #expr "' is not zero | " __VA_ARGS__); \
-    __debugbreak(); \
+    __debugbreak();                                                                          \
     exit(0);                                                                                 \
   }
+#else
+#define HY_ASSERT(expr, ...)                                                                 \
+  if (expr) {                                                                                \
+  } else {                                                                                   \
+    HY_LOG_FATAL("Assertion error in " __FILE__ ": '" #expr "' is not zero | " __VA_ARGS__); \
+    exit(0);                                                                                 \
+  }
+#endif
 
 #define HY_INVOKE_ERROR(...)                                    \
   HY_LOG_FATAL("Hydrogen error in " __FILE__ ": " __VA_ARGS__); \
