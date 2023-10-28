@@ -34,7 +34,7 @@ void Application::Run() {
   Renderer::SetContext(renderContext);
   renderContext->Init(clientProject, engineProject);
 
-  MainRenderDevice = RenderDevice::Create([](const RenderDeviceProperties& deviceProperties) -> std::size_t {
+  Renderer::SetRenderDevice(RenderDevice::Create([](const RenderDeviceProperties& deviceProperties) -> std::size_t {
     size_t result = 0;
 
     switch (deviceProperties.DeviceType) {
@@ -50,7 +50,7 @@ void Application::Run() {
     for (auto& heap : deviceProperties.MemoryHeaps) result += heap.MemorySize / 1024;  // Choose the GPU with most memory
 
     return result;
-  });
+  }));
 
   CurrentScene = NewScopePointer<Scene>("Main Scene");
 

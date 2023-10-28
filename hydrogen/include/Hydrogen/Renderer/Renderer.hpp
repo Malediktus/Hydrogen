@@ -7,57 +7,9 @@
 #include <tracy/tracy.hpp>
 
 namespace Hydrogen {
-enum LightType { None = 0, Point = 1, Directional = 2, Spot = 3 };
-
-struct Light {
-  Light(const Vector3& ambient, const Vector3& diffuse, const Vector3 specular) : Ambient(ambient), Diffuse(diffuse), Specular(specular) { ZoneScoped; }
-  ~Light() = default;
-
-  LightType Type = LightType::None;
-  Vector3 Ambient;
-  Vector3 Diffuse;
-  Vector3 Specular;
-};
-
-struct PointLight : public Light {
-  PointLight(float constant, float linear, float quadratic, const Vector3& ambient, const Vector3& diffuse, const Vector3 specular)
-      : Light(ambient, diffuse, specular), Constant(constant), Linear(linear), Quadratic(quadratic) {
-    ZoneScoped;
-    Type = LightType::Point;
-  }
-  ~PointLight() = default;
-
-  float Constant;
-  float Linear;
-  float Quadratic;
-};
-
-struct DirectionalLight : public Light {
-  DirectionalLight(const Vector3& ambient, const Vector3& diffuse, const Vector3 specular) : Light(ambient, diffuse, specular) {
-    ZoneScoped;
-    Type = LightType::Directional;
-  }
-  ~DirectionalLight() = default;
-};
-
-struct SpotLight : public Light {
-  SpotLight(float cutOff, float outerCutOff, float constant, float linear, float quadratic, const Vector3& ambient, const Vector3& diffuse, const Vector3 specular)
-      : Light(ambient, diffuse, specular), CutOff(cutOff), OuterCutOff(outerCutOff), Constant(constant), Linear(linear), Quadratic(quadratic) {
-    ZoneScoped;
-    Type = LightType::Spot;
-  }
-  ~SpotLight() = default;
-
-  float CutOff;
-  float OuterCutOff;
-  float Constant;
-  float Linear;
-  float Quadratic;
-};
-
 class Renderer {
  public:
-  Renderer(const ReferencePointer<class RenderWindow>& window, const ReferencePointer<class RenderDevice>& device, const ScopePointer<class Scene>& scene);
+  Renderer(const ReferencePointer<class RenderWindow>& window, const ScopePointer<class Scene>& scene);
   ~Renderer();
 
   void Render();
@@ -65,8 +17,7 @@ class Renderer {
 
   inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
-  static void SetContext(ReferencePointer<class Context> context) { s_Context = context; }
-  const ReferencePointer<class Framebuffer>& GetFramebuffer() { return m_Framebuffer; }
+  static void SetContext(const ReferencePointer<class Context>& context) { s_Context = context; }
 
   template <typename T>
   static ReferencePointer<T> GetContext() {
@@ -74,13 +25,21 @@ class Renderer {
     return std::dynamic_pointer_cast<T>(s_Context);
   }
 
+  static void SetRenderDevice(const ReferencePointer<class RenderDevice>& renderDevice) { s_RenderDevice = renderDevice; }
+
+  template <typename T>
+  static ReferencePointer<T> GetRenderDevice() {
+    static_assert(std::is_base_of<RenderDevice, T>::value, "T must be derived from RenderDevice");
+    return std::dynamic_pointer_cast<T>(s_RenderDevice);
+  }
+
  private:
   static ReferencePointer<Context> s_Context;
+  static ReferencePointer<RenderDevice> s_RenderDevice;
   static uint32_t s_MaxFramesInFlight;
 
   const ScopePointer<class Scene>& m_Scene;
   ReferencePointer<class RenderWindow> m_RenderWindow;
-  ReferencePointer<class RenderDevice> m_Device;
   ReferencePointer<class SwapChain> m_SwapChain;
   ReferencePointer<class Framebuffer> m_Framebuffer;
   ReferencePointer<class Shader> m_Shader;

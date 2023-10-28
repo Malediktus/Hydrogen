@@ -34,18 +34,19 @@ struct LightData {
 };
 
 ReferencePointer<Context> Renderer::s_Context;
+ReferencePointer<RenderDevice> Renderer::s_RenderDevice;
 uint32_t Renderer::s_MaxFramesInFlight = MAX_FRAMES_IN_FLIGHT;
 
-Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ReferencePointer<RenderDevice>& device, const ScopePointer<class Scene>& scene)
-    : m_Device(device), m_RenderWindow(window), m_Scene(scene) {
+Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ScopePointer<class Scene>& scene)
+    : m_RenderWindow(window), m_Scene(scene) {
   ZoneScoped;
 
-  m_SwapChain = SwapChain::Create(window, device, true);
-  m_Framebuffer = Framebuffer::Create(device, m_SwapChain);
-  m_WhiteTexture = AssetManager::Get<SpriteAsset>("assets/Textures/WhiteTexture.png")->CreateTexture2D(device);
-  m_UniformBuffer = UniformBuffer::Create(m_Device, sizeof(UniformBufferObject));
+  m_SwapChain = SwapChain::Create(window, s_RenderDevice, true);
+  m_Framebuffer = Framebuffer::Create(s_RenderDevice, m_SwapChain);
+  m_WhiteTexture = AssetManager::Get<SpriteAsset>("assets/Textures/WhiteTexture.png")->CreateTexture2D(s_RenderDevice);
+  m_UniformBuffer = UniformBuffer::Create(s_RenderDevice, sizeof(UniformBufferObject));
 
-  m_LightBuffer = UniformBuffer::Create(m_Device, sizeof(LightData));
+  m_LightBuffer = UniformBuffer::Create(s_RenderDevice, sizeof(LightData));
 
   ShaderDependency uniformBuffer{};
   uniformBuffer.Type = ShaderDependencyType::UniformBuffer;
@@ -68,13 +69,13 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const Reference
   specularTexture.Location = 3;
 
   m_Shader = AssetManager::Get<ShaderAsset>("assets/Raw.glsl")
-                 ->CreateShader(device, m_SwapChain, m_Framebuffer,
+                 ->CreateShader(s_RenderDevice, m_SwapChain, m_Framebuffer,
                                 {{ShaderDataType::Float3, "Position", false}, {ShaderDataType::Float3, "Normal", false}, {ShaderDataType::Float2, "TexCoords", false}},
                                 {uniformBuffer, lightBuffer, diffuseTexture, specularTexture});
 
   m_CommandBuffers.resize(s_MaxFramesInFlight);
   for (uint32_t i = 0; i < s_MaxFramesInFlight; i++) {
-    m_CommandBuffers[i] = CommandBuffer::Create(device);
+    m_CommandBuffers[i] = CommandBuffer::Create(s_RenderDevice);
   }
 
   LightData lightData{};
@@ -94,7 +95,7 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const Reference
   HY_LOG_INFO("Initialized renderer");
 }
 
-Renderer::~Renderer() { m_Device->WaitForIdle(); }
+Renderer::~Renderer() { s_RenderDevice->WaitForIdle(); }
 
 void Renderer::Render() {
   static auto startTime = std::chrono::high_resolution_clock::now();
