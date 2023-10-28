@@ -14,9 +14,9 @@ void SpriteAsset::Load(const std::filesystem::path& filepath) {
   HY_LOG_INFO("Finished loading sprite asset '{}'!", filepath.string());
 }
 
-ReferencePointer<Texture2D> SpriteAsset::CreateTexture2D(const ReferencePointer<RenderDevice>& renderDevice) {
+ReferencePointer<Texture2D> SpriteAsset::CreateTexture2D(const ReferencePointer<RenderWindow>& window) {
   HY_ASSERT(m_Pixels, "SpriteAsset already created Texture2D or is uninitialized!");
-  auto texture = Texture2D::Create(renderDevice, m_Width, m_Height, m_Pixels);
+  auto texture = Texture2D::Create(window, m_Width, m_Height, m_Pixels);
   stbi_image_free(m_Pixels);
   m_Pixels = nullptr;
   return texture;

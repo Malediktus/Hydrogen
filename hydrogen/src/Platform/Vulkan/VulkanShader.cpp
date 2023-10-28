@@ -1,12 +1,13 @@
 #include <Hydrogen/Core/Base.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanFramebuffer.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanShader.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanSurfaceAttachment.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanTexture.hpp>
 #include <Hydrogen/Renderer/Buffer.hpp>
+#include <Hydrogen/Renderer/RenderWindow.hpp>
+#include <Hydrogen/Renderer/Renderer.hpp>
 #include <Hydrogen/Renderer/ShaderCompiler.hpp>
 #include <array>
 #include <glm/gtc/type_ptr.hpp>
@@ -75,14 +76,9 @@ static VkShaderStageFlags ShaderStageToVkShaderStageFlags(ShaderStage stage) {
 }
 }  // namespace Hydrogen::Vulkan::Utils
 
-VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<SwapChain>& swapChain, const ReferencePointer<Framebuffer>& framebuffer,
-                           const BufferLayout& vertexLayout, ShaderDependencyGraph dependencyGraph, const String& name, const DynamicArray<uint32_t>& vertexSrc,
-                           const DynamicArray<uint32_t>& fragmentSrc, const DynamicArray<uint32_t>& geometrySrc)
-    : m_Name(name),
-      m_HasDependencies(dependencyGraph.Dependencies.size() > 0),
-      m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)),
-      m_SwapChain(std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)),
-      m_Framebuffer(std::dynamic_pointer_cast<VulkanFramebuffer>(framebuffer)) {
+VulkanShader::VulkanShader(const ReferencePointer<RenderWindow>& window, const BufferLayout& vertexLayout, ShaderDependencyGraph dependencyGraph, const String& name,
+                           const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc, const DynamicArray<uint32_t>& geometrySrc)
+    : m_Name(name), m_HasDependencies(dependencyGraph.Dependencies.size() > 0), m_Window(window) {
   ZoneScoped;
 
   m_DescriptorPool = VK_NULL_HANDLE;
@@ -123,7 +119,7 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
     descriptorLayoutCreateInfo.bindingCount = static_cast<uint32_t>(m_DescriptorSetLayoutBindings.size());
     descriptorLayoutCreateInfo.pBindings = m_DescriptorSetLayoutBindings.data();
 
-    VK_CHECK_ERROR(vkCreateDescriptorSetLayout(m_RenderDevice->GetDevice(), &descriptorLayoutCreateInfo, nullptr, &m_DescriptorSetLayout),
+    VK_CHECK_ERROR(vkCreateDescriptorSetLayout(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &descriptorLayoutCreateInfo, nullptr, &m_DescriptorSetLayout),
                    "Failed to create Vulkan descriptor set layout");
 
     DynamicArray<VkDescriptorPoolSize> descriptorPoolSizes;
@@ -149,7 +145,8 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
     descriptorPoolCreateInfo.pPoolSizes = descriptorPoolSizes.data();
     descriptorPoolCreateInfo.maxSets = MAX_FRAMES_IN_FLIGHT;
 
-    VK_CHECK_ERROR(vkCreateDescriptorPool(m_RenderDevice->GetDevice(), &descriptorPoolCreateInfo, nullptr, &m_DescriptorPool), "Failed to create vulkan descriptor pool!");
+    VK_CHECK_ERROR(vkCreateDescriptorPool(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &descriptorPoolCreateInfo, nullptr, &m_DescriptorPool),
+                   "Failed to create vulkan descriptor pool!");
   }
 
   VkVertexInputBindingDescription bindingDescription{};
@@ -180,7 +177,8 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
     createInfo.codeSize = vertexSrc.size() * sizeof(uint32_t);
     createInfo.pCode = reinterpret_cast<const uint32_t*>(vertexSrc.data());
 
-    VK_CHECK_ERROR(vkCreateShaderModule(m_RenderDevice->GetDevice(), &createInfo, nullptr, &m_VertexShaderModule), "Failed to create vulkan shader module!");
+    VK_CHECK_ERROR(vkCreateShaderModule(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &createInfo, nullptr, &m_VertexShaderModule),
+                   "Failed to create vulkan shader module!");
 
     VkPipelineShaderStageCreateInfo vertexShaderStageInfo{};
     vertexShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -197,7 +195,8 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
     createInfo.codeSize = fragmentSrc.size() * sizeof(uint32_t);
     createInfo.pCode = reinterpret_cast<const uint32_t*>(fragmentSrc.data());
 
-    VK_CHECK_ERROR(vkCreateShaderModule(m_RenderDevice->GetDevice(), &createInfo, nullptr, &m_FragmentShaderModule), "Failed to create vulkan shader module!");
+    VK_CHECK_ERROR(vkCreateShaderModule(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &createInfo, nullptr, &m_FragmentShaderModule),
+                   "Failed to create vulkan shader module!");
 
     VkPipelineShaderStageCreateInfo fragmentShaderStageInfo{};
     fragmentShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -214,7 +213,8 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
     createInfo.codeSize = geometrySrc.size() * sizeof(uint32_t);
     createInfo.pCode = reinterpret_cast<const uint32_t*>(geometrySrc.data());
 
-    VK_CHECK_ERROR(vkCreateShaderModule(m_RenderDevice->GetDevice(), &createInfo, nullptr, &m_GeometryShaderModule), "Failed to create vulkan shader module!");
+    VK_CHECK_ERROR(vkCreateShaderModule(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &createInfo, nullptr, &m_GeometryShaderModule),
+                   "Failed to create vulkan shader module!");
 
     VkPipelineShaderStageCreateInfo geometryShaderStageInfo{};
     geometryShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -247,14 +247,14 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
   VkViewport viewport{};
   viewport.x = 0.0f;
   viewport.y = 0.0f;
-  viewport.width = (float)m_SwapChain->GetExtent().width;
-  viewport.height = (float)m_SwapChain->GetExtent().height;
+  viewport.width = (float)m_Window->GetSurfaceAttachment<VulkanSurfaceAttachment>()->GetExtent().width;
+  viewport.height = (float)m_Window->GetSurfaceAttachment<VulkanSurfaceAttachment>()->GetExtent().height;
   viewport.minDepth = 0.0f;
   viewport.maxDepth = 1.0f;
 
   VkRect2D scissor{};
   scissor.offset = {0, 0};
-  scissor.extent = m_SwapChain->GetExtent();
+  scissor.extent = m_Window->GetSurfaceAttachment<VulkanSurfaceAttachment>()->GetExtent();
 
   VkPipelineViewportStateCreateInfo viewportState{};
   viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -335,7 +335,8 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
     pipelineLayoutInfo.pSetLayouts = &m_DescriptorSetLayout;
   }
 
-  VK_CHECK_ERROR(vkCreatePipelineLayout(m_RenderDevice->GetDevice(), &pipelineLayoutInfo, nullptr, &m_PipelineLayout), "Failed to create vulkan pipeline layout!");
+  VK_CHECK_ERROR(vkCreatePipelineLayout(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &pipelineLayoutInfo, nullptr, &m_PipelineLayout),
+                 "Failed to create vulkan pipeline layout!");
 
   VkGraphicsPipelineCreateInfo pipelineInfo{};
   pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -350,12 +351,13 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
   pipelineInfo.pColorBlendState = &colorBlending;
   pipelineInfo.pDynamicState = &dynamicState;
   pipelineInfo.layout = m_PipelineLayout;
-  pipelineInfo.renderPass = m_Framebuffer->GetRenderPass();
+  pipelineInfo.renderPass = m_Window->GetSurfaceAttachment<VulkanSurfaceAttachment>()->GetRenderPass();
   pipelineInfo.subpass = 0;
   pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;  // Optional
   pipelineInfo.basePipelineIndex = -1;               // Optional
 
-  VK_CHECK_ERROR(vkCreateGraphicsPipelines(m_RenderDevice->GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_Pipeline), "Failed to create vulkan pipeline!");
+  VK_CHECK_ERROR(vkCreateGraphicsPipelines(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_Pipeline),
+                 "Failed to create vulkan pipeline!");
 
   if (m_HasDependencies) {
     VkDescriptorSetAllocateInfo allocInfo{};
@@ -364,22 +366,22 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderDevice>& renderDevice, c
     allocInfo.descriptorSetCount = 1;
     allocInfo.pSetLayouts = &m_DescriptorSetLayout;
 
-    VK_CHECK_ERROR(vkAllocateDescriptorSets(m_RenderDevice->GetDevice(), &allocInfo, &m_DescriptorSet), "Failed to create vulkan descriptor set!");
+    VK_CHECK_ERROR(vkAllocateDescriptorSets(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &allocInfo, &m_DescriptorSet), "Failed to create vulkan descriptor set!");
   }
 }
 
 VulkanShader::~VulkanShader() {
   ZoneScoped;
 
-  if (m_HasDependencies) vkDestroyDescriptorSetLayout(m_RenderDevice->GetDevice(), m_DescriptorSetLayout, nullptr);
-  vkDestroyPipeline(m_RenderDevice->GetDevice(), m_Pipeline, nullptr);
-  vkDestroyPipelineLayout(m_RenderDevice->GetDevice(), m_PipelineLayout, nullptr);
+  if (m_HasDependencies) vkDestroyDescriptorSetLayout(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_DescriptorSetLayout, nullptr);
+  vkDestroyPipeline(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_Pipeline, nullptr);
+  vkDestroyPipelineLayout(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_PipelineLayout, nullptr);
 
-  if (m_VertexShaderModule != VK_NULL_HANDLE) vkDestroyShaderModule(m_RenderDevice->GetDevice(), m_VertexShaderModule, nullptr);
-  if (m_FragmentShaderModule != VK_NULL_HANDLE) vkDestroyShaderModule(m_RenderDevice->GetDevice(), m_FragmentShaderModule, nullptr);
-  if (m_GeometryShaderModule != VK_NULL_HANDLE) vkDestroyShaderModule(m_RenderDevice->GetDevice(), m_GeometryShaderModule, nullptr);
+  if (m_VertexShaderModule != VK_NULL_HANDLE) vkDestroyShaderModule(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_VertexShaderModule, nullptr);
+  if (m_FragmentShaderModule != VK_NULL_HANDLE) vkDestroyShaderModule(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_FragmentShaderModule, nullptr);
+  if (m_GeometryShaderModule != VK_NULL_HANDLE) vkDestroyShaderModule(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_GeometryShaderModule, nullptr);
 
-  if (m_HasDependencies) vkDestroyDescriptorPool(m_RenderDevice->GetDevice(), m_DescriptorPool, nullptr);
+  if (m_HasDependencies) vkDestroyDescriptorPool(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_DescriptorPool, nullptr);
 }
 
 void VulkanShader::SetBuffer(const ReferencePointer<class UniformBuffer>& buffer, uint32_t location) {
@@ -399,7 +401,7 @@ void VulkanShader::SetBuffer(const ReferencePointer<class UniformBuffer>& buffer
   descriptorWrite.descriptorCount = 1;
   descriptorWrite.pBufferInfo = &bufferInfo;
 
-  vkUpdateDescriptorSets(m_RenderDevice->GetDevice(), 1, &descriptorWrite, 0, nullptr);
+  vkUpdateDescriptorSets(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), 1, &descriptorWrite, 0, nullptr);
 }
 
 void VulkanShader::SetTexture(const ReferencePointer<class Texture2D>& texture, uint32_t location) {
@@ -419,7 +421,7 @@ void VulkanShader::SetTexture(const ReferencePointer<class Texture2D>& texture, 
   descriptorWrite.descriptorCount = 1;
   descriptorWrite.pImageInfo = &imageInfo;
 
-  vkUpdateDescriptorSets(m_RenderDevice->GetDevice(), 1, &descriptorWrite, 0, nullptr);
+  vkUpdateDescriptorSets(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), 1, &descriptorWrite, 0, nullptr);
 }
 
 void VulkanShader::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const {

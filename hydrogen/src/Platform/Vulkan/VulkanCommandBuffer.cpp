@@ -6,55 +6,58 @@
 #include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanShader.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanSurfaceAttachment.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanVertexArray.hpp>
+#include <Hydrogen/Renderer/RenderWindow.hpp>
+#include <Hydrogen/Renderer/Renderer.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen;
 using namespace Hydrogen::Vulkan;
 
-VulkanCommandBuffer::VulkanCommandBuffer(const ReferencePointer<RenderDevice>& renderDevice)
-    : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)), m_ImageIndex(0) {
+VulkanCommandBuffer::VulkanCommandBuffer(const ReferencePointer<class RenderWindow>& window) : m_Window(window), m_ImageIndex(0) {
   ZoneScoped;
 
   VkCommandBufferAllocateInfo allocInfo{};
   allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-  allocInfo.commandPool = m_RenderDevice->GetCommandPool();
+  allocInfo.commandPool = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetCommandPool();
   allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
   allocInfo.commandBufferCount = 1;
 
-  VK_CHECK_ERROR(vkAllocateCommandBuffers(m_RenderDevice->GetDevice(), &allocInfo, &m_CommandBuffer), "Failed to allocate vulkan command buffer!");
+  VK_CHECK_ERROR(vkAllocateCommandBuffers(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &allocInfo, &m_CommandBuffer), "Failed to allocate vulkan command buffer!");
 
   VkSemaphoreCreateInfo semaphoreInfo{};
   semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
-  VK_CHECK_ERROR(vkCreateSemaphore(m_RenderDevice->GetDevice(), &semaphoreInfo, nullptr, &m_ImageAvailableSemaphore), "Failed to create vulkan semaphore!");
-  VK_CHECK_ERROR(vkCreateSemaphore(m_RenderDevice->GetDevice(), &semaphoreInfo, nullptr, &m_RenderFinishedSemaphore), "Failed to create vulkan semaphore!");
+  VK_CHECK_ERROR(vkCreateSemaphore(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &semaphoreInfo, nullptr, &m_ImageAvailableSemaphore),
+                 "Failed to create vulkan semaphore!");
+  VK_CHECK_ERROR(vkCreateSemaphore(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &semaphoreInfo, nullptr, &m_RenderFinishedSemaphore),
+                 "Failed to create vulkan semaphore!");
 
   VkFenceCreateInfo fenceInfo{};
   fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 
-  VK_CHECK_ERROR(vkCreateFence(m_RenderDevice->GetDevice(), &fenceInfo, nullptr, &m_InFlightFence), "Failed to create vulkan fence!");
-  vkResetFences(m_RenderDevice->GetDevice(), 1, &m_InFlightFence);
+  VK_CHECK_ERROR(vkCreateFence(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &fenceInfo, nullptr, &m_InFlightFence), "Failed to create vulkan fence!");
+  vkResetFences(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), 1, &m_InFlightFence);
 }
 
 VulkanCommandBuffer::~VulkanCommandBuffer() {
   ZoneScoped;
-  vkWaitForFences(m_RenderDevice->GetDevice(), 1, &m_InFlightFence, VK_TRUE, UINT64_MAX);
-  vkResetFences(m_RenderDevice->GetDevice(), 1, &m_InFlightFence);
+  vkWaitForFences(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), 1, &m_InFlightFence, VK_TRUE, UINT64_MAX);
+  vkResetFences(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), 1, &m_InFlightFence);
 
-  vkDestroySemaphore(m_RenderDevice->GetDevice(), m_ImageAvailableSemaphore, nullptr);
-  vkDestroySemaphore(m_RenderDevice->GetDevice(), m_RenderFinishedSemaphore, nullptr);
-  vkDestroyFence(m_RenderDevice->GetDevice(), m_InFlightFence, nullptr);
+  vkDestroySemaphore(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_ImageAvailableSemaphore, nullptr);
+  vkDestroySemaphore(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_RenderFinishedSemaphore, nullptr);
+  vkDestroyFence(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_InFlightFence, nullptr);
 }
 
 void VulkanCommandBuffer::Reset() {
   ZoneScoped;
-  if (vkWaitForFences(m_RenderDevice->GetDevice(), 1, &m_InFlightFence, VK_TRUE, 500000000) == VK_TIMEOUT) {
+  if (vkWaitForFences(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), 1, &m_InFlightFence, VK_TRUE, 500000000) == VK_TIMEOUT) {
     HY_LOG_WARN("vkWaitForFences timed out!");
   }
 
-  vkResetFences(m_RenderDevice->GetDevice(), 1, &m_InFlightFence);
+  vkResetFences(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), 1, &m_InFlightFence);
   vkResetCommandBuffer(m_CommandBuffer, 0);
 }
 
@@ -91,10 +94,10 @@ void VulkanCommandBuffer::CmdUploadResources() {
   submitInfo.signalSemaphoreCount = 1;
   submitInfo.pSignalSemaphores = signalSemaphores;
 
-  VK_CHECK_ERROR(vkQueueSubmit(m_RenderDevice->GetGraphicsQueue(), 1, &submitInfo, m_InFlightFence), "Failed to submit vulkan graphics queue!");
+  VK_CHECK_ERROR(vkQueueSubmit(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetGraphicsQueue(), 1, &submitInfo, m_InFlightFence), "Failed to submit vulkan graphics queue!");
 }
 
-void VulkanCommandBuffer::CmdDisplayImage(const ReferencePointer<SwapChain> swapChain) {
+void VulkanCommandBuffer::CmdDisplayImage() {
   ZoneScoped;
 
   VkSemaphore waitSemaphores[] = {m_RenderFinishedSemaphore};
@@ -105,12 +108,12 @@ void VulkanCommandBuffer::CmdDisplayImage(const ReferencePointer<SwapChain> swap
   presentInfo.waitSemaphoreCount = 1;
   presentInfo.pWaitSemaphores = waitSemaphores;
 
-  VkSwapchainKHR swapChains[] = {std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)->GetSwapChain()};
+  VkSwapchainKHR swapChains[] = {m_Window->GetSurfaceAttachment<VulkanSurfaceAttachment>()->GetSwapChain()};
   presentInfo.swapchainCount = 1;
   presentInfo.pSwapchains = swapChains;
   presentInfo.pImageIndices = &m_ImageIndex;
 
-  vkQueuePresentKHR(std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)->GetPresentQueue(), &presentInfo);
+  vkQueuePresentKHR(m_Window->GetSurfaceAttachment<VulkanSurfaceAttachment>()->GetPresentQueue(), &presentInfo);
 }
 
 void VulkanCommandBuffer::CmdDraw(const ReferencePointer<VertexBuffer>& vertexBuffer) {
@@ -123,10 +126,10 @@ void VulkanCommandBuffer::CmdDrawIndexed(const ReferencePointer<class VertexArra
   vkCmdDrawIndexed(m_CommandBuffer, static_cast<uint32_t>(vertexArray->GetIndexBuffer()->GetCount()), 1, 0, 0, 0);
 }
 
-void VulkanCommandBuffer::CmdSetViewport(const ReferencePointer<SwapChain>& swapChain, uint32_t width, uint32_t height) {
+void VulkanCommandBuffer::CmdSetViewport(uint32_t width, uint32_t height) {
   ZoneScoped;
 
-  auto swapChainExtent = std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)->GetExtent();
+  auto swapChainExtent = m_Window->GetSurfaceAttachment<VulkanSurfaceAttachment>()->GetExtent();
 
   float viewportWidth = static_cast<float>(width);
   float viewportHeight = static_cast<float>(height);
@@ -147,11 +150,11 @@ void VulkanCommandBuffer::CmdSetViewport(const ReferencePointer<SwapChain>& swap
   vkCmdSetViewport(m_CommandBuffer, 0, 1, &viewport);
 }
 
-void VulkanCommandBuffer::CmdSetScissor(const ReferencePointer<SwapChain>& swapChain, int offsetX, int offsetY) {
+void VulkanCommandBuffer::CmdSetScissor(int offsetX, int offsetY) {
   ZoneScoped;
   VkRect2D scissor{};
   scissor.offset = {offsetX, offsetY};
-  scissor.extent = std::dynamic_pointer_cast<VulkanSwapChain>(swapChain)->GetExtent();
+  scissor.extent = m_Window->GetSurfaceAttachment<VulkanSurfaceAttachment>()->GetExtent();
   vkCmdSetScissor(m_CommandBuffer, 0, 1, &scissor);
 }
 

@@ -19,16 +19,16 @@ void MeshAsset::Load(const std::filesystem::path& filepath) {
   HY_LOG_INFO("Finished loading mesh asset '{}'!", filepath.string());
 }
 
-void MeshAsset::Spawn(const ReferencePointer<class RenderDevice>& renderDevice, const ScopePointer<Scene>& scene, const String& name) {
+void MeshAsset::Spawn(const ReferencePointer<class RenderWindow>& window, const ScopePointer<Scene>& scene, const String& name) {
   // HY_ASSERT(m_Scene, "MeshAsset not yet loaded!");
   Assimp::Importer importer;
   m_Scene = importer.ReadFile(m_Filepath.string(), aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
   HY_ASSERT((m_Scene && !(m_Scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) && m_Scene->mRootNode), "Failed to load mesh file {}", m_Filepath.string());
-  HandleNode(renderDevice, m_Scene->mRootNode, name, scene, Entity());
+  HandleNode(window, m_Scene->mRootNode, name, scene, Entity());
   importer.FreeScene();
 }
 
-void MeshAsset::HandleNode(const ReferencePointer<class RenderDevice>& renderDevice, aiNode* node, const String& name, const ScopePointer<Scene>& scene, Entity parent) {
+void MeshAsset::HandleNode(const ReferencePointer<class RenderWindow>& window, aiNode* node, const String& name, const ScopePointer<Scene>& scene, Entity parent) {
   Entity entity;
   // TODO: Set transform
 
@@ -44,14 +44,14 @@ void MeshAsset::HandleNode(const ReferencePointer<class RenderDevice>& renderDev
     aiMesh* currentMesh = m_Scene->mMeshes[node->mMeshes[i]];
 
     MeshRendererComponent::Mesh mesh;
-    mesh.VertexArray = CreateVertexArrayForMesh(renderDevice, currentMesh);
+    mesh.VertexArray = CreateVertexArrayForMesh(window, currentMesh);
 
     meshRenderer.Meshes.push_back(mesh);
 
     meshRenderer._Material.Shininess = 30.0f;
     if (currentMesh->mMaterialIndex >= 0) {
       aiMaterial* currentMaterial = m_Scene->mMaterials[currentMesh->mMaterialIndex];
-      meshRenderer._Material = LoadMaterial(renderDevice, currentMaterial);
+      meshRenderer._Material = LoadMaterial(window, currentMaterial);
     }
   }
 
@@ -60,11 +60,11 @@ void MeshAsset::HandleNode(const ReferencePointer<class RenderDevice>& renderDev
   }
 
   for (uint32_t i = 0; i < node->mNumChildren; i++) {
-    HandleNode(renderDevice, node->mChildren[i], name, scene, entity);
+    HandleNode(window, node->mChildren[i], name, scene, entity);
   }
 }
 
-ReferencePointer<VertexArray> MeshAsset::CreateVertexArrayForMesh(const ReferencePointer<RenderDevice>& renderDevice, aiMesh* mesh) {
+ReferencePointer<VertexArray> MeshAsset::CreateVertexArrayForMesh(const ReferencePointer<class RenderWindow>& window, aiMesh* mesh) {
   aiVector3D* vertices = mesh->mVertices;
   aiVector3D* normals = mesh->mNormals;
   aiVector3D** texCoords = mesh->mTextureCoords;
@@ -91,9 +91,9 @@ ReferencePointer<VertexArray> MeshAsset::CreateVertexArrayForMesh(const Referenc
     }
   }
 
-  auto vertexBuffer = VertexBuffer::Create(renderDevice, vertexData.data(), vertexData.size() * sizeof(float));
+  auto vertexBuffer = VertexBuffer::Create(window, vertexData.data(), vertexData.size() * sizeof(float));
   vertexBuffer->SetLayout({{ShaderDataType::Float3, "Position", false}, {ShaderDataType::Float3, "Normal", false}, {ShaderDataType::Float2, "TexCoords", false}});
-  auto indexBuffer = IndexBuffer::Create(renderDevice, indexData.data(), indexData.size() * sizeof(uint32_t));
+  auto indexBuffer = IndexBuffer::Create(window, indexData.data(), indexData.size() * sizeof(uint32_t));
   auto vertexArray = VertexArray::Create();
   vertexArray->AddVertexBuffer(vertexBuffer);
   vertexArray->SetIndexBuffer(indexBuffer);
@@ -101,19 +101,19 @@ ReferencePointer<VertexArray> MeshAsset::CreateVertexArrayForMesh(const Referenc
   return vertexArray;
 }
 
-MeshRendererComponent::Material MeshAsset::LoadMaterial(const ReferencePointer<RenderDevice>& renderDevice, aiMaterial* material) {
+MeshRendererComponent::Material MeshAsset::LoadMaterial(const ReferencePointer<RenderWindow>& window, aiMaterial* material) {
   MeshRendererComponent::Material result;
 
   for (uint32_t i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); i++) {
     aiString str;
     material->GetTexture(aiTextureType_DIFFUSE, i, &str);
-    result.DiffuseMaps.push_back(AssetManager::Get<SpriteAsset>(str.C_Str())->CreateTexture2D(renderDevice));
+    result.DiffuseMaps.push_back(AssetManager::Get<SpriteAsset>(str.C_Str())->CreateTexture2D(window));
   }
 
   for (uint32_t i = 0; i < material->GetTextureCount(aiTextureType_SPECULAR); i++) {
     aiString str;
     material->GetTexture(aiTextureType_SPECULAR, i, &str);
-    result.SpecularMaps.push_back(AssetManager::Get<SpriteAsset>(str.C_Str())->CreateTexture2D(renderDevice));
+    result.SpecularMaps.push_back(AssetManager::Get<SpriteAsset>(str.C_Str())->CreateTexture2D(window));
   }
 
   return result;

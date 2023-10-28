@@ -124,12 +124,12 @@ void WindowsWindow::UpdateImGuiPlatformWindows() {
   // }
 }
 
-const DynamicArray<char*> WindowsWindow::GetVulkanWindowExtensions() {
+const DynamicArray<const char*> WindowsWindow::GetVulkanWindowExtensions() {
   uint32_t glfwExtensionCount = 0;
   const char** glfwExtensions;
   glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
-  DynamicArray<char*> result;
+  DynamicArray<const char*> result;
   result.reserve(glfwExtensionCount);
   for (uint32_t i = 0; i < glfwExtensionCount; i++) {
     result.push_back((char*)glfwExtensions[i]);

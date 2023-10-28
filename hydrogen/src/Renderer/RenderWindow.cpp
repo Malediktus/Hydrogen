@@ -10,3 +10,5 @@ RendererAPI::API RenderWindow::ChooseRenderingAPI(bool vulkanAvailable) {
   RendererAPI::SetAPI(api);
   return api;
 }
+
+void RenderWindow::InitRenderSurface() { m_SurfaceAttachment = SurfaceAttachment::Create(this, false); }

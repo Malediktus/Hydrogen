@@ -2,7 +2,7 @@
 
 #include <vulkan/vulkan.h>
 
-#include "../../Renderer/SwapChain.hpp"
+#include "../../Renderer/SurfaceAttachment.hpp"
 #include "VulkanRenderDevice.hpp"
 
 namespace Hydrogen::Vulkan {
@@ -12,12 +12,10 @@ struct SwapChainSupportDetails {
   DynamicArray<VkPresentModeKHR> PresentModes;
 };
 
-class VulkanSwapChain : public SwapChain {
+class VulkanSurfaceAttachment : public SurfaceAttachment {
  public:
-  VulkanSwapChain(const ReferencePointer<class RenderWindow>& window, const ReferencePointer<class RenderDevice>& renderDevice, bool verticalSync);
-  virtual ~VulkanSwapChain();
-
-  virtual void AcquireNextImage(const ReferencePointer<class CommandBuffer>& commandBuffer) override;
+  VulkanSurfaceAttachment(RenderWindow* window, bool verticalSync);
+  virtual ~VulkanSurfaceAttachment();
 
   static SwapChainSupportDetails QuerySwapChainSupportDetails(VkPhysicalDevice device, const ReferencePointer<class RenderWindow>& window);
   static SwapChainSupportDetails QuerySwapChainSupportDetails(VkPhysicalDevice device, VkSurfaceKHR surface);
@@ -34,6 +32,9 @@ class VulkanSwapChain : public SwapChain {
 
   VkImageView GetDepthImageView() { return m_DepthImageView; }
 
+  const DynamicArray<VkFramebuffer>& GetFramebuffers() { return m_Framebuffers; }
+  VkRenderPass GetRenderPass() { return m_RenderPass; }
+
  private:
   void FindPresentQueueFamily();
   void CreateSwapChain(SwapChainSupportDetails swapChainSupport, VkSurfaceFormatKHR surfaceFormat, VkPresentModeKHR presentMode, uint32_t imageCount);
@@ -43,8 +44,7 @@ class VulkanSwapChain : public SwapChain {
   VkPresentModeKHR ChooseSwapPresentMode(const DynamicArray<VkPresentModeKHR>& availablePresentModes, bool prefereVerticalSync);
   VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
-  ReferencePointer<class RenderWindow> m_RenderWindow;
-  ReferencePointer<class VulkanRenderDevice> m_RenderDevice;
+  RenderWindow* m_RenderWindow;
   VkQueueFamily m_PresentQueueFamily;
   VkQueue m_PresentQueue;
   VkSurfaceKHR m_WindowSurface;
@@ -57,5 +57,7 @@ class VulkanSwapChain : public SwapChain {
   VkImage m_DepthImage;
   VkDeviceMemory m_DepthImageMemory;
   VkImageView m_DepthImageView;
+  VkRenderPass m_RenderPass;
+  DynamicArray<VkFramebuffer> m_Framebuffers;
 };
 }  // namespace Hydrogen::Vulkan

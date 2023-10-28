@@ -38,10 +38,8 @@ class Renderer {
   static ReferencePointer<RenderDevice> s_RenderDevice;
   static uint32_t s_MaxFramesInFlight;
 
-  const ScopePointer<class Scene>& m_Scene;
   ReferencePointer<class RenderWindow> m_RenderWindow;
-  ReferencePointer<class SwapChain> m_SwapChain;
-  ReferencePointer<class Framebuffer> m_Framebuffer;
+  const ScopePointer<class Scene>& m_Scene;
   ReferencePointer<class Shader> m_Shader;
   DynamicArray<ReferencePointer<class CommandBuffer>> m_CommandBuffers;
   uint32_t m_CurrentFrame;

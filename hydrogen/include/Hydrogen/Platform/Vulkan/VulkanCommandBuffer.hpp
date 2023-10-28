@@ -10,7 +10,7 @@
 namespace Hydrogen::Vulkan {
 class VulkanCommandBuffer : public CommandBuffer {
  public:
-  VulkanCommandBuffer(const ReferencePointer<class RenderDevice>& renderDevice);
+  VulkanCommandBuffer(const ReferencePointer<class RenderWindow>& window);
   virtual ~VulkanCommandBuffer();
 
   virtual void Reset() override;
@@ -18,11 +18,11 @@ class VulkanCommandBuffer : public CommandBuffer {
   virtual void End() override;
 
   virtual void CmdUploadResources() override;
-  virtual void CmdDisplayImage(const ReferencePointer<class SwapChain> swapChain) override;
+  virtual void CmdDisplayImage() override;
   virtual void CmdDraw(const ReferencePointer<class VertexBuffer>& vertexBuffer) override;
   virtual void CmdDrawIndexed(const ReferencePointer<class VertexArray>& vertexArray) override;
-  virtual void CmdSetViewport(const ReferencePointer<class SwapChain>& swapChain, uint32_t width = UINT32_MAX, uint32_t height = UINT32_MAX) override;
-  virtual void CmdSetScissor(const ReferencePointer<class SwapChain>& swapChain, int offsetX = 0, int offsetY = 0) override;
+  virtual void CmdSetViewport(uint32_t width = UINT32_MAX, uint32_t height = UINT32_MAX) override;
+  virtual void CmdSetScissor(int offsetX = 0, int offsetY = 0) override;
   virtual void CmdDrawImGuiDrawData(const ReferencePointer<class Shader>& shader = nullptr) override;
 
   VkCommandBuffer GetCommandBuffer() { return m_CommandBuffer; }
@@ -33,7 +33,7 @@ class VulkanCommandBuffer : public CommandBuffer {
   uint32_t* GetImageIndexPointer() { return &m_ImageIndex; }
 
  private:
-  ReferencePointer<class VulkanRenderDevice> m_RenderDevice;
+  ReferencePointer<class RenderWindow> m_Window;
   VkCommandBuffer m_CommandBuffer;
   VkSemaphore m_ImageAvailableSemaphore;
   VkSemaphore m_RenderFinishedSemaphore;

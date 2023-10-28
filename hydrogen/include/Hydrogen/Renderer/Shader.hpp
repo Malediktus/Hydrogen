@@ -32,8 +32,7 @@ class Shader {
 
   virtual const String& GetName() const = 0;
 
-  static ReferencePointer<Shader> Create(const ReferencePointer<class RenderDevice>& renderDevice, const ReferencePointer<class SwapChain>& swapChain,
-                                         const ReferencePointer<class Framebuffer>& framebuffer, const class BufferLayout& vertexLayout, ShaderDependencyGraph dependencyGraph,
+  static ReferencePointer<Shader> Create(const ReferencePointer<class RenderWindow>& window, const class BufferLayout& vertexLayout, ShaderDependencyGraph dependencyGraph,
                                          const String& name, const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc,
                                          const DynamicArray<uint32_t>& geometrySrc);
 };
@@ -42,8 +41,7 @@ class ShaderLibrary {
  public:
   void Add(const String& name, const ReferencePointer<class Shader>& shader);
   void Add(const ReferencePointer<class Shader>& shader);
-  ReferencePointer<class Shader> Load(const ReferencePointer<class RenderDevice>& renderDevice, const ReferencePointer<class SwapChain>& swapChain,
-                                      const ReferencePointer<class Framebuffer>& framebuffer, const class BufferLayout& vertexLayout, ShaderDependencyGraph dependencyGraph,
+  ReferencePointer<class Shader> Load(const ReferencePointer<class RenderWindow>& window, const class BufferLayout& vertexLayout, ShaderDependencyGraph dependencyGraph,
                                       const String& name, const DynamicArray<uint32_t>& vertexSrc, const DynamicArray<uint32_t>& fragmentSrc,
                                       const DynamicArray<uint32_t>& geometrySrc);
 

@@ -4,16 +4,16 @@
 #include <Hydrogen/Core/Assert.hpp>
 #include <Hydrogen/Core/Base.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanFramebuffer.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanSurfaceAttachment.hpp>
+#include <Hydrogen/Renderer/RenderWindow.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen::Vulkan;
 
-VulkanRendererAPI::VulkanRendererAPI(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<Framebuffer>& framebuffer)
-    : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(renderDevice)), m_Framebuffer(std::dynamic_pointer_cast<VulkanFramebuffer>(framebuffer)) {}
+VulkanRendererAPI::VulkanRendererAPI(const ReferencePointer<class RenderWindow>& window) : m_Window(window) {}
 
 void VulkanRendererAPI::SetupImGui() {
   const auto& context = Renderer::GetContext<VulkanContext>();
@@ -37,19 +37,20 @@ void VulkanRendererAPI::SetupImGui() {
   createInfo.poolSizeCount = static_cast<uint32_t>(std::size(poolSizes));
   createInfo.pPoolSizes = poolSizes;
 
-  VK_CHECK_ERROR(vkCreateDescriptorPool(m_RenderDevice->GetDevice(), &createInfo, nullptr, &m_ImGuiPool), "Failed to create imgui descriptor pool");
+  VK_CHECK_ERROR(vkCreateDescriptorPool(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &createInfo, nullptr, &m_ImGuiPool),
+                 "Failed to create imgui descriptor pool");
 
   ImGui_ImplVulkan_InitInfo initInfo = {};
   initInfo.Instance = context->GetInstance();
-  initInfo.PhysicalDevice = m_RenderDevice->GetPhysicalDevice();
-  initInfo.Device = m_RenderDevice->GetDevice();
-  initInfo.Queue = m_RenderDevice->GetGraphicsQueue();
+  initInfo.PhysicalDevice = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetPhysicalDevice();
+  initInfo.Device = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice();
+  initInfo.Queue = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetGraphicsQueue();
   initInfo.DescriptorPool = m_ImGuiPool;
   initInfo.MinImageCount = 3;
   initInfo.ImageCount = 3;
   initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
-  ImGui_ImplVulkan_Init(&initInfo, m_Framebuffer->GetRenderPass());
+  ImGui_ImplVulkan_Init(&initInfo, m_Window->GetSurfaceAttachment<VulkanSurfaceAttachment>()->GetRenderPass());
 
   // Upload fonts and textures to gpu
   VkFence uploadFence;
@@ -58,15 +59,15 @@ void VulkanRendererAPI::SetupImGui() {
   VkFenceCreateInfo fenceInfo{};
   fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 
-  VK_CHECK_ERROR(vkCreateFence(m_RenderDevice->GetDevice(), &fenceInfo, nullptr, &uploadFence), "Failed to create vulkan fence!");
+  VK_CHECK_ERROR(vkCreateFence(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &fenceInfo, nullptr, &uploadFence), "Failed to create vulkan fence!");
 
   VkCommandBufferAllocateInfo allocInfo{};
   allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-  allocInfo.commandPool = m_RenderDevice->GetCommandPool();
+  allocInfo.commandPool = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetCommandPool();
   allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
   allocInfo.commandBufferCount = 1;
 
-  VK_CHECK_ERROR(vkAllocateCommandBuffers(m_RenderDevice->GetDevice(), &allocInfo, &commandBuffer), "Failed to allocate vulkan command buffer!");
+  VK_CHECK_ERROR(vkAllocateCommandBuffers(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &allocInfo, &commandBuffer), "Failed to allocate vulkan command buffer!");
 
   VkCommandBufferBeginInfo beginInfo{};
   beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -91,13 +92,13 @@ void VulkanRendererAPI::SetupImGui() {
   submitInfo.signalSemaphoreCount = 0;
   submitInfo.pSignalSemaphores = nullptr;
 
-  VK_CHECK_ERROR(vkQueueSubmit(m_RenderDevice->GetGraphicsQueue(), 1, &submitInfo, uploadFence), "Failed to submit to vulkan graphics queue!");
+  VK_CHECK_ERROR(vkQueueSubmit(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetGraphicsQueue(), 1, &submitInfo, uploadFence), "Failed to submit to vulkan graphics queue!");
 
-  vkWaitForFences(m_RenderDevice->GetDevice(), 1, &uploadFence, true, 9999999999);
-  vkResetFences(m_RenderDevice->GetDevice(), 1, &uploadFence);
+  vkWaitForFences(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), 1, &uploadFence, true, 9999999999);
+  vkResetFences(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), 1, &uploadFence);
 
-  vkDestroyFence(m_RenderDevice->GetDevice(), uploadFence, nullptr);
-  vkFreeCommandBuffers(m_RenderDevice->GetDevice(), m_RenderDevice->GetCommandPool(), 1, &commandBuffer);
+  vkDestroyFence(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), uploadFence, nullptr);
+  vkFreeCommandBuffers(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), Renderer::GetRenderDevice<VulkanRenderDevice>()->GetCommandPool(), 1, &commandBuffer);
 
   // Free fonts and textures from cpu memory
   ImGui_ImplVulkan_DestroyFontUploadObjects();
@@ -106,6 +107,6 @@ void VulkanRendererAPI::SetupImGui() {
 void VulkanRendererAPI::ImGuiNewFrame() { ImGui_ImplVulkan_NewFrame(); }
 
 void VulkanRendererAPI::DestroyImGui() {
-  vkDestroyDescriptorPool(m_RenderDevice->GetDevice(), m_ImGuiPool, nullptr);
+  vkDestroyDescriptorPool(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_ImGuiPool, nullptr);
   ImGui_ImplVulkan_Shutdown();
 }

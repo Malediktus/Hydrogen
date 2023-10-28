@@ -37,7 +37,7 @@ class MacOSWindow : public Window {
   void UpdateImGuiPlatformWindows() override;
 
   void* GetWindowOpenGLProcAddress() override;
-  const DynamicArray<char*> GetVulkanWindowExtensions() override;
+  const DynamicArray<const char*> GetVulkanWindowExtensions() override;
   void* GetVulkanWindowSurface() override;
 
  private:

@@ -20,7 +20,7 @@ class MeshAsset : public Asset {
   }
 
   void Load(const std::filesystem::path& filepath) override;
-  void Spawn(const ReferencePointer<class RenderDevice>& renderDevice, const ScopePointer<class Scene>& scene, const String& name);
+  void Spawn(const ReferencePointer<class RenderWindow>& window, const ScopePointer<class Scene>& scene, const String& name);
 
   static const DynamicArray<String> GetFileExtensions() { return DynamicArray<String>{".obj", ".fbx"}; }
 
@@ -30,9 +30,9 @@ class MeshAsset : public Asset {
   }
 
  private:
-  void HandleNode(const ReferencePointer<class RenderDevice>& renderDevice, aiNode* node, const String& name, const ScopePointer<Scene>& scene, class Entity parent);
-  ReferencePointer<class VertexArray> CreateVertexArrayForMesh(const ReferencePointer<RenderDevice>& renderDevice, aiMesh* mesh);
-  MeshRendererComponent::Material LoadMaterial(const ReferencePointer<RenderDevice>& renderDevice, aiMaterial* material);
+  void HandleNode(const ReferencePointer<class RenderWindow>& window, aiNode* node, const String& name, const ScopePointer<Scene>& scene, class Entity parent);
+  ReferencePointer<class VertexArray> CreateVertexArrayForMesh(const ReferencePointer<class RenderWindow>& window, aiMesh* mesh);
+  MeshRendererComponent::Material LoadMaterial(const ReferencePointer<class RenderWindow>& window, aiMaterial* material);
 
   std::filesystem::path m_Filepath;
   const aiScene* m_Scene;

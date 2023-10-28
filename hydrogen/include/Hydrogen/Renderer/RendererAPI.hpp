@@ -16,7 +16,7 @@ class RendererAPI {
   inline static RendererAPI::API GetAPI() { return s_API; }
   inline static void SetAPI(RendererAPI::API api) { s_API = api; }
 
-  static ReferencePointer<RendererAPI> Create(const ReferencePointer<class RenderDevice>& renderDevice, const ReferencePointer<class Framebuffer>& framebuffer);
+  static ReferencePointer<RendererAPI> Create(const ReferencePointer<class RenderWindow>& window);
 
  private:
   static API s_API;

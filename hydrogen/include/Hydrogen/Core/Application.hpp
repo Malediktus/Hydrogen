@@ -25,7 +25,6 @@ class Application {
   ReferencePointer<Logger> Console;
   ReferencePointer<Window> AppWindow;
   ScopePointer<Scene> CurrentScene;
-  ReferencePointer<RenderDevice> MainRenderDevice;
   struct _ApplicationInfo {
     String Name;
     Vector3 Version;

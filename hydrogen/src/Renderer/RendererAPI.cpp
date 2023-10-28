@@ -8,11 +8,11 @@ using namespace Hydrogen;
 
 RendererAPI::API RendererAPI::s_API = RendererAPI::API::OpenGL;
 
-ReferencePointer<RendererAPI> RendererAPI::Create(const ReferencePointer<RenderDevice>& renderDevice, const ReferencePointer<Framebuffer>& framebuffer) {
+ReferencePointer<RendererAPI> RendererAPI::Create(const ReferencePointer<class RenderWindow>& window) {
   ZoneScoped;
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
-      return NewReferencePointer<Vulkan::VulkanRendererAPI>(renderDevice, framebuffer);
+      return NewReferencePointer<Vulkan::VulkanRendererAPI>(window);
     default:
       HY_ASSERT_CHECK(false,
                       "Invalid renderer API value returned from "

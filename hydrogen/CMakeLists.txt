@@ -38,7 +38,6 @@ set(RENDERER_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/Buffer.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/Camera.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/Context.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/Framebuffer.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/RenderDevice.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/RendererAPI.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/RenderWindow.hpp"
@@ -47,17 +46,16 @@ set(RENDERER_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/VertexArray.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/Renderer.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/ShaderCompiler.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/SwapChain.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/SurfaceAttachment.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/CommandBuffer.hpp"
 )
 set(VULKAN_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanBuffer.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanContext.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanFramebuffer.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanShader.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanSurfaceAttachment.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanTexture.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanVertexArray.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp"
@@ -111,7 +109,6 @@ set(SCENE_SOURCES
 set(RENDERER_SOURCES
     src/Renderer/Buffer.cpp
     src/Renderer/Context.cpp
-    src/Renderer/Framebuffer.cpp
     src/Renderer/RenderDevice.cpp
     src/Renderer/RendererAPI.cpp
     src/Renderer/RenderWindow.cpp
@@ -120,17 +117,16 @@ set(RENDERER_SOURCES
     src/Renderer/VertexArray.cpp
     src/Renderer/Renderer.cpp
     src/Renderer/ShaderCompiler.cpp
-    src/Renderer/SwapChain.cpp
+    src/Renderer/SurfaceAttachment.cpp
     src/Renderer/CommandBuffer.cpp
 )
 set(VULKAN_SOURCES
     src/Platform/Vulkan/VulkanBuffer.cpp
     src/Platform/Vulkan/VulkanContext.cpp
-    src/Platform/Vulkan/VulkanFramebuffer.cpp
     src/Platform/Vulkan/VulkanRenderDevice.cpp
     src/Platform/Vulkan/VulkanRendererAPI.cpp
     src/Platform/Vulkan/VulkanShader.cpp
-    src/Platform/Vulkan/VulkanSwapChain.cpp
+    src/Platform/Vulkan/VulkanSurfaceAttachment.cpp
     src/Platform/Vulkan/VulkanTexture.cpp
     src/Platform/Vulkan/VulkanVertexArray.cpp
     src/Platform/Vulkan/VulkanCommandBuffer.cpp

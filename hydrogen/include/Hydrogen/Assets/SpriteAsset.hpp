@@ -19,7 +19,7 @@ class SpriteAsset : public Asset {
   }
 
   void Load(const std::filesystem::path& filepath) override;
-  ReferencePointer<class Texture2D> CreateTexture2D(const ReferencePointer<class RenderDevice>& renderDevice);
+  ReferencePointer<class Texture2D> CreateTexture2D(const ReferencePointer<class RenderWindow>& window);
 
   static const DynamicArray<String> GetFileExtensions() { return DynamicArray<String>{".jpg", ".jpeg", ".png", ".tga", ".bmp", ".psd", ".gif", ".hdr", ".pic", ".pnm"}; }
 

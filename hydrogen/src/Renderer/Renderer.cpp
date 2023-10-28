@@ -1,12 +1,11 @@
 #include <Hydrogen/Assets/AssetManager.hpp>
 #include <Hydrogen/Renderer/Buffer.hpp>
 #include <Hydrogen/Renderer/CommandBuffer.hpp>
-#include <Hydrogen/Renderer/Framebuffer.hpp>
 #include <Hydrogen/Renderer/RenderDevice.hpp>
 #include <Hydrogen/Renderer/RenderWindow.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <Hydrogen/Renderer/Shader.hpp>
-#include <Hydrogen/Renderer/SwapChain.hpp>
+#include <Hydrogen/Renderer/SurfaceAttachment.hpp>
 #include <Hydrogen/Renderer/VertexArray.hpp>
 #include <Hydrogen/Scene/Components.hpp>
 #include <Hydrogen/Scene/Scene.hpp>
@@ -39,12 +38,10 @@ uint32_t Renderer::s_MaxFramesInFlight = MAX_FRAMES_IN_FLIGHT;
 Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ScopePointer<class Scene>& scene) : m_RenderWindow(window), m_Scene(scene) {
   ZoneScoped;
 
-  m_SwapChain = SwapChain::Create(window, s_RenderDevice, true);
-  m_Framebuffer = Framebuffer::Create(s_RenderDevice, m_SwapChain);
-  m_WhiteTexture = AssetManager::Get<SpriteAsset>("assets/Textures/WhiteTexture.png")->CreateTexture2D(s_RenderDevice);
-  m_UniformBuffer = UniformBuffer::Create(s_RenderDevice, sizeof(UniformBufferObject));
+  m_WhiteTexture = AssetManager::Get<SpriteAsset>("assets/Textures/WhiteTexture.png")->CreateTexture2D(window);
+  m_UniformBuffer = UniformBuffer::Create(window, sizeof(UniformBufferObject));
 
-  m_LightBuffer = UniformBuffer::Create(s_RenderDevice, sizeof(LightData));
+  m_LightBuffer = UniformBuffer::Create(window, sizeof(LightData));
 
   ShaderDependency uniformBuffer{};
   uniformBuffer.Type = ShaderDependencyType::UniformBuffer;
@@ -66,14 +63,14 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ScopePoin
   specularTexture.Stage = ShaderStage::PixelShader;
   specularTexture.Location = 3;
 
-  m_Shader = AssetManager::Get<ShaderAsset>("assets/Raw.glsl")
-                 ->CreateShader(s_RenderDevice, m_SwapChain, m_Framebuffer,
-                                {{ShaderDataType::Float3, "Position", false}, {ShaderDataType::Float3, "Normal", false}, {ShaderDataType::Float2, "TexCoords", false}},
-                                {uniformBuffer, lightBuffer, diffuseTexture, specularTexture});
+  m_Shader =
+      AssetManager::Get<ShaderAsset>("assets/Raw.glsl")
+          ->CreateShader(m_RenderWindow, {{ShaderDataType::Float3, "Position", false}, {ShaderDataType::Float3, "Normal", false}, {ShaderDataType::Float2, "TexCoords", false}},
+                         {uniformBuffer, lightBuffer, diffuseTexture, specularTexture});
 
   m_CommandBuffers.resize(s_MaxFramesInFlight);
   for (uint32_t i = 0; i < s_MaxFramesInFlight; i++) {
-    m_CommandBuffers[i] = CommandBuffer::Create(s_RenderDevice);
+    m_CommandBuffers[i] = CommandBuffer::Create(m_RenderWindow);
   }
 
   LightData lightData{};
@@ -96,7 +93,7 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ScopePoin
 Renderer::~Renderer() { s_RenderDevice->WaitForIdle(); }
 
 void Renderer::Render() {
-  static auto startTime = std::chrono::high_resolution_clock::now();
+  /*static auto startTime = std::chrono::high_resolution_clock::now();
 
   auto currentTime = std::chrono::high_resolution_clock::now();
   float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
@@ -175,7 +172,7 @@ void Renderer::Render() {
   commandBuffer->CmdUploadResources();
   commandBuffer->CmdDisplayImage(m_SwapChain);
 
-  m_CurrentFrame = (m_CurrentFrame + 1) % s_MaxFramesInFlight;
+  m_CurrentFrame = (m_CurrentFrame + 1) % s_MaxFramesInFlight;*/
 }
 
 void Renderer::RenderMesh(const ReferencePointer<CommandBuffer>& commandBuffer, const ReferencePointer<class VertexArray>& vertexArray) {

@@ -3,7 +3,7 @@
 #include <Hydrogen/Core/Window.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanSwapChain.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanSurfaceAttachment.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <set>
 #include <tracy/Tracy.hpp>
@@ -33,7 +33,7 @@ VulkanRenderDevice::~VulkanRenderDevice() {
 bool VulkanRenderDevice::ScreenSupported(const ReferencePointer<RenderWindow>& window) {
   HY_ASSERT(m_PhysicalDevice, "Constructor must be called before VulkanRenderDevice::ScreenSupported!")
 
-  SwapChainSupportDetails swapChainSupport = VulkanSwapChain::QuerySwapChainSupportDetails(m_PhysicalDevice, window);
+  SwapChainSupportDetails swapChainSupport = VulkanSurfaceAttachment::QuerySwapChainSupportDetails(m_PhysicalDevice, window);
   VkQueueFamily presentFamily = VkQueueFamily();
 
   uint32_t queueFamilyCount = 0;
@@ -54,7 +54,8 @@ bool VulkanRenderDevice::ScreenSupported(const ReferencePointer<RenderWindow>& w
 
 void VulkanRenderDevice::WaitForIdle() { vkDeviceWaitIdle(m_Device); }
 
-void VulkanRenderDevice::PickPhysicalDevice(const DynamicArray<char*>& requiredExtensions, const std::function<std::size_t(const RenderDeviceProperties&)>& deviceRateFunction) {
+void VulkanRenderDevice::PickPhysicalDevice(const DynamicArray<const char*>& requiredExtensions,
+                                            const std::function<std::size_t(const RenderDeviceProperties&)>& deviceRateFunction) {
   auto instance = Renderer::GetContext<VulkanContext>()->GetInstance();
 
   uint32_t deviceCount = 0;
@@ -129,7 +130,7 @@ void VulkanRenderDevice::PopulateRenderDeviceProperties(RenderDeviceProperties& 
   }
 }
 
-void VulkanRenderDevice::CreateLogicalDevice(const DynamicArray<char*>& requiredExtensions, const DynamicArray<char*>& validationLayers) {
+void VulkanRenderDevice::CreateLogicalDevice(const DynamicArray<const char*>& requiredExtensions, const DynamicArray<const char*>& validationLayers) {
   float queuePriority = 1.0f;
 
   VkDeviceQueueCreateInfo graphicsQueueCreateInfo{};
@@ -205,7 +206,7 @@ VkQueueFamily VulkanRenderDevice::FindTransferQueueFamily(VkPhysicalDevice devic
   return VkQueueFamily();
 }
 
-bool VulkanRenderDevice::CheckDeviceExtensionSupport(VkPhysicalDevice device, const DynamicArray<char*>& deviceExtensions) {
+bool VulkanRenderDevice::CheckDeviceExtensionSupport(VkPhysicalDevice device, const DynamicArray<const char*>& deviceExtensions) {
   uint32_t extensionCount;
   vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
 

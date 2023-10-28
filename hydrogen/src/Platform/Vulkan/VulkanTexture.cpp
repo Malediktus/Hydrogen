@@ -2,6 +2,7 @@
 #include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanTexture.hpp>
+#include <Hydrogen/Renderer/Renderer.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen::Vulkan;
@@ -21,17 +22,17 @@ uint32_t FindMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, Vk
 }
 }  // namespace Hydrogen::Vulkan::Utils
 
-VulkanTexture2D::VulkanTexture2D(const ReferencePointer<RenderDevice>& device, const uint32_t width, const uint32_t height, const void* data)
-    : m_RenderDevice(std::dynamic_pointer_cast<VulkanRenderDevice>(device)), m_Width(width), m_Height(height) {
+VulkanTexture2D::VulkanTexture2D(const ReferencePointer<RenderWindow>& window, const uint32_t width, const uint32_t height, const void* data)
+    : m_Width(width), m_Height(height), m_Window(window) {
   ZoneScoped;
   VkDeviceSize imageSize = width * height * 4;
 
-  VulkanBuffer stagingBuffer(m_RenderDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+  VulkanBuffer stagingBuffer(window, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
   void* mappedMemory;
-  vkMapMemory(m_RenderDevice->GetDevice(), stagingBuffer.GetBufferMemory(), 0, imageSize, 0, &mappedMemory);
+  vkMapMemory(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), stagingBuffer.GetBufferMemory(), 0, imageSize, 0, &mappedMemory);
   memcpy(mappedMemory, data, static_cast<size_t>(imageSize));
-  vkUnmapMemory(m_RenderDevice->GetDevice(), stagingBuffer.GetBufferMemory());
+  vkUnmapMemory(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), stagingBuffer.GetBufferMemory());
 
   VkImageCreateInfo imageInfo{};
   imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -49,28 +50,30 @@ VulkanTexture2D::VulkanTexture2D(const ReferencePointer<RenderDevice>& device, c
   imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
   imageInfo.flags = 0;  // Optional
 
-  VK_CHECK_ERROR(vkCreateImage(m_RenderDevice->GetDevice(), &imageInfo, nullptr, &m_Image), "Failed to create vulkan image!");
+  VK_CHECK_ERROR(vkCreateImage(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &imageInfo, nullptr, &m_Image), "Failed to create vulkan image!");
 
   VkMemoryRequirements memRequirements;
-  vkGetImageMemoryRequirements(m_RenderDevice->GetDevice(), m_Image, &memRequirements);
+  vkGetImageMemoryRequirements(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_Image, &memRequirements);
 
   VkMemoryAllocateInfo allocInfo{};
   allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
   allocInfo.allocationSize = memRequirements.size;
-  allocInfo.memoryTypeIndex = Utils::FindMemoryType(m_RenderDevice->GetPhysicalDevice(), memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+  allocInfo.memoryTypeIndex =
+      Utils::FindMemoryType(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetPhysicalDevice(), memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-  VK_CHECK_ERROR(vkAllocateMemory(m_RenderDevice->GetDevice(), &allocInfo, nullptr, &m_ImageMemory), "Failed to allocate vulkan memory!");
+  VK_CHECK_ERROR(vkAllocateMemory(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &allocInfo, nullptr, &m_ImageMemory), "Failed to allocate vulkan memory!");
 
-  vkBindImageMemory(m_RenderDevice->GetDevice(), m_Image, m_ImageMemory, 0);
+  vkBindImageMemory(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_Image, m_ImageMemory, 0);
 
   VkCommandBufferAllocateInfo commandBufferAllocInfo{};
   commandBufferAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
   commandBufferAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-  commandBufferAllocInfo.commandPool = m_RenderDevice->GetCommandPool();
+  commandBufferAllocInfo.commandPool = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetCommandPool();
   commandBufferAllocInfo.commandBufferCount = 1;
 
   VkCommandBuffer commandBuffer;
-  VK_CHECK_ERROR(vkAllocateCommandBuffers(m_RenderDevice->GetDevice(), &commandBufferAllocInfo, &commandBuffer), "Failed to allocate vulkan command buffer!");
+  VK_CHECK_ERROR(vkAllocateCommandBuffers(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &commandBufferAllocInfo, &commandBuffer),
+                 "Failed to allocate vulkan command buffer!");
 
   VkCommandBufferBeginInfo beginInfo{};
   beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -104,10 +107,10 @@ VulkanTexture2D::VulkanTexture2D(const ReferencePointer<RenderDevice>& device, c
   submitInfo.commandBufferCount = 1;
   submitInfo.pCommandBuffers = &commandBuffer;
 
-  VK_CHECK_ERROR(vkQueueSubmit(m_RenderDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE), "Failed to submit vulkan graphics queue!");
-  VK_CHECK_ERROR(vkQueueWaitIdle(m_RenderDevice->GetGraphicsQueue()), "Failed to wait for vulkan graphics queue idle!");
+  VK_CHECK_ERROR(vkQueueSubmit(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE), "Failed to submit vulkan graphics queue!");
+  VK_CHECK_ERROR(vkQueueWaitIdle(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetGraphicsQueue()), "Failed to wait for vulkan graphics queue idle!");
 
-  vkFreeCommandBuffers(m_RenderDevice->GetDevice(), m_RenderDevice->GetCommandPool(), 1, &commandBuffer);
+  vkFreeCommandBuffers(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), Renderer::GetRenderDevice<VulkanRenderDevice>()->GetCommandPool(), 1, &commandBuffer);
 
   VkImageViewCreateInfo viewInfo{};
   viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -120,7 +123,7 @@ VulkanTexture2D::VulkanTexture2D(const ReferencePointer<RenderDevice>& device, c
   viewInfo.subresourceRange.baseArrayLayer = 0;
   viewInfo.subresourceRange.layerCount = 1;
 
-  VK_CHECK_ERROR(vkCreateImageView(m_RenderDevice->GetDevice(), &viewInfo, nullptr, &m_ImageView), "Failed to create vulkan image view!");
+  VK_CHECK_ERROR(vkCreateImageView(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &viewInfo, nullptr, &m_ImageView), "Failed to create vulkan image view!");
 
   VkSamplerCreateInfo samplerInfo{};
   samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -132,7 +135,7 @@ VulkanTexture2D::VulkanTexture2D(const ReferencePointer<RenderDevice>& device, c
   samplerInfo.anisotropyEnable = VK_TRUE;
 
   VkPhysicalDeviceProperties properties{};
-  vkGetPhysicalDeviceProperties(m_RenderDevice->GetPhysicalDevice(), &properties);
+  vkGetPhysicalDeviceProperties(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetPhysicalDevice(), &properties);
   samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
   samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
   samplerInfo.unnormalizedCoordinates = VK_FALSE;
@@ -143,16 +146,16 @@ VulkanTexture2D::VulkanTexture2D(const ReferencePointer<RenderDevice>& device, c
   samplerInfo.minLod = 0.0f;
   samplerInfo.maxLod = 0.0f;
 
-  VK_CHECK_ERROR(vkCreateSampler(m_RenderDevice->GetDevice(), &samplerInfo, nullptr, &m_Sampler), "Failed to create vulkan sampler!");
+  VK_CHECK_ERROR(vkCreateSampler(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), &samplerInfo, nullptr, &m_Sampler), "Failed to create vulkan sampler!");
 }
 
 VulkanTexture2D::~VulkanTexture2D() {
   ZoneScoped;
 
-  vkDestroySampler(m_RenderDevice->GetDevice(), m_Sampler, nullptr);
-  vkDestroyImageView(m_RenderDevice->GetDevice(), m_ImageView, nullptr);
-  vkDestroyImage(m_RenderDevice->GetDevice(), m_Image, nullptr);
-  vkFreeMemory(m_RenderDevice->GetDevice(), m_ImageMemory, nullptr);
+  vkDestroySampler(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_Sampler, nullptr);
+  vkDestroyImageView(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_ImageView, nullptr);
+  vkDestroyImage(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_Image, nullptr);
+  vkFreeMemory(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_ImageMemory, nullptr);
 }
 
 void VulkanTexture2D::TransitionImageLayout(VkCommandBuffer commandBuffer, VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {

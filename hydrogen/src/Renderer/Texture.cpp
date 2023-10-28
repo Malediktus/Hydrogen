@@ -6,11 +6,11 @@
 
 using namespace Hydrogen;
 
-ReferencePointer<Texture2D> Texture2D::Create(const ReferencePointer<RenderDevice>& device, const uint32_t width, const uint32_t height, const void* data) {
+ReferencePointer<Texture2D> Texture2D::Create(const ReferencePointer<class RenderWindow>& window, const uint32_t width, const uint32_t height, const void* data) {
   ZoneScoped;
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
-      return NewReferencePointer<Vulkan::VulkanTexture2D>(device, width, height, data);
+      return NewReferencePointer<Vulkan::VulkanTexture2D>(window, width, height, data);
     default:
       HY_ASSERT_CHECK(false,
                       "Invalid renderer API value returned from "

@@ -2,6 +2,7 @@
 #include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
+#include <Hydrogen/Renderer/Renderer.hpp>
 #include <tracy/Tracy.hpp>
 
 using namespace Hydrogen::Vulkan;
@@ -21,11 +22,10 @@ static uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags proper
 }
 }  // namespace Hydrogen::Vulkan::Utils
 
-VulkanBuffer::VulkanBuffer(ReferencePointer<VulkanRenderDevice> renderDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties)
-    : m_RenderDevice(renderDevice) {
+VulkanBuffer::VulkanBuffer(const ReferencePointer<class RenderWindow>& window, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties) : m_Window(window) {
   ZoneScoped;
 
-  auto device = renderDevice->GetDevice();
+  auto device = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice();
 
   VkBufferCreateInfo bufferInfo{};
   bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -41,7 +41,7 @@ VulkanBuffer::VulkanBuffer(ReferencePointer<VulkanRenderDevice> renderDevice, Vk
   VkMemoryAllocateInfo allocInfo{};
   allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
   allocInfo.allocationSize = memoryRequirements.size;
-  allocInfo.memoryTypeIndex = Utils::FindMemoryType(memoryRequirements.memoryTypeBits, properties, renderDevice->GetPhysicalDevice());
+  allocInfo.memoryTypeIndex = Utils::FindMemoryType(memoryRequirements.memoryTypeBits, properties, Renderer::GetRenderDevice<VulkanRenderDevice>()->GetPhysicalDevice());
 
   VK_CHECK_ERROR(vkAllocateMemory(device, &allocInfo, nullptr, &m_BufferMemory), "Failed to allocate buffer memory");
 
@@ -49,20 +49,17 @@ VulkanBuffer::VulkanBuffer(ReferencePointer<VulkanRenderDevice> renderDevice, Vk
 }
 
 VulkanBuffer::~VulkanBuffer() {
-  vkDestroyBuffer(m_RenderDevice->GetDevice(), m_Buffer, nullptr);
-  vkFreeMemory(m_RenderDevice->GetDevice(), m_BufferMemory, nullptr);
+  vkDestroyBuffer(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_Buffer, nullptr);
+  vkFreeMemory(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_BufferMemory, nullptr);
 }
 
-VulkanVertexBuffer::VulkanVertexBuffer(const ReferencePointer<RenderDevice>& device, float* vertices, size_t size)
-    : m_Size(size),
-      VulkanBuffer(std::dynamic_pointer_cast<VulkanRenderDevice>(device), size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                   VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) {
+VulkanVertexBuffer::VulkanVertexBuffer(const ReferencePointer<class RenderWindow>& window, float* vertices, size_t size)
+    : VulkanBuffer(window, size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT), m_Size(size) {
   ZoneScoped;
 
-  auto vulkanDevice = m_RenderDevice->GetDevice();
+  auto vulkanDevice = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice();
 
-  VulkanBuffer stagingBuffer(std::dynamic_pointer_cast<VulkanRenderDevice>(device), size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+  VulkanBuffer stagingBuffer(window, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
   void* data;
   vkMapMemory(vulkanDevice, stagingBuffer.GetBufferMemory(), 0, size, 0, &data);
@@ -72,7 +69,7 @@ VulkanVertexBuffer::VulkanVertexBuffer(const ReferencePointer<RenderDevice>& dev
   VkCommandBufferAllocateInfo allocInfo{};
   allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
   allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-  allocInfo.commandPool = m_RenderDevice->GetCommandPool();
+  allocInfo.commandPool = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetCommandPool();
   allocInfo.commandBufferCount = 1;
 
   VkCommandBuffer commandBuffer;
@@ -95,10 +92,10 @@ VulkanVertexBuffer::VulkanVertexBuffer(const ReferencePointer<RenderDevice>& dev
   submitInfo.commandBufferCount = 1;
   submitInfo.pCommandBuffers = &commandBuffer;
 
-  vkQueueSubmit(m_RenderDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-  vkQueueWaitIdle(m_RenderDevice->GetGraphicsQueue());
+  vkQueueSubmit(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+  vkQueueWaitIdle(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetGraphicsQueue());
 
-  vkFreeCommandBuffers(vulkanDevice, m_RenderDevice->GetCommandPool(), 1, &commandBuffer);
+  vkFreeCommandBuffers(vulkanDevice, Renderer::GetRenderDevice<VulkanRenderDevice>()->GetCommandPool(), 1, &commandBuffer);
 }
 
 VulkanVertexBuffer::~VulkanVertexBuffer() {}
@@ -110,16 +107,13 @@ void VulkanVertexBuffer::Bind(const ReferencePointer<CommandBuffer>& commandBuff
   vkCmdBindVertexBuffers(std::dynamic_pointer_cast<VulkanCommandBuffer>(commandBuffer)->GetCommandBuffer(), 0, 1, vertexBuffers, offsets);
 }
 
-VulkanIndexBuffer::VulkanIndexBuffer(const ReferencePointer<RenderDevice>& device, uint32_t* indices, size_t size)
-    : m_Count(size / sizeof(uint32_t)),
-      VulkanBuffer(std::dynamic_pointer_cast<VulkanRenderDevice>(device), size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                   VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) {
+VulkanIndexBuffer::VulkanIndexBuffer(const ReferencePointer<class RenderWindow>& window, uint32_t* indices, size_t size)
+    : VulkanBuffer(window, size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT), m_Count(size / sizeof(uint32_t)) {
   ZoneScoped;
 
-  auto vulkanDevice = m_RenderDevice->GetDevice();
+  auto vulkanDevice = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice();
 
-  VulkanBuffer stagingBuffer(std::dynamic_pointer_cast<VulkanRenderDevice>(device), size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+  VulkanBuffer stagingBuffer(window, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
   void* data;
   vkMapMemory(vulkanDevice, stagingBuffer.GetBufferMemory(), 0, size, 0, &data);
@@ -129,7 +123,7 @@ VulkanIndexBuffer::VulkanIndexBuffer(const ReferencePointer<RenderDevice>& devic
   VkCommandBufferAllocateInfo allocInfo{};
   allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
   allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-  allocInfo.commandPool = m_RenderDevice->GetCommandPool();
+  allocInfo.commandPool = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetCommandPool();
   allocInfo.commandBufferCount = 1;
 
   VkCommandBuffer commandBuffer;
@@ -152,10 +146,10 @@ VulkanIndexBuffer::VulkanIndexBuffer(const ReferencePointer<RenderDevice>& devic
   submitInfo.commandBufferCount = 1;
   submitInfo.pCommandBuffers = &commandBuffer;
 
-  vkQueueSubmit(m_RenderDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-  vkQueueWaitIdle(m_RenderDevice->GetGraphicsQueue());
+  vkQueueSubmit(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+  vkQueueWaitIdle(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetGraphicsQueue());
 
-  vkFreeCommandBuffers(vulkanDevice, m_RenderDevice->GetCommandPool(), 1, &commandBuffer);
+  vkFreeCommandBuffers(vulkanDevice, Renderer::GetRenderDevice<VulkanRenderDevice>()->GetCommandPool(), 1, &commandBuffer);
 }
 
 VulkanIndexBuffer::~VulkanIndexBuffer() { ZoneScoped; }
@@ -165,11 +159,9 @@ void VulkanIndexBuffer::Bind(const ReferencePointer<CommandBuffer>& commandBuffe
   vkCmdBindIndexBuffer(std::dynamic_pointer_cast<VulkanCommandBuffer>(commandBuffer)->GetCommandBuffer(), m_Buffer, 0, VK_INDEX_TYPE_UINT32);
 }
 
-VulkanUniformBuffer::VulkanUniformBuffer(const ReferencePointer<RenderDevice>& device, size_t size)
-    : VulkanBuffer(std::dynamic_pointer_cast<VulkanRenderDevice>(device), size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT),
-      m_Size(size) {
-  vkMapMemory(m_RenderDevice->GetDevice(), m_BufferMemory, 0, size, 0, &m_MappedMemory);
+VulkanUniformBuffer::VulkanUniformBuffer(const ReferencePointer<class RenderWindow>& window, size_t size)
+    : VulkanBuffer(window, size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT), m_Size(size) {
+  vkMapMemory(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_BufferMemory, 0, size, 0, &m_MappedMemory);
 }
 
 VulkanUniformBuffer::~VulkanUniformBuffer() {}

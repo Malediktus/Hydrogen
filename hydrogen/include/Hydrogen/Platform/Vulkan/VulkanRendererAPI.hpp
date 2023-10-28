@@ -7,7 +7,7 @@
 namespace Hydrogen::Vulkan {
 class VulkanRendererAPI : public RendererAPI {
  public:
-  VulkanRendererAPI(const ReferencePointer<class RenderDevice>& renderDevice, const ReferencePointer<class Framebuffer>& framebuffer);
+  VulkanRendererAPI(const ReferencePointer<class RenderWindow>& window);
   virtual ~VulkanRendererAPI() = default;
 
   virtual void SetupImGui() override;
@@ -15,8 +15,7 @@ class VulkanRendererAPI : public RendererAPI {
   virtual void DestroyImGui() override;
 
  private:
-  ReferencePointer<class VulkanRenderDevice> m_RenderDevice;
-  ReferencePointer<class VulkanFramebuffer> m_Framebuffer;
+  ReferencePointer<class RenderWindow> m_Window;
 
   VkDescriptorPool m_ImGuiPool;
 };

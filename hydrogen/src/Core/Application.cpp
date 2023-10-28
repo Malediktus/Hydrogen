@@ -6,7 +6,6 @@
 #include <Hydrogen/Core/Task.hpp>
 #include <Hydrogen/Core/Window.hpp>
 #include <Hydrogen/Renderer/Context.hpp>
-#include <Hydrogen/Renderer/Framebuffer.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <Hydrogen/Scene/Scene.hpp>
 
@@ -53,15 +52,17 @@ void Application::Run() {
     return result;
   }));
 
+  AppWindow->InitRenderSurface();
+
   CurrentScene = NewScopePointer<Scene>("Main Scene");
 
   auto test = AssetManager::Get<MeshAsset>("assets/Meshes/Backpack/Survival_BackPack_2.fbx");
-  test->Spawn(MainRenderDevice, CurrentScene, "Backpack");
+  test->Spawn(AppWindow, CurrentScene, "Backpack");
 
-  HY_ASSERT(!MainRenderDevice->ScreenSupported(AppWindow), "Screen is not supported!");  // TODO: Choose other graphics API or device
-  auto renderer = NewReferencePointer<Renderer>(AppWindow, MainRenderDevice, CurrentScene);
+  HY_ASSERT(!Renderer::GetRenderDevice<RenderDevice>()->ScreenSupported(AppWindow), "Screen is not supported!");  // TODO: Choose other graphics API or device
+  auto renderer = NewReferencePointer<Renderer>(AppWindow, CurrentScene);
 
-  auto rendererAPI = RendererAPI::Create(MainRenderDevice, renderer->GetFramebuffer());
+  auto rendererAPI = RendererAPI::Create(AppWindow);
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -106,14 +107,14 @@ void Application::Run() {
 
   OnShutdown();
 
-  MainRenderDevice->WaitForIdle();
+  Renderer::GetRenderDevice<RenderDevice>()->WaitForIdle();
 
   rendererAPI->DestroyImGui();
   AppWindow->DestroyImGui();
   ImGui::DestroyContext();
 
   // renderer.reset();
-  // MainRenderDevice.reset();
+  // Renderer::GetRenderDevice<RenderDevice>().reset();
   // Renderer::SetContext(nullptr);
 
   TaskManager::Shutdown();

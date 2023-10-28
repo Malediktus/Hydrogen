@@ -15,8 +15,7 @@ class ShaderAsset : public Asset {
   ShaderAsset() { m_AssetInfo.Preload = true; }
 
   void Load(const std::filesystem::path& filepath) override;
-  ReferencePointer<class Shader> CreateShader(const ReferencePointer<class RenderDevice>& renderDevice, const ReferencePointer<class SwapChain>& swapChain,
-                                              const ReferencePointer<class Framebuffer>& framebuffer, const class BufferLayout& vertexLayout,
+  ReferencePointer<class Shader> CreateShader(const ReferencePointer<class RenderWindow>& window, const class BufferLayout& vertexLayout,
                                               const struct ShaderDependencyGraph dependencyGraph);
 
   const DynamicArray<uint32_t>& GetVertexShader() { return m_VertexShader; }

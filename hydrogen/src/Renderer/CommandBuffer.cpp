@@ -6,11 +6,11 @@
 
 using namespace Hydrogen;
 
-ReferencePointer<CommandBuffer> CommandBuffer::Create(const ReferencePointer<RenderDevice>& renderDevice) {
+ReferencePointer<CommandBuffer> CommandBuffer::Create(const ReferencePointer<class RenderWindow>& window) {
   ZoneScoped;
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
-      return NewReferencePointer<Vulkan::VulkanCommandBuffer>(renderDevice);
+      return NewReferencePointer<Vulkan::VulkanCommandBuffer>(window);
     default:
       HY_ASSERT_CHECK(false,
                       "Invalid renderer API value returned from "
