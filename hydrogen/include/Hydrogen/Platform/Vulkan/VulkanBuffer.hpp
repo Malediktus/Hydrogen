@@ -24,7 +24,7 @@ class VulkanVertexBuffer : public VertexBuffer, public VulkanBuffer {
   VulkanVertexBuffer(const ReferencePointer<class RenderWindow>& window, float* vertices, size_t size);
   virtual ~VulkanVertexBuffer();
 
-  virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const override;
+  virtual void Bind() const override;
 
   virtual const BufferLayout& GetLayout() const override { return m_Layout; }
   virtual void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
@@ -42,7 +42,7 @@ class VulkanIndexBuffer : public IndexBuffer, public VulkanBuffer {
   VulkanIndexBuffer(const ReferencePointer<class RenderWindow>& window, uint32_t* indices, size_t size);
   virtual ~VulkanIndexBuffer();
 
-  virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const override;
+  virtual void Bind() const override;
 
   virtual size_t GetCount() const override { return m_Count; }
 

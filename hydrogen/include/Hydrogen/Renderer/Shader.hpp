@@ -28,7 +28,7 @@ class Shader {
 
   virtual void SetBuffer(const ReferencePointer<class UniformBuffer>& buffer, uint32_t location) = 0;
   virtual void SetTexture(const ReferencePointer<class Texture2D>& texture, uint32_t location) = 0;
-  virtual void Bind(const ReferencePointer<class CommandBuffer>& commandBuffer) const = 0;
+  virtual void Bind() const = 0;
 
   virtual const String& GetName() const = 0;
 

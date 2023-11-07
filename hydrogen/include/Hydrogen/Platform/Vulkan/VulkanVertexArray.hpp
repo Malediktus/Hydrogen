@@ -8,7 +8,7 @@ class VulkanVertexArray : public VertexArray {
   VulkanVertexArray();
   virtual ~VulkanVertexArray();
 
-  virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const override;
+  virtual void Bind() const override;
 
   virtual void AddVertexBuffer(const ReferencePointer<VertexBuffer>& vertexBuffer) override;
   virtual void SetIndexBuffer(const ReferencePointer<IndexBuffer>& indexBuffer) override;

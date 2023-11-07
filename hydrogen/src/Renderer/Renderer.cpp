@@ -1,6 +1,5 @@
 #include <Hydrogen/Assets/AssetManager.hpp>
 #include <Hydrogen/Renderer/Buffer.hpp>
-#include <Hydrogen/Renderer/CommandBuffer.hpp>
 #include <Hydrogen/Renderer/RenderDevice.hpp>
 #include <Hydrogen/Renderer/RenderWindow.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
@@ -68,11 +67,6 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ScopePoin
           ->CreateShader(m_RenderWindow, {{ShaderDataType::Float3, "Position", false}, {ShaderDataType::Float3, "Normal", false}, {ShaderDataType::Float2, "TexCoords", false}},
                          {uniformBuffer, lightBuffer, diffuseTexture, specularTexture});
 
-  m_CommandBuffers.resize(s_MaxFramesInFlight);
-  for (uint32_t i = 0; i < s_MaxFramesInFlight; i++) {
-    m_CommandBuffers[i] = CommandBuffer::Create(m_RenderWindow);
-  }
-
   LightData lightData{};
   lightData.LightPos = glm::vec3(1.2f, 1.0f, 2.0f);
   lightData.ViewPos = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -93,7 +87,7 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ScopePoin
 Renderer::~Renderer() { s_RenderDevice->WaitForIdle(); }
 
 void Renderer::Render() {
-  /*static auto startTime = std::chrono::high_resolution_clock::now();
+  static auto startTime = std::chrono::high_resolution_clock::now();
 
   auto currentTime = std::chrono::high_resolution_clock::now();
   float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
@@ -110,17 +104,11 @@ void Renderer::Render() {
 
   auto entities = m_Scene->GetEntities();
 
-  const auto& commandBuffer = m_CommandBuffers[m_CurrentFrame];
+  RendererAPI::Get()->BeginFrame();
+  m_Shader->Bind();
 
-  commandBuffer->Reset();
-  m_SwapChain->AcquireNextImage(commandBuffer);
-
-  commandBuffer->Begin();
-  m_Framebuffer->Begin({0.0f, 0.0f, 0.0f, 1.0f}, commandBuffer);
-  m_Shader->Bind(commandBuffer);
-
-  commandBuffer->CmdSetViewport(m_SwapChain);
-  commandBuffer->CmdSetScissor(m_SwapChain);
+  RendererAPI::Get()->SetViewport();
+  RendererAPI::Get()->SetScissor();
 
   for (auto& entity : entities) {
     if (entity.HasComponent<MeshRendererComponent>()) {
@@ -138,7 +126,7 @@ void Renderer::Render() {
           // m_Shader->SetTexture(m_WhiteTexture, 3);
         }
 
-        RenderMesh(commandBuffer, mesh.VertexArray);
+        RenderMesh(mesh.VertexArray);
       }
     }
 
@@ -159,23 +147,18 @@ void Renderer::Render() {
             // m_Shader->SetTexture(m_WhiteTexture, 3);
           }
 
-          RenderMesh(commandBuffer, mesh.VertexArray);
+          RenderMesh(mesh.VertexArray);
         }
       }
     }
   }
 
-  commandBuffer->CmdDrawImGuiDrawData();
-  m_Framebuffer->End(commandBuffer);
-  commandBuffer->End();
+  RendererAPI::Get()->EndFrame();
 
-  commandBuffer->CmdUploadResources();
-  commandBuffer->CmdDisplayImage(m_SwapChain);
-
-  m_CurrentFrame = (m_CurrentFrame + 1) % s_MaxFramesInFlight;*/
+  m_CurrentFrame = (m_CurrentFrame + 1) % s_MaxFramesInFlight;
 }
 
-void Renderer::RenderMesh(const ReferencePointer<CommandBuffer>& commandBuffer, const ReferencePointer<class VertexArray>& vertexArray) {
-  vertexArray->Bind(commandBuffer);
-  commandBuffer->CmdDrawIndexed(vertexArray);
+void Renderer::RenderMesh(const ReferencePointer<class VertexArray>& vertexArray) {
+  vertexArray->Bind();
+  RendererAPI::Get()->DrawIndexed(vertexArray);
 }

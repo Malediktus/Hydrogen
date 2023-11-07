@@ -7,7 +7,7 @@ class VertexArray {
  public:
   virtual ~VertexArray() = default;
 
-  virtual void Bind(const ReferencePointer<class CommandBuffer>& commandBuffer) const = 0;
+  virtual void Bind() const = 0;
 
   virtual void AddVertexBuffer(const ReferencePointer<class VertexBuffer>& vertexBuffer) = 0;
   virtual void SetIndexBuffer(const ReferencePointer<class IndexBuffer>& indexBuffer) = 0;

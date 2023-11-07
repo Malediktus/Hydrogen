@@ -47,7 +47,6 @@ set(RENDERER_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/Renderer.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/ShaderCompiler.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/SurfaceAttachment.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Renderer/CommandBuffer.hpp"
 )
 set(VULKAN_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanBuffer.hpp"
@@ -58,7 +57,6 @@ set(VULKAN_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanSurfaceAttachment.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanTexture.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanVertexArray.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp"
 )
 set(MACOS_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/Hydrogen/Platform/MacOS/MacOSWindow.hpp"
@@ -118,7 +116,6 @@ set(RENDERER_SOURCES
     src/Renderer/Renderer.cpp
     src/Renderer/ShaderCompiler.cpp
     src/Renderer/SurfaceAttachment.cpp
-    src/Renderer/CommandBuffer.cpp
 )
 set(VULKAN_SOURCES
     src/Platform/Vulkan/VulkanBuffer.cpp
@@ -129,7 +126,6 @@ set(VULKAN_SOURCES
     src/Platform/Vulkan/VulkanSurfaceAttachment.cpp
     src/Platform/Vulkan/VulkanTexture.cpp
     src/Platform/Vulkan/VulkanVertexArray.cpp
-    src/Platform/Vulkan/VulkanCommandBuffer.cpp
 )
 set(MACOS_SOURCES
     src/Platform/MacOS/MacOSWindow.cpp

@@ -9,13 +9,13 @@ VulkanVertexArray::VulkanVertexArray() { ZoneScoped; }
 
 VulkanVertexArray::~VulkanVertexArray() { ZoneScoped; }
 
-void VulkanVertexArray::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const {
+void VulkanVertexArray::Bind() const {
   ZoneScoped;
   HY_ASSERT(m_IndexBuffer, "No index buffer provided!");
   HY_ASSERT(m_VertexBuffers.size() != 0, "No vertex buffers provided!");
 
-  m_VertexBuffers[0]->Bind(commandBuffer);
-  m_IndexBuffer->Bind(commandBuffer);
+  m_VertexBuffers[0]->Bind();
+  m_IndexBuffer->Bind();
 }
 
 void VulkanVertexArray::AddVertexBuffer(const ReferencePointer<VertexBuffer>& vertexBuffer) {

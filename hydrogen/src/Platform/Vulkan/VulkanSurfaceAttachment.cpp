@@ -1,6 +1,5 @@
 #include <Hydrogen/Core/Base.hpp>
 #include <Hydrogen/Core/Window.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanContext.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanSurfaceAttachment.hpp>

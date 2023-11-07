@@ -118,7 +118,7 @@ class VertexBuffer {
  public:
   virtual ~VertexBuffer() = default;
 
-  virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const = 0;
+  virtual void Bind() const = 0;
 
   virtual const BufferLayout& GetLayout() const = 0;
   virtual void SetLayout(const BufferLayout& layout) = 0;
@@ -130,7 +130,7 @@ class IndexBuffer {
  public:
   virtual ~IndexBuffer() = default;
 
-  virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const = 0;
+  virtual void Bind() const = 0;
   virtual size_t GetCount() const = 0;
 
   static ReferencePointer<IndexBuffer> Create(const ReferencePointer<class RenderWindow>& window, uint32_t* indices, size_t size);

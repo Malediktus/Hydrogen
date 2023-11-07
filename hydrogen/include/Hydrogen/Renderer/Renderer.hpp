@@ -13,7 +13,7 @@ class Renderer {
   ~Renderer();
 
   void Render();
-  void RenderMesh(const ReferencePointer<class CommandBuffer>& commandBuffer, const ReferencePointer<class VertexArray>& vertexArray);
+  void RenderMesh(const ReferencePointer<class VertexArray>& vertexArray);
 
   inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
@@ -41,7 +41,6 @@ class Renderer {
   ReferencePointer<class RenderWindow> m_RenderWindow;
   const ScopePointer<class Scene>& m_Scene;
   ReferencePointer<class Shader> m_Shader;
-  DynamicArray<ReferencePointer<class CommandBuffer>> m_CommandBuffers;
   uint32_t m_CurrentFrame;
 
   ReferencePointer<class UniformBuffer> m_UniformBuffer;

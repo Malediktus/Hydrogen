@@ -1,6 +1,6 @@
 #include <Hydrogen/Core/Base.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanShader.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanSurfaceAttachment.hpp>
@@ -424,9 +424,9 @@ void VulkanShader::SetTexture(const ReferencePointer<class Texture2D>& texture, 
   vkUpdateDescriptorSets(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), 1, &descriptorWrite, 0, nullptr);
 }
 
-void VulkanShader::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const {
+void VulkanShader::Bind() const {
   ZoneScoped;
-  auto vulkanCommandBuffer = std::dynamic_pointer_cast<VulkanCommandBuffer>(commandBuffer)->GetCommandBuffer();
+  auto vulkanCommandBuffer = std::dynamic_pointer_cast<VulkanRendererAPI>(RendererAPI::Get())->GetCommandBuffer();
 
   if (m_HasDependencies) vkCmdBindDescriptorSets(vulkanCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_DescriptorSet, 0, nullptr);
   vkCmdBindPipeline(vulkanCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline);

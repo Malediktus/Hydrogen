@@ -1,6 +1,6 @@
 #include <Hydrogen/Core/Base.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanBuffer.hpp>
-#include <Hydrogen/Platform/Vulkan/VulkanCommandBuffer.hpp>
+#include <Hydrogen/Platform/Vulkan/VulkanRendererAPI.hpp>
 #include <Hydrogen/Platform/Vulkan/VulkanRenderDevice.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
 #include <tracy/Tracy.hpp>
@@ -100,11 +100,11 @@ VulkanVertexBuffer::VulkanVertexBuffer(const ReferencePointer<class RenderWindow
 
 VulkanVertexBuffer::~VulkanVertexBuffer() {}
 
-void VulkanVertexBuffer::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const {
+void VulkanVertexBuffer::Bind() const {
   ZoneScoped;
   VkBuffer vertexBuffers[] = {m_Buffer};
   VkDeviceSize offsets[] = {0};
-  vkCmdBindVertexBuffers(std::dynamic_pointer_cast<VulkanCommandBuffer>(commandBuffer)->GetCommandBuffer(), 0, 1, vertexBuffers, offsets);
+  vkCmdBindVertexBuffers(std::dynamic_pointer_cast<VulkanRendererAPI>(RendererAPI::Get())->GetCommandBuffer(), 0, 1, vertexBuffers, offsets);
 }
 
 VulkanIndexBuffer::VulkanIndexBuffer(const ReferencePointer<class RenderWindow>& window, uint32_t* indices, size_t size)
@@ -154,9 +154,9 @@ VulkanIndexBuffer::VulkanIndexBuffer(const ReferencePointer<class RenderWindow>&
 
 VulkanIndexBuffer::~VulkanIndexBuffer() { ZoneScoped; }
 
-void VulkanIndexBuffer::Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const {
+void VulkanIndexBuffer::Bind() const {
   ZoneScoped;
-  vkCmdBindIndexBuffer(std::dynamic_pointer_cast<VulkanCommandBuffer>(commandBuffer)->GetCommandBuffer(), m_Buffer, 0, VK_INDEX_TYPE_UINT32);
+  vkCmdBindIndexBuffer(std::dynamic_pointer_cast<VulkanRendererAPI>(RendererAPI::Get())->GetCommandBuffer(), m_Buffer, 0, VK_INDEX_TYPE_UINT32);
 }
 
 VulkanUniformBuffer::VulkanUniformBuffer(const ReferencePointer<class RenderWindow>& window, size_t size)

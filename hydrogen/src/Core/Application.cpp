@@ -59,10 +59,10 @@ void Application::Run() {
   auto test = AssetManager::Get<MeshAsset>("assets/Meshes/Backpack/Survival_BackPack_2.fbx");
   test->Spawn(AppWindow, CurrentScene, "Backpack");
 
+  auto rendererAPI = RendererAPI::Create(AppWindow);
+
   HY_ASSERT(!Renderer::GetRenderDevice<RenderDevice>()->ScreenSupported(AppWindow), "Screen is not supported!");  // TODO: Choose other graphics API or device
   auto renderer = NewReferencePointer<Renderer>(AppWindow, CurrentScene);
-
-  auto rendererAPI = RendererAPI::Create(AppWindow);
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -97,7 +97,7 @@ void Application::Run() {
     OnImGuiDraw();
     ImGui::Render();
 
-    renderer->Render();  // Also renders imgui draw data
+    renderer->Render();
 
     AppWindow->UpdateImGuiPlatformWindows();
 
@@ -112,10 +112,6 @@ void Application::Run() {
   rendererAPI->DestroyImGui();
   AppWindow->DestroyImGui();
   ImGui::DestroyContext();
-
-  // renderer.reset();
-  // Renderer::GetRenderDevice<RenderDevice>().reset();
-  // Renderer::SetContext(nullptr);
 
   TaskManager::Shutdown();
 }

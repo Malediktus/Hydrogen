@@ -16,7 +16,7 @@ class VulkanShader : public Shader {
 
   virtual void SetBuffer(const ReferencePointer<class UniformBuffer>& buffer, uint32_t location) override;
   virtual void SetTexture(const ReferencePointer<class Texture2D>& texture, uint32_t location) override;
-  virtual void Bind(const ReferencePointer<CommandBuffer>& commandBuffer) const override;
+  virtual void Bind() const override;
 
   virtual const String& GetName() const override { return m_Name; }
   VkPipeline GetPipeline() { return m_Pipeline; }
