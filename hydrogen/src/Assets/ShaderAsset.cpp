@@ -91,6 +91,10 @@ void ShaderAsset::Load(const std::filesystem::path& filepath) {
   HY_LOG_INFO("Finished loading shader asset '{}'!", filepath.string());
 }
 
-ReferencePointer<Shader> ShaderAsset::CreateShader(const ReferencePointer<RenderWindow>& window, const BufferLayout& vertexLayout, const ShaderDependencyGraph dependencyGraph) {
-  return Shader::Create(window, vertexLayout, dependencyGraph, m_Name, m_VertexShader, m_FragmentShader, m_GeometryShader);
+const ReferencePointer<Shader>& ShaderAsset::GetShader(const ReferencePointer<RenderWindow>& window, const BufferLayout& vertexLayout, const ShaderDependencyGraph dependencyGraph) {
+  if (m_Shader) {
+    return m_Shader;
+  }
+  m_Shader = Shader::Create(window, vertexLayout, dependencyGraph, m_Name, m_VertexShader, m_FragmentShader, m_GeometryShader);
+  return m_Shader;
 }

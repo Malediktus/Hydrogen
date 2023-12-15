@@ -22,7 +22,7 @@ static uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags proper
 }
 }  // namespace Hydrogen::Vulkan::Utils
 
-VulkanBuffer::VulkanBuffer(const ReferencePointer<class RenderWindow>& window, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties) : m_Window(window) {
+VulkanBuffer::VulkanBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties) {
   ZoneScoped;
 
   auto device = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice();
@@ -53,13 +53,13 @@ VulkanBuffer::~VulkanBuffer() {
   vkFreeMemory(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_BufferMemory, nullptr);
 }
 
-VulkanVertexBuffer::VulkanVertexBuffer(const ReferencePointer<class RenderWindow>& window, float* vertices, size_t size)
-    : VulkanBuffer(window, size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT), m_Size(size) {
+VulkanVertexBuffer::VulkanVertexBuffer(float* vertices, size_t size)
+    : VulkanBuffer(size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT), m_Size(size) {
   ZoneScoped;
 
   auto vulkanDevice = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice();
 
-  VulkanBuffer stagingBuffer(window, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+  VulkanBuffer stagingBuffer(size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
   void* data;
   vkMapMemory(vulkanDevice, stagingBuffer.GetBufferMemory(), 0, size, 0, &data);
@@ -107,13 +107,13 @@ void VulkanVertexBuffer::Bind() const {
   vkCmdBindVertexBuffers(std::dynamic_pointer_cast<VulkanRendererAPI>(RendererAPI::Get())->GetCommandBuffer(), 0, 1, vertexBuffers, offsets);
 }
 
-VulkanIndexBuffer::VulkanIndexBuffer(const ReferencePointer<class RenderWindow>& window, uint32_t* indices, size_t size)
-    : VulkanBuffer(window, size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT), m_Count(size / sizeof(uint32_t)) {
+VulkanIndexBuffer::VulkanIndexBuffer(uint32_t* indices, size_t size)
+    : VulkanBuffer(size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT), m_Count(size / sizeof(uint32_t)) {
   ZoneScoped;
 
   auto vulkanDevice = Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice();
 
-  VulkanBuffer stagingBuffer(window, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+  VulkanBuffer stagingBuffer(size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
   void* data;
   vkMapMemory(vulkanDevice, stagingBuffer.GetBufferMemory(), 0, size, 0, &data);
@@ -159,8 +159,8 @@ void VulkanIndexBuffer::Bind() const {
   vkCmdBindIndexBuffer(std::dynamic_pointer_cast<VulkanRendererAPI>(RendererAPI::Get())->GetCommandBuffer(), m_Buffer, 0, VK_INDEX_TYPE_UINT32);
 }
 
-VulkanUniformBuffer::VulkanUniformBuffer(const ReferencePointer<class RenderWindow>& window, size_t size)
-    : VulkanBuffer(window, size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT), m_Size(size) {
+VulkanUniformBuffer::VulkanUniformBuffer(size_t size)
+    : VulkanBuffer(size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT), m_Size(size) {
   vkMapMemory(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), m_BufferMemory, 0, size, 0, &m_MappedMemory);
 }
 

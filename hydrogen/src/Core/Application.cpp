@@ -7,9 +7,21 @@
 #include <Hydrogen/Core/Window.hpp>
 #include <Hydrogen/Renderer/Context.hpp>
 #include <Hydrogen/Renderer/Renderer.hpp>
+#include <Hydrogen/Renderer/VertexArray.hpp>
 #include <Hydrogen/Scene/Scene.hpp>
 
 using namespace Hydrogen;
+
+// TODO: Remove
+void ProcessMeshNode(const ReferencePointer<MeshNode>& node, const ReferencePointer<Renderer>& renderer) {
+  for (auto& mesh : node->Meshes) {
+    renderer->Submit(mesh.VertexArray, nullptr, node->Transform);
+  }
+
+  for (const auto& child : node->Chilren) {
+    ProcessMeshNode(child, renderer);
+  }
+}
 
 Application::Application() {
   Console = NewReferencePointer<Logger>("APP", Logger::LogLevel::Info);
@@ -19,8 +31,6 @@ Application::Application() {
 void Application::Run() {
   OnSetup();
   AppWindow = Window::Create(ApplicationInfo.Name, static_cast<uint32_t>(ApplicationInfo.WindowSize.x), static_cast<uint32_t>(ApplicationInfo.WindowSize.y));
-
-  AssetManager::Init();
 
   ProjectInformation clientProject;
   clientProject.ProjectName = ApplicationInfo.Name;
@@ -52,17 +62,16 @@ void Application::Run() {
     return result;
   }));
 
+  AssetManager::Init();
+
   AppWindow->InitRenderSurface();
 
   CurrentScene = NewScopePointer<Scene>("Main Scene");
 
-  auto test = AssetManager::Get<MeshAsset>("assets/Meshes/Backpack/Survival_BackPack_2.fbx");
-  test->Spawn(AppWindow, CurrentScene, "Backpack");
-
-  auto rendererAPI = RendererAPI::Create(AppWindow);
+  auto rendererAPI = RendererAPI::Create(AppWindow); // TODO: Currently a singleton, means only one window is supported
 
   HY_ASSERT(!Renderer::GetRenderDevice<RenderDevice>()->ScreenSupported(AppWindow), "Screen is not supported!");  // TODO: Choose other graphics API or device
-  auto renderer = NewReferencePointer<Renderer>(AppWindow, CurrentScene);
+  auto renderer = NewReferencePointer<Renderer>(AppWindow);
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -71,7 +80,6 @@ void Application::Run() {
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable Docking
-  // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable Multi-Viewport (Unimplemented  in vulkan)
 
   ImGui::StyleColorsDark();
 
@@ -97,7 +105,10 @@ void Application::Run() {
     OnImGuiDraw();
     ImGui::Render();
 
-    renderer->Render();
+    renderer->BeginFrame();
+    const auto& meshTree = AssetManager::Get<MeshAsset>("assets/Meshes/Backpack/Survival_BackPack_2.fbx")->GetTree();
+    ProcessMeshNode(meshTree, renderer);
+    renderer->EndFrame();
 
     AppWindow->UpdateImGuiPlatformWindows();
 

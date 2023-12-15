@@ -123,7 +123,7 @@ class VertexBuffer {
   virtual const BufferLayout& GetLayout() const = 0;
   virtual void SetLayout(const BufferLayout& layout) = 0;
 
-  static ReferencePointer<VertexBuffer> Create(const ReferencePointer<class RenderWindow>& window, float* vertices, size_t size);
+  static ReferencePointer<VertexBuffer> Create(float* vertices, size_t size);
 };
 
 class IndexBuffer {
@@ -133,7 +133,7 @@ class IndexBuffer {
   virtual void Bind() const = 0;
   virtual size_t GetCount() const = 0;
 
-  static ReferencePointer<IndexBuffer> Create(const ReferencePointer<class RenderWindow>& window, uint32_t* indices, size_t size);
+  static ReferencePointer<IndexBuffer> Create(uint32_t* indices, size_t size);
 };
 
 class UniformBuffer {
@@ -142,6 +142,6 @@ class UniformBuffer {
 
   virtual void SetData(void* data) = 0;
 
-  static ReferencePointer<UniformBuffer> Create(const ReferencePointer<class RenderWindow>& window, size_t size);
+  static ReferencePointer<UniformBuffer> Create(size_t size);
 };
 }  // namespace Hydrogen

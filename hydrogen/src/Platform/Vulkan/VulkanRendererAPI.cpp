@@ -15,6 +15,7 @@
 
 using namespace Hydrogen::Vulkan;
 
+// TODO: Multiple frames in flights
 VulkanRendererAPI::VulkanRendererAPI(const ReferencePointer<class RenderWindow>& window) : m_Window(window), m_ImageIndex(0) {
   VkCommandBufferAllocateInfo allocInfo{};
   allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;

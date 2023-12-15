@@ -22,12 +22,12 @@ uint32_t FindMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, Vk
 }
 }  // namespace Hydrogen::Vulkan::Utils
 
-VulkanTexture2D::VulkanTexture2D(const ReferencePointer<RenderWindow>& window, const uint32_t width, const uint32_t height, const void* data)
-    : m_Width(width), m_Height(height), m_Window(window) {
+VulkanTexture2D::VulkanTexture2D(const uint32_t width, const uint32_t height, const void* data)
+    : m_Width(width), m_Height(height) {
   ZoneScoped;
   VkDeviceSize imageSize = width * height * 4;
 
-  VulkanBuffer stagingBuffer(window, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+  VulkanBuffer stagingBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
   void* mappedMemory;
   vkMapMemory(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), stagingBuffer.GetBufferMemory(), 0, imageSize, 0, &mappedMemory);

@@ -89,6 +89,7 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderWindow>& window, const B
     DynamicArray<VkDescriptorSetLayoutBinding> m_DescriptorSetLayoutBindings(dependencyGraph.Dependencies.size());
     uint32_t numUniformBuffers = 0;
     uint32_t numTextures = 0;
+    uint32_t numDynamicUniformBuffers = 0;
 
     for (size_t i = 0; i < dependencyGraph.Dependencies.size(); i++) {
       VkDescriptorSetLayoutBinding layoutBinding{};
@@ -105,6 +106,10 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderWindow>& window, const B
         case ShaderDependencyType::Texture:
           numTextures++;
           layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+          break;
+        case ShaderDependencyType::DynamicUniformBuffer:
+          numDynamicUniformBuffers++;
+          layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
           break;
         default:
           HY_INVOKE_ERROR("Invalid ShaderDependencyType value!");
@@ -135,6 +140,14 @@ VulkanShader::VulkanShader(const ReferencePointer<RenderWindow>& window, const B
       VkDescriptorPoolSize poolSize{};
       poolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
       poolSize.descriptorCount = numTextures;
+
+      descriptorPoolSizes.push_back(poolSize);
+    }
+
+    if (numDynamicUniformBuffers > 0) {
+      VkDescriptorPoolSize poolSize{};
+      poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+      poolSize.descriptorCount = numDynamicUniformBuffers;
 
       descriptorPoolSizes.push_back(poolSize);
     }
@@ -398,6 +411,26 @@ void VulkanShader::SetBuffer(const ReferencePointer<class UniformBuffer>& buffer
   descriptorWrite.dstBinding = location;
   descriptorWrite.dstArrayElement = 0;
   descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+  descriptorWrite.descriptorCount = 1;
+  descriptorWrite.pBufferInfo = &bufferInfo;
+
+  vkUpdateDescriptorSets(Renderer::GetRenderDevice<VulkanRenderDevice>()->GetDevice(), 1, &descriptorWrite, 0, nullptr);
+}
+
+void VulkanShader::SetDynamicBuffer(const ReferencePointer<class UniformBuffer>& buffer, uint32_t location) {
+  ReferencePointer<VulkanUniformBuffer> uniformBuffer = std::dynamic_pointer_cast<VulkanUniformBuffer>(buffer);
+
+  VkDescriptorBufferInfo bufferInfo{};
+  bufferInfo.buffer = uniformBuffer->GetBuffer();
+  bufferInfo.offset = 0;
+  bufferInfo.range = static_cast<uint32_t>(uniformBuffer->GetSize());
+
+  VkWriteDescriptorSet descriptorWrite{};
+  descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+  descriptorWrite.dstSet = m_DescriptorSet;
+  descriptorWrite.dstBinding = location;
+  descriptorWrite.dstArrayElement = 0;
+  descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
   descriptorWrite.descriptorCount = 1;
   descriptorWrite.pBufferInfo = &bufferInfo;
 

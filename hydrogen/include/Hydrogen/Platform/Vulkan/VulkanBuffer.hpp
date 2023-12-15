@@ -7,21 +7,20 @@
 namespace Hydrogen::Vulkan {
 class VulkanBuffer {
  public:
-  VulkanBuffer(const ReferencePointer<class RenderWindow>& window, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties);
+  VulkanBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties);
   virtual ~VulkanBuffer();
 
   VkBuffer GetBuffer() { return m_Buffer; }
   VkDeviceMemory GetBufferMemory() { return m_BufferMemory; }
 
  protected:
-  ReferencePointer<class RenderWindow> m_Window;
   VkBuffer m_Buffer;
   VkDeviceMemory m_BufferMemory;
 };
 
 class VulkanVertexBuffer : public VertexBuffer, public VulkanBuffer {
  public:
-  VulkanVertexBuffer(const ReferencePointer<class RenderWindow>& window, float* vertices, size_t size);
+  VulkanVertexBuffer(float* vertices, size_t size);
   virtual ~VulkanVertexBuffer();
 
   virtual void Bind() const override;
@@ -39,7 +38,7 @@ class VulkanVertexBuffer : public VertexBuffer, public VulkanBuffer {
 
 class VulkanIndexBuffer : public IndexBuffer, public VulkanBuffer {
  public:
-  VulkanIndexBuffer(const ReferencePointer<class RenderWindow>& window, uint32_t* indices, size_t size);
+  VulkanIndexBuffer(uint32_t* indices, size_t size);
   virtual ~VulkanIndexBuffer();
 
   virtual void Bind() const override;
@@ -52,7 +51,7 @@ class VulkanIndexBuffer : public IndexBuffer, public VulkanBuffer {
 
 class VulkanUniformBuffer : public UniformBuffer, public VulkanBuffer {
  public:
-  VulkanUniformBuffer(const ReferencePointer<class RenderWindow>& window, size_t size);
+  VulkanUniformBuffer(size_t size);
   virtual ~VulkanUniformBuffer();
 
   virtual void SetData(void* data) override;

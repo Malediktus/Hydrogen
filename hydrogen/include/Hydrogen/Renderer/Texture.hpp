@@ -10,6 +10,6 @@ class Texture2D {
   virtual uint32_t GetWidth() const = 0;
   virtual uint32_t GetHeight() const = 0;
 
-  static ReferencePointer<Texture2D> Create(const ReferencePointer<class RenderWindow>& window, const uint32_t width, const uint32_t height, const void* data);
+  static ReferencePointer<Texture2D> Create(const uint32_t width, const uint32_t height, const void* data);
 };
 }  // namespace Hydrogen

@@ -6,7 +6,7 @@
 #include "../Renderer/ShaderCompiler.hpp"
 
 namespace Hydrogen {
-enum class ShaderDependencyType { UniformBuffer = 0, Texture = 1 };
+enum class ShaderDependencyType { UniformBuffer = 0, Texture = 1, DynamicUniformBuffer = 2 };
 
 struct ShaderDependency {
   ShaderDependency() : Type(ShaderDependencyType::UniformBuffer), Stage(ShaderStage::VertexShader), Location(0) {}
@@ -27,6 +27,7 @@ class Shader {
   virtual ~Shader() = default;
 
   virtual void SetBuffer(const ReferencePointer<class UniformBuffer>& buffer, uint32_t location) = 0;
+  virtual void SetDynamicBuffer(const ReferencePointer<class UniformBuffer>& buffer, uint32_t location) = 0;
   virtual void SetTexture(const ReferencePointer<class Texture2D>& texture, uint32_t location) = 0;
   virtual void Bind() const = 0;
 

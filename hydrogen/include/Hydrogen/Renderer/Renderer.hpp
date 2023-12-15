@@ -9,11 +9,12 @@
 namespace Hydrogen {
 class Renderer {
  public:
-  Renderer(const ReferencePointer<class RenderWindow>& window, const ScopePointer<class Scene>& scene);
+  Renderer(const ReferencePointer<class RenderWindow>& window);
   ~Renderer();
 
-  void Render();
-  void RenderMesh(const ReferencePointer<class VertexArray>& vertexArray);
+  void BeginFrame();
+  void Submit(const ReferencePointer<class VertexArray>& vertexArray, const ReferencePointer<class Shader>& shader, const glm::mat4& transform);
+  void EndFrame();
 
   inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
@@ -36,15 +37,14 @@ class Renderer {
  private:
   static ReferencePointer<Context> s_Context;
   static ReferencePointer<RenderDevice> s_RenderDevice;
-  static uint32_t s_MaxFramesInFlight;
 
   ReferencePointer<class RenderWindow> m_RenderWindow;
-  const ScopePointer<class Scene>& m_Scene;
-  ReferencePointer<class Shader> m_Shader;
-  uint32_t m_CurrentFrame;
 
+  // TODO: Remove
+  ReferencePointer<class Shader> m_Shader;
   ReferencePointer<class UniformBuffer> m_UniformBuffer;
   ReferencePointer<class UniformBuffer> m_LightBuffer;
+  ReferencePointer<class UniformBuffer> m_ObjectInformation;
   ReferencePointer<class Texture2D> m_WhiteTexture;
 };
 }  // namespace Hydrogen

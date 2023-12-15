@@ -15,6 +15,7 @@ class VulkanShader : public Shader {
   virtual ~VulkanShader();
 
   virtual void SetBuffer(const ReferencePointer<class UniformBuffer>& buffer, uint32_t location) override;
+  virtual void SetDynamicBuffer(const ReferencePointer<class UniformBuffer>& buffer, uint32_t location) override;
   virtual void SetTexture(const ReferencePointer<class Texture2D>& texture, uint32_t location) override;
   virtual void Bind() const override;
 

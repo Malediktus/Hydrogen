@@ -18,9 +18,12 @@
 using namespace Hydrogen;
 
 struct UniformBufferObject {
-  alignas(16) glm::mat4 Model;
   alignas(16) glm::mat4 View;
   alignas(16) glm::mat4 Proj;
+};
+
+struct ObjectInformation {
+  alignas(16) glm::mat4 Model;
 };
 
 struct LightData {
@@ -32,20 +35,24 @@ struct LightData {
 
 ReferencePointer<Context> Renderer::s_Context;
 ReferencePointer<RenderDevice> Renderer::s_RenderDevice;
-uint32_t Renderer::s_MaxFramesInFlight = MAX_FRAMES_IN_FLIGHT;
 
-Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ScopePointer<class Scene>& scene) : m_RenderWindow(window), m_Scene(scene) {
+Renderer::Renderer(const ReferencePointer<RenderWindow>& window) : m_RenderWindow(window) {
   ZoneScoped;
 
-  m_WhiteTexture = AssetManager::Get<SpriteAsset>("assets/Textures/WhiteTexture.png")->CreateTexture2D(window);
-  m_UniformBuffer = UniformBuffer::Create(window, sizeof(UniformBufferObject));
-
-  m_LightBuffer = UniformBuffer::Create(window, sizeof(LightData));
+  m_WhiteTexture = AssetManager::Get<SpriteAsset>("assets/Textures/WhiteTexture.png")->GetTexture2D();
+  m_UniformBuffer = UniformBuffer::Create(sizeof(UniformBufferObject));
+  m_ObjectInformation = UniformBuffer::Create(sizeof(ObjectInformation));
+  m_LightBuffer = UniformBuffer::Create(sizeof(LightData));
 
   ShaderDependency uniformBuffer{};
   uniformBuffer.Type = ShaderDependencyType::UniformBuffer;
   uniformBuffer.Stage = ShaderStage::VertexShader;
   uniformBuffer.Location = 0;
+
+  ShaderDependency objectInformation{};
+  objectInformation.Type = ShaderDependencyType::DynamicUniformBuffer;
+  objectInformation.Stage = ShaderStage::VertexShader;
+  objectInformation.Location = 4;
 
   ShaderDependency lightBuffer{};
   lightBuffer.Type = ShaderDependencyType::UniformBuffer;
@@ -64,8 +71,8 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ScopePoin
 
   m_Shader =
       AssetManager::Get<ShaderAsset>("assets/Raw.glsl")
-          ->CreateShader(m_RenderWindow, {{ShaderDataType::Float3, "Position", false}, {ShaderDataType::Float3, "Normal", false}, {ShaderDataType::Float2, "TexCoords", false}},
-                         {uniformBuffer, lightBuffer, diffuseTexture, specularTexture});
+          ->GetShader(m_RenderWindow, {{ShaderDataType::Float3, "Position", false}, {ShaderDataType::Float3, "Normal", false}, {ShaderDataType::Float2, "TexCoords", false}},
+                         {uniformBuffer, lightBuffer, diffuseTexture, specularTexture, objectInformation});
 
   LightData lightData{};
   lightData.LightPos = glm::vec3(1.2f, 1.0f, 2.0f);
@@ -78,23 +85,20 @@ Renderer::Renderer(const ReferencePointer<RenderWindow>& window, const ScopePoin
   m_Shader->SetBuffer(m_UniformBuffer, 0);
   m_Shader->SetTexture(m_WhiteTexture, 2);
   m_Shader->SetTexture(m_WhiteTexture, 3);
-
-  m_CurrentFrame = 0;
+  m_Shader->SetDynamicBuffer(m_ObjectInformation, 4);
 
   HY_LOG_INFO("Initialized renderer");
 }
 
 Renderer::~Renderer() { s_RenderDevice->WaitForIdle(); }
 
-void Renderer::Render() {
+void Renderer::BeginFrame() {
   static auto startTime = std::chrono::high_resolution_clock::now();
 
   auto currentTime = std::chrono::high_resolution_clock::now();
   float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
   UniformBufferObject ubo{};
-  ubo.Model = glm::rotate(glm::mat4(1.0f), time * glm::radians(20.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-  ubo.Model = glm::scale(ubo.Model, glm::vec3(0.2f, 0.2f, 0.2f));
   ubo.View = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
   const auto& viewportSize = m_RenderWindow->GetViewportSize();
   ubo.Proj = glm::perspective(glm::radians(45.0f), viewportSize.x / viewportSize.y, 0.001f, 1000.0f);
@@ -102,63 +106,20 @@ void Renderer::Render() {
 
   m_UniformBuffer->SetData(&ubo);
 
-  auto entities = m_Scene->GetEntities();
-
   RendererAPI::Get()->BeginFrame();
-  m_Shader->Bind();
-
   RendererAPI::Get()->SetViewport();
   RendererAPI::Get()->SetScissor();
-
-  for (auto& entity : entities) {
-    if (entity.HasComponent<MeshRendererComponent>()) {
-      for (auto& mesh : entity.GetComponent<MeshRendererComponent>().Meshes) {
-        auto& material = entity.GetComponent<MeshRendererComponent>()._Material;
-        if (material.DiffuseMaps.size() > 0) {
-          // m_Shader->SetTexture(material.DiffuseMaps[0], 2);
-        } else {
-          // m_Shader->SetTexture(m_WhiteTexture, 2);
-        }
-
-        if (material.SpecularMaps.size() > 0) {
-          // m_Shader->SetTexture(material.SpecularMaps[0], 3);
-        } else {
-          // m_Shader->SetTexture(m_WhiteTexture, 3);
-        }
-
-        RenderMesh(mesh.VertexArray);
-      }
-    }
-
-    auto children = entity.GetChildren();
-    for (auto& child : children) {
-      if (child.HasComponent<MeshRendererComponent>()) {
-        for (auto& mesh : child.GetComponent<MeshRendererComponent>().Meshes) {
-          auto& material = child.GetComponent<MeshRendererComponent>()._Material;
-          if (material.DiffuseMaps.size() > 0) {
-            // m_Shader->SetTexture(material.DiffuseMaps[0], 2);
-          } else {
-            // m_Shader->SetTexture(m_WhiteTexture, 2);
-          }
-
-          if (material.SpecularMaps.size() > 0) {
-            // m_Shader->SetTexture(material.SpecularMaps[0], 3);
-          } else {
-            // m_Shader->SetTexture(m_WhiteTexture, 3);
-          }
-
-          RenderMesh(mesh.VertexArray);
-        }
-      }
-    }
-  }
-
-  RendererAPI::Get()->EndFrame();
-
-  m_CurrentFrame = (m_CurrentFrame + 1) % s_MaxFramesInFlight;
 }
 
-void Renderer::RenderMesh(const ReferencePointer<class VertexArray>& vertexArray) {
+void Renderer::Submit(const ReferencePointer<VertexArray>& vertexArray, const ReferencePointer<Shader>& shader, const glm::mat4& transform) {
+  ObjectInformation info{};
+  info.Model = transform;
+
+  m_ObjectInformation->SetData(&info);
+
+  m_Shader->Bind();
   vertexArray->Bind();
   RendererAPI::Get()->DrawIndexed(vertexArray);
 }
+
+void Renderer::EndFrame() { RendererAPI::Get()->EndFrame(); }

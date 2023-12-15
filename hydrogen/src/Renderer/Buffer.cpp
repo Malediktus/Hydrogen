@@ -7,11 +7,11 @@
 
 using namespace Hydrogen;
 
-ReferencePointer<VertexBuffer> VertexBuffer::Create(const ReferencePointer<class RenderWindow>& window, float* vertices, size_t size) {
+ReferencePointer<VertexBuffer> VertexBuffer::Create(float* vertices, size_t size) {
   ZoneScoped;
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
-      return NewReferencePointer<Vulkan::VulkanVertexBuffer>(window, vertices, size);
+      return NewReferencePointer<Vulkan::VulkanVertexBuffer>(vertices, size);
     default:
       HY_ASSERT_CHECK(false,
                       "Invalid renderer API value returned from "
@@ -20,11 +20,11 @@ ReferencePointer<VertexBuffer> VertexBuffer::Create(const ReferencePointer<class
   return nullptr;
 }
 
-ReferencePointer<IndexBuffer> IndexBuffer::Create(const ReferencePointer<class RenderWindow>& window, uint32_t* indices, size_t size) {
+ReferencePointer<IndexBuffer> IndexBuffer::Create(uint32_t* indices, size_t size) {
   ZoneScoped;
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
-      return NewReferencePointer<Vulkan::VulkanIndexBuffer>(window, indices, size);
+      return NewReferencePointer<Vulkan::VulkanIndexBuffer>(indices, size);
     default:
       HY_ASSERT_CHECK(false,
                       "Invalid renderer API value returned from "
@@ -33,11 +33,11 @@ ReferencePointer<IndexBuffer> IndexBuffer::Create(const ReferencePointer<class R
   return nullptr;
 }
 
-ReferencePointer<UniformBuffer> UniformBuffer::Create(const ReferencePointer<class RenderWindow>& window, size_t size) {
+ReferencePointer<UniformBuffer> UniformBuffer::Create(size_t size) {
   ZoneScoped;
   switch (Renderer::GetAPI()) {
     case RendererAPI::API::Vulkan:
-      return NewReferencePointer<Vulkan::VulkanUniformBuffer>(window, size);
+      return NewReferencePointer<Vulkan::VulkanUniformBuffer>(size);
     default:
       HY_ASSERT_CHECK(false,
                       "Invalid renderer API value returned from "

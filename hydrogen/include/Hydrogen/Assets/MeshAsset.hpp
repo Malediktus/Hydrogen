@@ -12,6 +12,13 @@
 #include "Asset.hpp"
 
 namespace Hydrogen {
+struct MeshNode {
+  DynamicArray<ReferencePointer<MeshNode>> Chilren;
+  DynamicArray<MeshRendererComponent::Mesh> Meshes;
+  MeshRendererComponent::Material Material;
+  glm::mat4 Transform;
+};
+
 class MeshAsset : public Asset {
  public:
   MeshAsset() {
@@ -20,7 +27,7 @@ class MeshAsset : public Asset {
   }
 
   void Load(const std::filesystem::path& filepath) override;
-  void Spawn(const ReferencePointer<class RenderWindow>& window, const ScopePointer<class Scene>& scene, const String& name);
+  const ReferencePointer<MeshNode>& GetTree() { return m_Tree; }
 
   static const DynamicArray<String> GetFileExtensions() { return DynamicArray<String>{".obj", ".fbx"}; }
 
@@ -30,10 +37,11 @@ class MeshAsset : public Asset {
   }
 
  private:
-  void HandleNode(const ReferencePointer<class RenderWindow>& window, aiNode* node, const String& name, const ScopePointer<Scene>& scene, class Entity parent);
-  ReferencePointer<class VertexArray> CreateVertexArrayForMesh(const ReferencePointer<class RenderWindow>& window, aiMesh* mesh);
-  MeshRendererComponent::Material LoadMaterial(const ReferencePointer<class RenderWindow>& window, aiMaterial* material);
+  ReferencePointer<MeshNode> HandleNode(aiNode* node);
+  ReferencePointer<class VertexArray> CreateVertexArrayForMesh(aiMesh* mesh);
+  MeshRendererComponent::Material LoadMaterial(aiMaterial* material);
 
+  ReferencePointer<MeshNode> m_Tree;
   std::filesystem::path m_Filepath;
   const aiScene* m_Scene;
 };
